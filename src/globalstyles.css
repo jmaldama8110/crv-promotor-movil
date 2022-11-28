@@ -1,0 +1,18 @@
+.height-full{
+    height: 100%;
+}
+.margin-auto {
+    margin: auto;
+}
+.margin-bottom-sm {
+    margin-bottom: 1rem ;
+}
+.width-sm {
+    width: 20%
+}
+.width-md {
+    width: 50%;
+}
+.width-lg {
+    width: 100%;
+}

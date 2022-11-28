@@ -3,12 +3,18 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-
+import { AppContextProvider } from './store/store';
+import { startReplication } from './db';
 const container = document.getElementById('root');
 const root = createRoot(container!);
+
+startReplication();
+
 root.render(
   <React.StrictMode>
-    <App />
+    <AppContextProvider>
+      <App />
+    </AppContextProvider>
   </React.StrictMode>
 );
 
