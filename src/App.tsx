@@ -7,13 +7,16 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-  setupIonicReact
+  setupIonicReact,
+  useIonLoading,
+
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle } from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
-import Tab2 from './pages/Tab2';
-import Tab3 from './pages/Tab3';
+import { peopleOutline, personCircleOutline, lockClosedOutline, personAddOutline, notificationsCircleOutline } from 'ionicons/icons';
+import ClientsHome from './pages/Home/ClientsHome';
+import GroupsHome from './pages/Home/GroupsHome';
+import SupervisorHome from './pages/Home/SupervisorHome';
+import { Notifications } from './pages/Home/Notifications';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -33,44 +36,98 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './globalstyles.css';
+import { MyProfile } from './pages/Home/MyProfile';
+import { ClientsAdd } from './pages/Clients/ClientsAdd';
+import { useContext, useEffect } from 'react';
+import { AppContext } from './store/store';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
+const App: React.FC = () => {
+
+  let render = true;
+  const [ present, dismiss] = useIonLoading();
+  const { session, dispatchSession } = useContext(AppContext);
+
+  useEffect(()=>{ 
+    if( session.loading){
+      present({message: session.loading_msg});
+    } else{
+      dismiss();
+    }
+  },[session]);
+
+  useEffect( ()=>{
+    const loadRender = () =>{
+      if( render ){
+          ///// what needs to be rendered once goes here!  
+          dispatchSession({ type:'SET_LOADING', loading: true,loading_msg: 'Sincronizando...'});
+          // cuando se ejecute la sincronizacion en segundo plano
+
+          setTimeout( ()=>{
+            dispatchSession({type:'SET_LOADING',loading: false, loading_msg:''})
+          },2000)
+          render = false
+      }
+    }
+    loadRender();
+  },[])
+  return (<IonApp>
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
+          <Route exact path="/clients">
+            <ClientsHome />
           </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
+          <Route exact path="/groups">
+            <GroupsHome />
           </Route>
-          <Route path="/tab3">
-            <Tab3 />
+          <Route path="/supervisor">
+            <SupervisorHome />
           </Route>
+          <Route exact path='/notifications'>
+            <Notifications />
+          </Route>
+          <Route exact path='/myprofile'>
+            <MyProfile />
+          </Route>
+
+          <Route exact path="/clients/add">
+            <ClientsAdd />
+          </Route>
+
           <Route exact path="/">
-            <Redirect to="/tab1" />
+            <Redirect to="/clients" />
           </Route>
         </IonRouterOutlet>
+
         <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon icon={triangle} />
-            <IonLabel>Tab 1</IonLabel>
+          <IonTabButton tab="tab1" href="/clients">
+            <IonIcon icon={personAddOutline} />
+            <IonLabel>Clientes</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon icon={ellipse} />
-            <IonLabel>Tab 2</IonLabel>
+          <IonTabButton tab="tab2" href="/groups">
+            <IonIcon icon={peopleOutline} />
+            <IonLabel>Grupos</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon icon={square} />
-            <IonLabel>Tab 3</IonLabel>
+          <IonTabButton tab="tab3" href="/supervisor">
+            <IonIcon icon={lockClosedOutline} />
+            <IonLabel>Supervisor</IonLabel>
           </IonTabButton>
+          <IonTabButton tab="tab4" href="/myprofile">
+            <IonIcon icon={personCircleOutline} />
+            <IonLabel>Mi Perfil</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="tab5" href="/notifications">
+            <IonIcon icon={notificationsCircleOutline} />
+            <IonLabel>Mensajes</IonLabel>
+          </IonTabButton>
+
         </IonTabBar>
       </IonTabs>
     </IonReactRouter>
   </IonApp>
 );
-
+}
 export default App;
