@@ -13,7 +13,10 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { peopleOutline, personCircleOutline, lockClosedOutline, personAddOutline, notificationsCircleOutline } from 'ionicons/icons';
+
 import ClientsHome from './pages/Home/ClientsHome';
+
+
 import GroupsHome from './pages/Home/GroupsHome';
 import SupervisorHome from './pages/Home/SupervisorHome';
 import { Notifications } from './pages/Home/Notifications';
@@ -38,9 +41,10 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import './globalstyles.css';
 import { MyProfile } from './pages/Home/MyProfile';
-import { ClientsAdd } from './pages/Clients/ClientsAdd';
 import { useContext, useEffect } from 'react';
 import { AppContext } from './store/store';
+import { ClientsEdit } from './pages/Clients/ClientsEdit';
+import { ClientsAdd } from './pages/Clients/ClientsAdd';
 
 setupIonicReact();
 
@@ -77,32 +81,24 @@ const App: React.FC = () => {
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/clients">
-            <ClientsHome />
-          </Route>
-          <Route exact path="/groups">
-            <GroupsHome />
-          </Route>
-          <Route path="/supervisor">
-            <SupervisorHome />
-          </Route>
-          <Route exact path='/notifications'>
-            <Notifications />
-          </Route>
-          <Route exact path='/myprofile'>
-            <MyProfile />
-          </Route>
+          <Route exact path="/clients" component={ClientsHome}></Route>
+          <Route path="/clients/edit/:id" component={ClientsEdit}></Route>
+          <Route path="/clients/add" component={ClientsAdd}></Route>
+          
+          <Route exact path="/groups"><GroupsHome /></Route>
+          <Route path="/supervisor"><SupervisorHome /></Route>
+          <Route exact path='/notifications'><Notifications /></Route>
+          <Route exact path='/myprofile'><MyProfile /></Route>
+          
+          <Route exact path="/"><Redirect to="/myprofile" /></Route>
 
-          <Route exact path="/clients/add">
-            <ClientsAdd />
-          </Route>
-
-          <Route exact path="/">
-            <Redirect to="/clients" />
-          </Route>
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom">
+          <IonTabButton tab="tab4" href="/myprofile">
+            <IonIcon icon={personCircleOutline} />
+            <IonLabel>Mi Perfil</IonLabel>
+          </IonTabButton>
           <IonTabButton tab="tab1" href="/clients">
             <IonIcon icon={personAddOutline} />
             <IonLabel>Clientes</IonLabel>
@@ -114,10 +110,6 @@ const App: React.FC = () => {
           <IonTabButton tab="tab3" href="/supervisor">
             <IonIcon icon={lockClosedOutline} />
             <IonLabel>Supervisor</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab4" href="/myprofile">
-            <IonIcon icon={personCircleOutline} />
-            <IonLabel>Mi Perfil</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab5" href="/notifications">
             <IonIcon icon={notificationsCircleOutline} />

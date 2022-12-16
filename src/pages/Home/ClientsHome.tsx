@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonItem, IonItemDivider, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import { useContext, useEffect, useState } from 'react';
 import { db } from '../../db';
 
@@ -7,13 +7,18 @@ import {
   SearchData,
   SelectDropSearch,
 } from "../../components/SelectDropSearch";
-import { AppContext } from '../../store/store';
+// import { AppContext } from '../../store/store';
+import { useHistory } from 'react-router';
+
 
 const ClientsHome: React.FC = () => {
 
-
-  const { session, dispatchSession } = useContext(AppContext);
+  // const { session, dispatchSession } = useContext(AppContext);
+  let history = useHistory();
   let render = true;
+
+
+  const [ clients, setClients] = useState<SearchData[]>([]);
 
   const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
@@ -23,16 +28,27 @@ const ClientsHome: React.FC = () => {
 
   useEffect( ()=>{
     if( render ){
-      /// run once
-      db.find({
-        selector: { couchdb_type: 'HF_CLIENT'}
-      }).then( data =>{
+
+      /// Llena datos de clientes HF
+      db.createIndex({
+        index: { fields: ['couchdb_type'] }
+      }).then( function() {
+        console.log('Index, created...');
+        db.find({
+          selector:{
+            couchdb_type: "HF_CLIENT"
+          }
+        }).then( data =>{
             const newData = data.docs.map( (i:any)=>( {id: i._id, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`} ))
             setClientSearchData( newData);
-            console.log('Clients Loaded: ',newData.length)
-      }).catch(err =>{
-        alert('No fue posible cargar clientes...')
-      })
+            console.log('Clients Loaded: ', newData.length)
+
+        })
+      }).catch(e =>{
+        console.log('Index creation error...',e);
+      });
+
+
 
       render = false;
     }
@@ -41,7 +57,7 @@ const ClientsHome: React.FC = () => {
   useEffect( ()=>{
     if( clientSelected.id ){
       /// if selected a Client
-      
+      history.push(`/clients/edit/${clientSelected.id}`);
     }
   },[clientSelected])
 
@@ -60,17 +76,22 @@ const ClientsHome: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <IonList className='ion-padding height-full'>
-        
         <IonButton color='medium' className='width-md margin-bottom-sm' expand='block' routerLink='/clients/add'>Agregar</IonButton>
+        <IonItemDivider><IonLabel>Clientes Recientes</IonLabel></IonItemDivider>
 
-        <SelectDropSearch
-              dataList={clientSearchData}
-              setSelectedItemFx={setClientSelected}
-              currentItem={clientSelected}
-              description={'Buscar...'}
-            />
-        
+        <IonList className='ion-padding'>
+          <IonLabel>No hay busquedas recientes...</IonLabel>
+        </IonList>
+
+        <IonList>
+          <IonItemDivider><IonLabel>Buscar</IonLabel></IonItemDivider>
+          <SelectDropSearch
+                dataList={clientSearchData}
+                setSelectedItemFx={setClientSelected}
+                currentItem={clientSelected}
+                description={'Buscar...'}
+              />
+   
         </IonList>
       </IonContent>
     </IonPage>
