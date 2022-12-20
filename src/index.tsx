@@ -13,7 +13,7 @@ startReplication();
 root.render(
   <React.StrictMode>
     <AppContextProvider>
-      <App />
+        <App />
     </AppContextProvider>
   </React.StrictMode>
 );

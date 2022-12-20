@@ -1,4 +1,4 @@
-import { Redirect, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import {
   IonApp,
   IonIcon,
@@ -45,8 +45,10 @@ import { useContext, useEffect } from 'react';
 import { AppContext } from './store/store';
 import { ClientsEdit } from './pages/Clients/ClientsEdit';
 import { ClientsAdd } from './pages/Clients/ClientsAdd';
+import { Login } from './pages/Session/Login';
 
 setupIonicReact();
+
 
 const App: React.FC = () => {
 
@@ -76,21 +78,59 @@ const App: React.FC = () => {
       }
     }
     loadRender();
-  },[])
-  return (<IonApp>
+  },[]);
+
+  
+  return (
+  <IonApp>
     <IonReactRouter>
+    
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/clients" component={ClientsHome}></Route>
-          <Route path="/clients/edit/:id" component={ClientsEdit}></Route>
-          <Route path="/clients/add" component={ClientsAdd}></Route>
-          
-          <Route exact path="/groups"><GroupsHome /></Route>
-          <Route path="/supervisor"><SupervisorHome /></Route>
-          <Route exact path='/notifications'><Notifications /></Route>
-          <Route exact path='/myprofile'><MyProfile /></Route>
-          
-          <Route exact path="/"><Redirect to="/myprofile" /></Route>
+          <Route  exact
+                  path="/clients"
+                  render={ (props) =>{
+                    return (!!session.user) ? <ClientsHome  /> : <Login {...props} />
+                  }}
+          ></Route>
+          <Route  exact
+                  path="/clients/edit/:id"                  
+                  render={ (props) =>{
+                    return (!!session.user) ? <ClientsEdit {...props}  /> : <Login {...props} />
+                  }}
+          ></Route>
+          <Route  exact
+                  path="/clients/add" 
+                  
+                  render={ (props) => {
+                    return (!!session.user) ? <ClientsAdd {...props} />: <Login {...props} />
+                  }}
+          ></Route>
+
+          <Route  exact
+                  path="/groups" 
+                  render={ (props) => {
+                    return (!!session.user) ? <GroupsHome />: <Login {...props} />
+                  }}
+          ></Route>
+          <Route  exact
+                  path="/supervisor" 
+                  render={ (props) => {
+                    return (!!session.user) ? <SupervisorHome />: <Login {...props} />
+                  }}
+          ></Route>
+          <Route  exact
+                  path="/notifications" 
+                  render={ (props) => {
+                    return (!!session.user) ? <Notifications />: <Login {...props} />
+                  }}
+          ></Route>
+          <Route  exact
+                  path="/myprofile" 
+                  render={ (props) => {
+                    return (!!session.user) ? <MyProfile {...props} />: <Login {...props} />
+                  }}
+          ></Route>
 
         </IonRouterOutlet>
 
@@ -115,10 +155,12 @@ const App: React.FC = () => {
             <IonIcon icon={notificationsCircleOutline} />
             <IonLabel>Mensajes</IonLabel>
           </IonTabButton>
-
         </IonTabBar>
       </IonTabs>
+
+      <Route exact path="/" component={Login}></Route>
     </IonReactRouter>
+
   </IonApp>
 );
 }

@@ -58,6 +58,7 @@ const ClientsHome: React.FC = () => {
     if( clientSelected.id ){
       /// if selected a Client
       history.push(`/clients/edit/${clientSelected.id}`);
+      
     }
   },[clientSelected])
 
@@ -76,14 +77,14 @@ const ClientsHome: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <IonButton color='medium' className='width-md margin-bottom-sm' expand='block' routerLink='/clients/add'>Agregar</IonButton>
-        <IonItemDivider><IonLabel>Clientes Recientes</IonLabel></IonItemDivider>
 
         <IonList className='ion-padding'>
+          <IonItemDivider><IonLabel>Nuevos Clientes</IonLabel></IonItemDivider>
+          <IonButton color='medium' className='width-md margin-bottom-sm' expand='block' routerLink='/clients/add'>Agregar</IonButton>
           <IonLabel>No hay busquedas recientes...</IonLabel>
         </IonList>
 
-        <IonList>
+        <IonList className='ion-padding height-full'>
           <IonItemDivider><IonLabel>Buscar</IonLabel></IonItemDivider>
           <SelectDropSearch
                 dataList={clientSearchData}
