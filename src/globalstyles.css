@@ -1,6 +1,10 @@
 .height-full{
     height: 100%;
 }
+.height-fixed {
+    height: 430px;
+    border: 1px solid red;
+}
 .margin-auto {
     margin: auto;
 }

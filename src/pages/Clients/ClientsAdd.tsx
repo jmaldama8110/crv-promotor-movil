@@ -1,7 +1,36 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react";
+import { RouteComponentProps } from "react-router";
+import { db } from "../../db";
 import { ClientsForm } from "./ClientsForm";
 
-export const ClientsAdd: React.FC = () => {
+export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
+  function onClientAdd (data: any){
+
+    /// Save new record
+    db.put({
+      couchdb_type: 'CLIENT',
+      _id: Date.now().toString(),
+      ...data
+    }).then( (doc)=>{
+      
+      db.put({
+        _id: Date.now().toString(),
+        couchdb_type: 'EVENTS',
+        user: '',
+        datetime: Date.now(),
+        event_type: 'NEW_CLIENT',
+        data: doc,
+        done: false
+      })
+      history.push('/clients');
+      alert('Se guardo el cliente!');
+
+    }).catch( e =>{
+      alert('No se pudo guardar el dato del cliente')
+    })
+
+    
+  }
   return (
     <IonPage>
       <IonHeader>
@@ -15,7 +44,7 @@ export const ClientsAdd: React.FC = () => {
             <IonTitle size="large">Mis Clientes</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ClientsForm />
+        <ClientsForm onSubmit={onClientAdd} />
       </IonContent>
     </IonPage>
   );
