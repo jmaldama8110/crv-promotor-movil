@@ -1,4 +1,4 @@
-import { Route } from 'react-router-dom';
+import { Route } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
@@ -9,159 +9,168 @@ import {
   IonTabs,
   setupIonicReact,
   useIonLoading,
+} from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import {
+  peopleOutline,
+  personCircleOutline,
+  lockClosedOutline,
+  personAddOutline,
+  notificationsCircleOutline,
+} from "ionicons/icons";
 
-} from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { peopleOutline, personCircleOutline, lockClosedOutline, personAddOutline, notificationsCircleOutline } from 'ionicons/icons';
+import jwt_decode from "jwt-decode";
 
-import ClientsHome from './pages/Home/ClientsHome';
+import ClientsHome from "./pages/Home/ClientsHome";
 
-
-import GroupsHome from './pages/Home/GroupsHome';
-import SupervisorHome from './pages/Home/SupervisorHome';
-import { Notifications } from './pages/Home/Notifications';
+import GroupsHome from "./pages/Home/GroupsHome";
+import SupervisorHome from "./pages/Home/SupervisorHome";
+import { Notifications } from "./pages/Home/Notifications";
 
 /* Core CSS required for Ionic components to work properly */
-import '@ionic/react/css/core.css';
+import "@ionic/react/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
-import '@ionic/react/css/normalize.css';
-import '@ionic/react/css/structure.css';
-import '@ionic/react/css/typography.css';
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/structure.css";
+import "@ionic/react/css/typography.css";
 
 /* Optional CSS utils that can be commented out */
-import '@ionic/react/css/padding.css';
-import '@ionic/react/css/float-elements.css';
-import '@ionic/react/css/text-alignment.css';
-import '@ionic/react/css/text-transformation.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/display.css';
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/text-transformation.css";
+import "@ionic/react/css/flex-utils.css";
+import "@ionic/react/css/display.css";
 
 /* Theme variables */
-import './theme/variables.css';
-import './globalstyles.css';
-import { MyProfile } from './pages/Home/MyProfile';
-import { useContext, useEffect } from 'react';
-import { AppContext } from './store/store';
-import { ClientsEdit } from './pages/Clients/ClientsEdit';
-import { ClientsAdd } from './pages/Clients/ClientsAdd';
-import { Login } from './pages/Session/Login';
+import "./theme/variables.css";
+import "./globalstyles.css";
+import { MyProfile } from "./pages/Home/MyProfile";
+import { useContext, useEffect } from "react";
+import { AppContext } from "./store/store";
+import { ClientsEdit } from "./pages/Clients/ClientsEdit";
+import { ClientsAdd } from "./pages/Clients/ClientsAdd";
 
 setupIonicReact();
 
+interface SyncInfo {
+  local_target: string;
+  remote_target: string;
+  sync_expiration: Date;
+}
+
 
 const App: React.FC = () => {
-
   let render = true;
-  const [ present, dismiss] = useIonLoading();
+  const [present, dismiss] = useIonLoading();
   const { session, dispatchSession } = useContext(AppContext);
 
-  useEffect(()=>{ 
-    if( session.loading){
-      present({message: session.loading_msg});
-    } else{
+  useEffect(() => {
+    if (session.loading) {
+      present({ message: session.loading_msg });
+    } else {
       dismiss();
     }
-  },[session]);
+  }, [session]);
 
-  useEffect( ()=>{
-    const loadRender = () =>{
-      if( render ){
-          ///// what needs to be rendered once goes here!  
-          dispatchSession({ type:'SET_LOADING', loading: true,loading_msg: 'Sincronizando...'});
-          // cuando se ejecute la sincronizacion en segundo plano
+  useEffect(() => {
+    const loadRender = () => {
+      if (render) {
+        ///// what needs to be rendered once goes here!
+        dispatchSession({
+          type: "SET_LOADING",
+          loading: true,
+          loading_msg: "Sincronizando...",
+        });
+        // cuando se ejecute la sincronizacion en segundo plano
 
-          setTimeout( ()=>{
-            dispatchSession({type:'SET_LOADING',loading: false, loading_msg:''})
-          },2000)
-          render = false
+        setTimeout(() => {
+          dispatchSession({
+            type: "SET_LOADING",
+            loading: false,
+            loading_msg: "",
+          });
+        }, 2000);
+        render = false;
       }
+    };
+    // loadRender();
+
+
+  }, []);
+
+  async function onTabChange  (){
+    /**
+     * Evaluar si el token aun esta vigente
+     */
+    let hoursDiff = 0;
+
+    if( session.current_token ){
+      const decoded:any = jwt_decode(session.current_token);
+      const sync: SyncInfo = decoded.sync_info
+      if( sync.sync_expiration ){
+        const queryDate = new Date(sync.sync_expiration);
+        const now = new Date();
+        const timeDiff =  queryDate.getTime() - now.getTime();
+          // To calculate the no. of Hours between two dates
+        hoursDiff = timeDiff / (1000 * 3600 );
+        if( hoursDiff <= 0 ){
+          dispatchSession({
+            type:"LOGIN",
+            name: "",
+            lastname:"",
+            user: "",
+            current_token:"",
+            token_expiration: ""
+          });
+          alert('La sesion expiró, debes conectarte e iniciar sesion nuevamente')
+        }
+      }
+
     }
-    loadRender();
-  },[]);
+  }
 
-  
   return (
-  <IonApp>
-    <IonReactRouter>
-    
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route  exact
-                  path="/clients"
-                  render={ (props) =>{
-                    return (!!session.user) ? <ClientsHome  /> : <Login {...props} />
-                  }}
-          ></Route>
-          <Route  exact
-                  path="/clients/edit/:id"                  
-                  render={ (props) =>{
-                    return (!!session.user) ? <ClientsEdit {...props}  /> : <Login {...props} />
-                  }}
-          ></Route>
-          <Route  exact
-                  path="/clients/add" 
-                  
-                  render={ (props) => {
-                    return (!!session.user) ? <ClientsAdd {...props} />: <Login {...props} />
-                  }}
-          ></Route>
+    <IonApp>
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/clients" component={ClientsHome}></Route>
+            <Route exact path="/clients/edit/:id" component={ClientsEdit}></Route>
+            <Route exact path="/clients/add" component={ClientsAdd}></Route>
+            <Route exact path="/groups" component={GroupsHome}></Route>
+            <Route exact path="/supervisor" component={SupervisorHome}></Route>
+            <Route exact path="/notifications" component={Notifications}></Route>
+            <Route exact path="/" component={MyProfile}></Route>
 
-          <Route  exact
-                  path="/groups" 
-                  render={ (props) => {
-                    return (!!session.user) ? <GroupsHome />: <Login {...props} />
-                  }}
-          ></Route>
-          <Route  exact
-                  path="/supervisor" 
-                  render={ (props) => {
-                    return (!!session.user) ? <SupervisorHome />: <Login {...props} />
-                  }}
-          ></Route>
-          <Route  exact
-                  path="/notifications" 
-                  render={ (props) => {
-                    return (!!session.user) ? <Notifications />: <Login {...props} />
-                  }}
-          ></Route>
-          <Route  exact
-                  path="/myprofile" 
-                  render={ (props) => {
-                    return (!!session.user) ? <MyProfile {...props} />: <Login {...props} />
-                  }}
-          ></Route>
+          </IonRouterOutlet>
 
-        </IonRouterOutlet>
-
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="tab4" href="/myprofile">
-            <IonIcon icon={personCircleOutline} />
-            <IonLabel>Mi Perfil</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab1" href="/clients">
-            <IonIcon icon={personAddOutline} />
-            <IonLabel>Clientes</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/groups">
-            <IonIcon icon={peopleOutline} />
-            <IonLabel>Grupos</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/supervisor">
-            <IonIcon icon={lockClosedOutline} />
-            <IonLabel>Supervisor</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab5" href="/notifications">
-            <IonIcon icon={notificationsCircleOutline} />
-            <IonLabel>Mensajes</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-
-      <Route exact path="/" component={Login}></Route>
-    </IonReactRouter>
-
-  </IonApp>
-);
-}
+          <IonTabBar slot="bottom" onClick={onTabChange}>
+            <IonTabButton tab="tab4" href="/">
+              <IonIcon icon={personCircleOutline} />
+              <IonLabel>Mi Perfil</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab1" href="/clients" disabled={!session.user} >
+              <IonIcon icon={personAddOutline} />
+              <IonLabel>Clientes</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab2" href="/groups" disabled>
+              <IonIcon icon={peopleOutline} />
+              <IonLabel>Grupos</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab3" href="/supervisor" disabled>
+              <IonIcon icon={lockClosedOutline} />
+              <IonLabel>Supervisor</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab5" href="/notifications">
+              <IonIcon icon={notificationsCircleOutline} />
+              <IonLabel>Mensajes</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 export default App;

@@ -1,56 +1,119 @@
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
   IonList,
   IonInput,
   IonLabel,
   IonButton,
   IonItem,
+  useIonLoading,
 } from "@ionic/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
+import { Preferences } from "@capacitor/preferences";
 import { AppContext } from "../../store/store";
+import api from "../../api/api";
+import jwt_decode from "jwt-decode";
+export const LOGIN_KEY_PREFERENCES = 'promotor-movil-preferences';
+
+
+/// UserSession and UserInfo combine API format response when login
+interface UserInfo {
+  name: string;
+  lastname: string;
+  second_lastname: string;
+  email: string;
+  current_token: string;
+}
+
+interface UserSession {
+  user: UserInfo,
+  token:string;
+}
+
+
 
 export const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const { dispatchSession } = useContext(AppContext);
 
-  const [user,setUser] = useState<string>('josman@gmail.com');
-  const [pass,setPass] = useState<string>('s0m3t0ughpassw0rd1!');
+  const [user,setUser] = useState<string>('promotor@grupoconserva.mx');
+  const [pass,setPass] = useState<string>('123456');
 
-  function onLogin() {
-    dispatchSession({
-      type: "SET_LOADING",
-      loading: true,
-      loading_msg: "Iniciando sesion",
-    });
-    setTimeout(() => {
-      dispatchSession({
-        type: "LOGIN",
-        name: "JOSMAN",
-        lastname: "Gmz",
-        user: "josman@gmail.com",
-        current_token: "e3u29e2839",
+  const [present, dismiss] = useIonLoading();
+
+  async function onLogin() {
+
+    try {
+     const apiResponse =  await api.post("/users/login",{
+        email: user,
+        password: pass
       });
-      dispatchSession({
-        type: "SET_LOADING",
-        loading: false,
-        loading_msg: "",
-      });
-      history.push("/myprofile");
-    }, 3000);
+      
+      let usrInfo: UserSession = apiResponse.data;
+      
+      dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Iniciando sesion",});
+      const decoded:any = jwt_decode(usrInfo.token);
+      const localDate = new Date(decoded.sync_info.sync_expiration);
+
+      setTimeout( async () => {
+        await Preferences.set({
+          key: LOGIN_KEY_PREFERENCES,
+          value: JSON.stringify(usrInfo),
+        });
+        
+        dispatchSession({
+          type: "LOGIN",
+          name: usrInfo.user.name,
+          lastname: usrInfo.user.lastname,
+          user: usrInfo.user.email,
+          current_token: usrInfo.token,
+          token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
+        });
+  
+        dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "",});
+      }, 3000);
+    }
+    catch(e){
+      alert("No fue posible iniciar la sesion!, verifica tus credenciales");
+    }
+
   }
+  useEffect(() => {
+    /// check wheter there is an user already saved localy
+    async function loadDataFromLocalStorage() {
+      
+      const { value } = await Preferences.get({ key: LOGIN_KEY_PREFERENCES });
+      
+      if (value) {
+        try {
+          // present( {message: 'Iniciando...'});
+    
+          const userLocalStorage = JSON.parse(value);
+          const decoded:any = jwt_decode(userLocalStorage.token);
+          const localDate = new Date(decoded.sync_info.sync_expiration);
+
+          dispatchSession({
+            type: "LOGIN",
+            name: userLocalStorage.user.name,
+            lastname: userLocalStorage.user.lastname,
+            user: userLocalStorage.user.email,
+            current_token: userLocalStorage.token,
+            token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
+          });
+          // dismiss();
+        }
+        catch(error){
+          // dismiss();
+          await Preferences.remove({ key: LOGIN_KEY_PREFERENCES });
+          alert('No se puedo iniciar sesion con el usuario guardado! Inicie sesion nuevamente')
+        }
+
+      }
+    }
+
+    loadDataFromLocalStorage();
+
+  }, []);
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Inicio de Sesion</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
         <IonList className="ion-padding">
           <IonItem>
             <IonLabel position="floating">Usuario</IonLabel>
@@ -63,7 +126,5 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
           <IonButton expand="block" onClick={onLogin}>Login</IonButton>
         </IonList>
-      </IonContent>
-    </IonPage>
   );
 };

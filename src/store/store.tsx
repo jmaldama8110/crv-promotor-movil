@@ -9,18 +9,21 @@ interface SharedContext {
   dispatchSession: React.Dispatch<Actions>;
 }
 
+
 export const AppContext = createContext<SharedContext >({} as SharedContext);
 
 export const AppContextProvider = ( props: AppContextProviderProps) =>{
 
   const sessionInit: Session = {
-    name: '',
-    lastname: '',
-    user: '',
-    current_token: '',
+    name: "",
+    lastname: "",
+    user: "",
+    current_token: "",
+    token_expiration: "",
     loading: false,
     loading_msg: ''
   }
+  
   const [ session, dispatchSession] = useReducer(SessionReducer,sessionInit )
   
   const sharedCtx: SharedContext = {

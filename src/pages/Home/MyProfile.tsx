@@ -5,14 +5,14 @@ import {
   IonTitle,
   IonContent,
   IonList,
-  IonLabel,
   IonButton,
 } from "@ionic/react";
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
 import { AppContext } from "../../store/store";
+import { Login } from "../Session/Login";
 
-export const MyProfile: React.FC<RouteComponentProps> = ({history}) => {
+export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
   const { session,dispatchSession } = useContext(AppContext);
 
@@ -38,9 +38,9 @@ export const MyProfile: React.FC<RouteComponentProps> = ({history}) => {
         lastname: "",
         user: "",
         current_token: "",
+        token_expiration: ""
       });
 
-      history.push("/");
     },3000)
 
   }
@@ -58,13 +58,18 @@ export const MyProfile: React.FC<RouteComponentProps> = ({history}) => {
             <IonTitle size="large">Mi Perfil</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonList className="ion-padding">
+        {!session.user &&
+        <Login {...props}/>
+
+        }
+        {session.user &&
+          <IonList className="ion-padding">
           <p>Nombre: {session.name} {session.lastname}</p>
           <p>Usuario: {session.user}</p>
-          <p>token: {session.current_token}</p>
-          <IonButton onClick={onCloseSession} expand="block" color="warning">Cerrar</IonButton>
-
-        </IonList>
+          <p>Expira el: {session.token_expiration}</p>
+          
+          <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
+        </IonList>}
       </IonContent>
     </IonPage>
   );

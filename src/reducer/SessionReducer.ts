@@ -5,6 +5,7 @@ export type Actions =
       lastname: string;
       user: string;
       current_token: string;
+      token_expiration: string;
     }
   | {
     type: "SET_LOADING",
@@ -17,6 +18,7 @@ export interface Session {
   lastname: string;
   user: string;
   current_token: string;
+  token_expiration: string;
   loading: boolean;
   loading_msg: string;
 }
@@ -32,6 +34,7 @@ export const SessionReducer = (state: State, action: Actions) => {
         lastname: action.lastname,
         user: action.user,
         current_token: action.current_token,
+        token_expiration: action.token_expiration
       };
     case "SET_LOADING":
       return {

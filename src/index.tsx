@@ -8,7 +8,7 @@ import { startReplication } from './db';
 const container = document.getElementById('root');
 const root = createRoot(container!);
 
-startReplication();
+// startReplication();
 
 root.render(
   <React.StrictMode>
