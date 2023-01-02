@@ -120,12 +120,11 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
 
   const { dispatchSession } = useContext(AppContext);
   
-  useEffect( ()=>{
+  useEffect( ()=> {
     if( !render.current ){
       render.current = true;
       /// this codes runs only Once!
       db.createIndex( { index: { fields: ['couchdb_type','name']}}).then( function (){
-        
         db.find( { selector: {
           couchdb_type: "CATALOG",
           name: "CATA_ActividadEconomica"
@@ -154,18 +153,15 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
                   }).catch(e=>{
                     console.log(e);
                   });
-
                 }).catch(e=>{
                   console.log(e);
                 });
               }).catch(e=>{
                 console.log(e);
               });
-
             }).catch( err =>{
               alert('No fue posible cargar Escolaridad');
             });
-
         }).catch( err =>{
           alert( 'No fue posible cargar datos de Actividad Economica...');
         });
@@ -183,14 +179,109 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
   },[])
   useEffect(() => {
     // if client exists, means we are editing the client
-    if (client) {
-      setName(client.name);
-      setLastname(client.lastname);
-      setSecondLastName(client.second_lastname);
-      setCurp(client.curp);
+    async function loadData (){
+      if (client) {
+        console.log(client);
+        setName(client.name);
+        setLastname(client.lastname);
+        setSecondLastName(client.second_lastname);
+        setCurp(client.curp);
+        setRfc(client.rfc);
+        setBisAddressSame( client.bis_address_same);        
+        setNotBis( client.not_bis );
+        if( client.phones ){
+          const phoneMobile = client.phones.find( (i:any)=> (i.type === 'Móvil')).phone
+          setPhone(phoneMobile);
+        }
+        if( client.address ){ // populates Colonies component
+          const homeAddress = client.address.find( (i:any) => ( i.type === 'DOMICILIO'))      
+          setMyCp(homeAddress.post_code);
+          populateColoniesByPostCode( homeAddress.post_code, setColonyCat);
+          setAddressL1( homeAddress.address_line1);
+
+          const bisAddress = client.address.find( (i:any) => ( i.type === 'NEGOCIO'))      
+          setBisCp(bisAddress.post_code);
+          populateColoniesByPostCode( bisAddress.post_code, setColonyBisCat);
+          setAddressL1Bis( bisAddress.address_line1);
+
+        }
+        if( client.tributary_regime ){
+          setTributaryRegime( client.tributary_regime[0]);
+        }
+
       
+        
+      }
     }
+    loadData();
+
   }, [client]);
+
+  useEffect( ()=>{
+    /// When Colonies are donde populated, set the value on the component's list
+    if( client ){
+      if( client.address ){
+        const homeAddress = client.address.find( (i:any) => ( i.type === 'DOMICILIO'))
+        setColonyId(homeAddress.colony[0]);
+      }
+    }
+  },[colonyCat]);
+  useEffect( ()=>{
+    /// When Colonies are donde populated, set the value on the component's list
+    if( client){
+      if( client.address){
+        const bisAddress = client.address.find( (i:any) => ( i.type === 'NEGOCIO')) 
+        setColonyBisId(bisAddress.colony[0]);
+        setBisCp(bisAddress.post_code);
+        setAddressL1Bis(bisAddress.address_line1);
+      }
+    }
+  },[colonyBisCat]);
+
+  
+  useEffect( ()=>{
+    if( client ){
+      if( client.ocupation)
+        setOcupation({id: client.ocupation[0],etiqueta: client.ocupation[1]});
+    }
+  },[ocupationCatalog])
+  useEffect( ()=>{
+    if( client ){
+    if( client.business_data ){
+      setBisStartedDate(client.business_data.business_start_date);
+      setBiStartedDateFormatted( formatDate( client.business_data.business_start_date));
+      setOwnOrRent( client.business_data.business_owned);
+      if( client.business_data.profession ) {
+        setProfession( { id: client.business_data.profession[0], etiqueta: client.business_data.profession[1] } )
+        setBusinessName( client.business_data.business_name);
+        setBisStartedDate( client.business_data.business_start_date );  
+      }
+    }
+  }
+  },[professionCatalog])
+  useEffect( ()=>{
+    if( client){
+      if(client.business_data){
+      if( client.business_data.economic_activity)
+        setEconomicActivity( { id: client.business_data.economic_activity[0], etiqueta: client.business_data.economic_activity[1] } )
+      }
+    }
+  },[economicActivityCatalog])
+  
+  useEffect( ()=>{
+    if( client){
+      if( client.education_level)
+      setEducationLevel( client.education_level[0]);
+    }
+  },[educationLevelCatalog]);
+
+  useEffect( ()=>{
+    if( client){
+      if( client.marital_status)        
+        setMaritalStatus( client.marital_status[0]);
+      }
+  },[maritalStatusCatalog]);
+  
 
   useEffect(() => {
     if (phone) {
@@ -219,14 +310,8 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
     
   }
 
-  function populateColoniesByPostCode( cpData: string, updateFx: (value: React.SetStateAction<ColonyType[]>) => void, refComp: React.MutableRefObject<any> ) {
+  function populateColoniesByPostCode( cpData: string, updateFx: (value: React.SetStateAction<ColonyType[]>) => void, refComp?: React.MutableRefObject<any> ) {
     if (!cpData) return;
-
-    dispatchSession({
-      type: "SET_LOADING",
-      loading: true,
-      loading_msg: "Cargando Asentamientos...",
-    });
 
     db.createIndex({
       index: { fields: ['couchdb_type','codigo_postal']}
@@ -247,12 +332,9 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
         .catch((err) => {
           console.log(err);
         });
-        dispatchSession({
-          type: "SET_LOADING",
-          loading: false,
-          loading_msg: "",
-        });
-        refComp.current.open();
+    
+        if( refComp )
+          refComp.current.open();
     })
   }
 
@@ -304,8 +386,6 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
       }
   },[bisColonyId])
 
-
-
   const onPopulateHomeColonies = async ()=>{
     populateColoniesByPostCode(myCP,setColonyCat, myColonySelectList);
   }
@@ -323,10 +403,6 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
     let negocioAddress = {
       _id: Date.now().toString(),
       type: "NEGOCIO"
-    }
-    if( client ){
-        /// we editing a client
-        
     }
     
     const newPhoneAdd = {
@@ -371,7 +447,6 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
           _id: domicilioAddress._id,
           type: domicilioAddress.type,
           address_line1,
-          
           country: [countryId, countryName],
           province: [provinceId, provinceName],
           municipality: [municipalityId, municipalityName],
@@ -420,6 +495,7 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
         profession: [profession.id, profession.etiqueta],
         business_start_date: bisStartedDate,
         business_name: businessName,
+        business_owned: bisOwnOrRent
       },
       beneficiaries: [],
       personal_references: [],
@@ -484,7 +560,6 @@ export const ClientsForm: React.FC<ClientsFormProps> = ({
       </IonItem>
 
       <IonButton onClick={onPopulateHomeColonies}>Buscar</IonButton>
-
       <IonItem>
         <IonLabel position="stacked">Colonia / Asentamiento</IonLabel>
         <IonSelect ref={myColonySelectList} value={colonyId} okText="Ok" cancelText="Cancelar" onIonChange={(e) => setColonyId(e.detail.value)}>

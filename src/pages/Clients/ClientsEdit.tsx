@@ -26,8 +26,17 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
 
   const onUpdate = (data:any) => {
     // Update selected Client
+    const itemId = match.url.replace("/clients/edit/", "");
+    db.get(itemId).then( (clientInfo:any) => {
+      return db.put({
+        ...clientInfo,
+        ...data
+      });
 
-    history.push('/clients')
+    })
+    alert('Se guardo el cliente!')
+    history.push('/clients');
+    
   };
 
   return (

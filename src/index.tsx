@@ -4,11 +4,13 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { AppContextProvider } from './store/store';
-import { startReplication } from './db';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
 const container = document.getElementById('root');
 const root = createRoot(container!);
 
-// startReplication();
+// Call the element loader after the platform has been bootstrapped
+defineCustomElements(window);
 
 root.render(
   <React.StrictMode>

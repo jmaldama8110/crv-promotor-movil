@@ -1,67 +1,95 @@
-import { IonButton, IonContent, IonHeader, IonItem, IonItemDivider, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { useContext, useEffect, useState } from 'react';
+import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonActionSheet } from '@ionic/react';
+import { useEffect, useState } from 'react';
 import { db } from '../../db';
+import type { OverlayEventDetail } from '@ionic/core';
 
 import './ClientsHome.css';
 import {
   SearchData,
   SelectDropSearch,
 } from "../../components/SelectDropSearch";
-// import { AppContext } from '../../store/store';
 import { useHistory } from 'react-router';
 
 
 const ClientsHome: React.FC = () => {
 
-  // const { session, dispatchSession } = useContext(AppContext);
+
+  const [editAction, setEditAction ] = useState<boolean>(false);
+
+  const [present] = useIonActionSheet();
+  const [actions, setActions] = useState<OverlayEventDetail>();
+  
   let history = useHistory();
   let render = true;
-
-
-  const [ clients, setClients] = useState<SearchData[]>([]);
 
   const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: 0,
+    rev: "",
     etiqueta: "",
   });
 
+
   useEffect( ()=>{
     if( render ){
-
-      /// Llena datos de clientes HF
-      db.createIndex({
-        index: { fields: ['couchdb_type'] }
-      }).then( function() {
+     db.createIndex( {
+      index: { fields: [ "couchdb_type"] }
+     }).then( function (){
         console.log('Index, created...');
         db.find({
-          selector:{
-            couchdb_type: "HF_CLIENT"
+          selector: {
+            couchdb_type: "CLIENT"
           }
         }).then( data =>{
-            const newData = data.docs.map( (i:any)=>( {id: i._id, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`} ))
-            setClientSearchData( newData);
-            console.log('Clients Loaded: ', newData.length)
-
-        })
-      }).catch(e =>{
-        console.log('Index creation error...',e);
-      });
-
-
-
+          const newData = data.docs.map( (i:any)=>( {id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`} ))
+          setClientSearchData( newData);
+          console.log('Clients Loaded: ', newData.length)
+      })
+     })
       render = false;
     }
   },[])
 
-  useEffect( ()=>{
-    if( clientSelected.id ){
-      /// if selected a Client
-      history.push(`/clients/edit/${clientSelected.id}`);
-      
-    }
-  },[clientSelected])
 
+  function onShowActions(){
+    const buttons = clientSelected.id ? 
+    [
+      { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
+      { text: 'Editar', data: { action:"edit", routerLink: `/clients/edit/${clientSelected.id}` } },
+      { text: 'Ver Solicitudes', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps`} },
+      { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
+      { text: 'Garantias', data: { action: '' } },
+      { text: 'Personas Relacionadas', data: { action: '' } },
+      { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },
+    ] :
+      [
+        { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
+        { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },  
+      ]
+      present(
+        { header: 'Mis Clientes',
+          subHeader: 'Acciones / tareas:',
+          buttons,
+            onDidDismiss: ({ detail }) => setActions(detail),
+          })
+  }
+  
+  useEffect( ()=>{
+    if( actions ){
+      if( actions.data){
+        if(actions.data.action === 'add')
+          history.push(actions.data.routerLink);
+        if(actions.data.action === 'edit')
+          history.push(actions.data.routerLink);
+        if( actions.data.action === 'edit-socioeconomics')
+          history.push(actions.data.routerLink);
+        if( actions.data.action === 'loanapps')
+            history.push(actions.data.routerLink);
+
+        
+      }
+    }
+  },[actions])
 
   return (
     <IonPage>
@@ -77,23 +105,23 @@ const ClientsHome: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-
-        <IonList className='ion-padding'>
-          <IonItemDivider><IonLabel>Nuevos Clientes</IonLabel></IonItemDivider>
-          <IonButton color='medium' className='width-md margin-bottom-sm' expand='block' routerLink='/clients/add'>Agregar</IonButton>
-          <IonLabel>No hay busquedas recientes...</IonLabel>
-        </IonList>
-
         <IonList className='ion-padding height-full'>
-          <IonItemDivider><IonLabel>Buscar</IonLabel></IonItemDivider>
-          <SelectDropSearch
-                dataList={clientSearchData}
-                setSelectedItemFx={setClientSelected}
-                currentItem={clientSelected}
-                description={'Buscar...'}
-              />
-   
+          <IonItemGroup>
+                <IonItemDivider><IonLabel>Clientes</IonLabel></IonItemDivider>
+                              
+                <SelectDropSearch
+                  dataList={clientSearchData}
+                  setSelectedItemFx={setClientSelected}
+                  currentItem={clientSelected}
+                  description={'Buscar...'}
+                  
+                />
+        </IonItemGroup>
+
+        <IonButton onClick={onShowActions} color='medium'>Acciones</IonButton>
+
         </IonList>
+
       </IonContent>
     </IonPage>
   );

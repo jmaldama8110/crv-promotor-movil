@@ -1,3 +1,4 @@
+import { Preferences } from "@capacitor/preferences";
 import {
   IonPage,
   IonHeader,
@@ -7,10 +8,11 @@ import {
   IonList,
   IonButton,
 } from "@ionic/react";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
+import { startReplication } from "../../db";
 import { AppContext } from "../../store/store";
-import { Login } from "../Session/Login";
+import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
 
 export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
@@ -24,13 +26,14 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       loading_msg: "Cerrando la sesion..."
     })
 
-    setTimeout( ()=> {
+    setTimeout( async ()=> {
 
       dispatchSession({
         type: "SET_LOADING",
         loading: false,
         loading_msg: ""
       })
+      await Preferences.remove({ key: LOGIN_KEY_PREFERENCES });
 
       dispatchSession({
         type: "LOGIN",
@@ -42,14 +45,17 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       });
 
     },3000)
-
   }
+
+  useEffect( ()=>{
+    startReplication();
+  },[]) 
   
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>My Profile</IonTitle>
+          <IonTitle>Mi Perfil</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -69,6 +75,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
           <p>Expira el: {session.token_expiration}</p>
           
           <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
+
         </IonList>}
       </IonContent>
     </IonPage>

@@ -4,6 +4,7 @@ import "./SelectDropSearch.css";
 
 export interface SearchData{
   id: number;
+  rev?: string;
   etiqueta: string;
 }
 interface SearchToolProps {
@@ -46,7 +47,7 @@ export const SelectDropSearch: React.FC<SearchToolProps> = ({ dataList,setSelect
   },[searchText])
 
   function onRestoreList(){
-    
+    setSelectedItemFx({ id:0, etiqueta: "",rev: ""})
     setVisibleList(true);
     setSearchList([]);
   }

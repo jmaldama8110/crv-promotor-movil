@@ -12,16 +12,6 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
       _id: Date.now().toString(),
       ...data
     }).then( (doc)=>{
-      
-      db.put({
-        _id: Date.now().toString(),
-        couchdb_type: 'EVENTS',
-        user: '',
-        datetime: Date.now(),
-        event_type: 'NEW_CLIENT',
-        data: doc,
-        done: false
-      })
       history.push('/clients');
       alert('Se guardo el cliente!');
 

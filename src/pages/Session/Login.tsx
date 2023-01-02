@@ -53,6 +53,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
       const decoded:any = jwt_decode(usrInfo.token);
       const localDate = new Date(decoded.sync_info.sync_expiration);
 
+  
       setTimeout( async () => {
         await Preferences.set({
           key: LOGIN_KEY_PREFERENCES,
@@ -83,9 +84,6 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
       const { value } = await Preferences.get({ key: LOGIN_KEY_PREFERENCES });
       
       if (value) {
-        try {
-          // present( {message: 'Iniciando...'});
-    
           const userLocalStorage = JSON.parse(value);
           const decoded:any = jwt_decode(userLocalStorage.token);
           const localDate = new Date(decoded.sync_info.sync_expiration);
@@ -98,14 +96,6 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
             current_token: userLocalStorage.token,
             token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
           });
-          // dismiss();
-        }
-        catch(error){
-          // dismiss();
-          await Preferences.remove({ key: LOGIN_KEY_PREFERENCES });
-          alert('No se puedo iniciar sesion con el usuario guardado! Inicie sesion nuevamente')
-        }
-
       }
     }
 

@@ -20,9 +20,7 @@ import {
 } from "ionicons/icons";
 
 import jwt_decode from "jwt-decode";
-
 import ClientsHome from "./pages/Home/ClientsHome";
-
 import GroupsHome from "./pages/Home/GroupsHome";
 import SupervisorHome from "./pages/Home/SupervisorHome";
 import { Notifications } from "./pages/Home/Notifications";
@@ -51,6 +49,10 @@ import { useContext, useEffect } from "react";
 import { AppContext } from "./store/store";
 import { ClientsEdit } from "./pages/Clients/ClientsEdit";
 import { ClientsAdd } from "./pages/Clients/ClientsAdd";
+import { SocioEconomicsForm } from "./pages/Socioeconomics/SocioEconomicsForm";
+import { LoanApplicationHome } from "./pages/LoanApp/LoanApplicationHome";
+import { LoanApplicationAdd } from "./pages/LoanApp/LoanApplicationAdd";
+import { LoanApplicationEdit } from "./pages/LoanApp/LoanApplicationEdit";
 
 setupIonicReact();
 
@@ -138,7 +140,11 @@ const App: React.FC = () => {
           <IonRouterOutlet>
             <Route exact path="/clients" component={ClientsHome}></Route>
             <Route exact path="/clients/edit/:id" component={ClientsEdit}></Route>
+            <Route exact path="/clients/socioeconomics/edit/:id" component={SocioEconomicsForm}></Route>
             <Route exact path="/clients/add" component={ClientsAdd}></Route>
+            <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
+            <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>
+            <Route exact path="/clients/:id/loanapps/edit/:id" component={LoanApplicationEdit}></Route>
             <Route exact path="/groups" component={GroupsHome}></Route>
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>
