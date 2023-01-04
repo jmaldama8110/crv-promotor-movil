@@ -3,10 +3,13 @@ import { RouteComponentProps } from "react-router";
 import { LoanApplicationForm } from "./LoanApplicationForm";
 
 import { db } from "../../db";
+import { AppContext } from "../../store/store";
+import { useContext } from "react";
 
 export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
 
     const [presentLoading, dismissLoading] = useIonLoading();
+    const { session } = useContext(AppContext);
     
     const onAdd = async (data:any) =>{
         const clientId = props.match.url.split("/")[2];
@@ -16,6 +19,7 @@ export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
             _id: Date.now().toString(),
             apply_by: clientId,
             apply_at: new Date(),
+            created_by: session.user,
             status:[1, "Pendiente"],
             ...data
           }).then( (doc)=>{

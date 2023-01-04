@@ -14,20 +14,34 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
 
       const itemId = props.match.url.split("/")[5];
       db.get(itemId)
-        .then((data) => {
-          console.log(data);
-          setLoan(data);
+        .then( (loan:any) => {
+
+          db.get(loan.product).then( (prod) =>{
+            
+            const newData = {
+              ...loan,
+              product: prod
+            }
+            setLoan(newData);
+          })
         })
         .catch((err) => {
           alert("No fue posible recuperar datos del cliente: " + itemId);
         });
     },[])
-    HACER FUNCIONAR LA EDICION DEL LOAN EDIT
-    LA FALLA ESTA EN QUE EL SERVICIO ORIGINAL DEVUELVE EL PRODUCTO COMPLETO,
-    Y EN COUCHDB, HAY QUE RECUPERAR LA INFORMACION DEL PRODUCTO DE FORMA MANUAL
+    
     const onSave = async (data:any) => {
-     
-      console.log(data);
+      const itemId = props.match.url.split("/")[5];
+      db.get(itemId).then( (loanInfo:any) => {
+        return db.put({
+          ...loanInfo,
+          ...data,
+          updated_at: Date.now()
+        });
+      })
+      props.history.goBack();     
+      alert('Se guardo la solicitud!')
+      
     }
   return (
     <IonPage>

@@ -23,28 +23,47 @@ export const LoanAppCard: React.FC<RouteComponentProps> = ({match}) => {
     const [loans, setLoans] = useState<loanData[]>([])
 
     useEffect( () => {
+
         
-        db.createIndex( {
-            index: { fields: [ "couchdb_type"] }
-           }).then( function (){
-              db.find({
+        db.createIndex( { index: { fields: ["couchdb_type"] }}).then( ()=>{
+            db.find({
                 selector: {
-                  couchdb_type: "LOANAPP",
+                    couchdb_type: "PRODUCT"
                 }
-              }).then( (data:any) =>{
-            //// once all docs are loaded, filter by ClientId
-            const clientId = match.url.split("/")[2];
-            const clientLoans = data.docs.filter( (i:any)=>(i.apply_by === clientId ))
-            
-            const newData = clientLoans.map( (x:any) => ({  id: x._id, 
-                                                            applyAmount: x.apply_amount,
-                                                            status: x.status[0],
-                                                            term: x.term,
-                                                            frequency: x.frequency[1]
-                                                         }))
-            setLoans(newData);
+            }).then( (data:any) =>{
+                /// retrieves all products first, then  all Loans
+                const prodList = data.docs;
+                db.createIndex( {
+                    index: { fields: [ "couchdb_type"] }
+                   }).then( function (){
+                      db.find({
+                        selector: {
+                          couchdb_type: "LOANAPP",
+                        }
+                      }).then( (data:any) =>{
+                    //// once all docs are loaded, filter by ClientId
+                    const clientId = match.url.split("/")[2];
+                    const clientLoans = data.docs.filter( (i:any)=>(i.apply_by === clientId ))
+                    
+                    const newData = clientLoans.map( (x:any) => { 
+
+                        const loanProduct = prodList.find( (p:any) => p._id === x.product )                        
+                        return  {   id: x._id,
+                                    applyAmount: x.apply_amount,
+                                    productLogo: loanProduct.logo,
+                                    productName: loanProduct.product_name,
+                                    status: x.status[0],
+                                    term: x.term,
+                                    frequency: x.frequency[1] }
+                    })
+                    setLoans(newData);
+                    })
+                })
             })
         })
+
+
+
 
       }, []);
 
@@ -76,11 +95,11 @@ export const LoanAppCard: React.FC<RouteComponentProps> = ({match}) => {
                 color={ getStatus(i.status) }
                 routerLink={`loanapps/edit/${i.id}`}
                 key={n}>
-                    {/* <img
+                    <img
                         src={`data:image/png;base64,${i.productLogo}`}
-                    ></img> */}
+                    ></img>
                     <IonCardHeader>
-                        <h1>Product Name</h1>
+                        <h1>{i.productName}</h1>
                     </IonCardHeader>
                     <IonCardContent>
                         {formatLocalCurrency(parseFloat(i.applyAmount)) } / {i.term} {i.frequency}

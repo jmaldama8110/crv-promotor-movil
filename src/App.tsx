@@ -53,6 +53,13 @@ import { SocioEconomicsForm } from "./pages/Socioeconomics/SocioEconomicsForm";
 import { LoanApplicationHome } from "./pages/LoanApp/LoanApplicationHome";
 import { LoanApplicationAdd } from "./pages/LoanApp/LoanApplicationAdd";
 import { LoanApplicationEdit } from "./pages/LoanApp/LoanApplicationEdit";
+import { GuaranteesHome } from "./pages/Guarantees/GuaranteesHome";
+import { GuaranteeAddEq } from "./pages/Guarantees/Equipment/GuaranteesAddEq";
+import { GuaranteesEditEq } from "./pages/Guarantees/Equipment/GuaranteesEditEq";
+import { GuaranteeAddVh } from "./pages/Guarantees/Vehicules/GuaranteesAddVh";
+import { GuaranteesEditVh } from "./pages/Guarantees/Vehicules/GuaranteesEditVh";
+import { GuaranteeAddProp } from "./pages/Guarantees/Properties/GuaranteesAddProp";
+import { GuaranteesEditProp } from "./pages/Guarantees/Properties/GuaranteesEditProp";
 
 setupIonicReact();
 
@@ -145,6 +152,16 @@ const App: React.FC = () => {
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
             <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>
             <Route exact path="/clients/:id/loanapps/edit/:id" component={LoanApplicationEdit}></Route>
+
+            <Route exact path="/clients/:id/guarantees" component={GuaranteesHome}></Route>
+            <Route exact path="/clients/:id/guarantees/equipment/add" component={GuaranteeAddEq}></Route>
+            <Route exact path="/clients/:id/guarantees/equipment/edit/:id" component={GuaranteesEditEq}></Route>
+            <Route exact path="/clients/:id/guarantees/vehicle/add" component={GuaranteeAddVh}></Route>
+            <Route exact path="/clients/:id/guarantees/vehicle/edit/:id" component={GuaranteesEditVh}></Route>
+            <Route exact path="/clients/:id/guarantees/property/add" component={GuaranteeAddProp}></Route>
+            <Route exact path="/clients/:id/guarantees/property/edit/:id" component={GuaranteesEditProp}></Route>
+            
+            
             <Route exact path="/groups" component={GroupsHome}></Route>
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>

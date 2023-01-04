@@ -10,11 +10,11 @@ import {
 } from "../../components/SelectDropSearch";
 import { useHistory } from 'react-router';
 
+import { Guarantee } from '../../reducer/GuaranteesReducer';
+
 
 const ClientsHome: React.FC = () => {
 
-
-  const [editAction, setEditAction ] = useState<boolean>(false);
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
@@ -30,7 +30,12 @@ const ClientsHome: React.FC = () => {
   });
 
 
+  
+
   useEffect( ()=>{
+
+    
+
     if( render ){
      db.createIndex( {
       index: { fields: [ "couchdb_type"] }
@@ -58,7 +63,7 @@ const ClientsHome: React.FC = () => {
       { text: 'Editar', data: { action:"edit", routerLink: `/clients/edit/${clientSelected.id}` } },
       { text: 'Ver Solicitudes', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps`} },
       { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
-      { text: 'Garantias', data: { action: '' } },
+      { text: 'Ver Garantias', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
       { text: 'Personas Relacionadas', data: { action: '' } },
       { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },
     ] :
@@ -84,6 +89,8 @@ const ClientsHome: React.FC = () => {
         if( actions.data.action === 'edit-socioeconomics')
           history.push(actions.data.routerLink);
         if( actions.data.action === 'loanapps')
+            history.push(actions.data.routerLink);
+        if( actions.data.action === 'guarantees')
             history.push(actions.data.routerLink);
 
         
@@ -119,6 +126,7 @@ const ClientsHome: React.FC = () => {
         </IonItemGroup>
 
         <IonButton onClick={onShowActions} color='medium'>Acciones</IonButton>
+
 
         </IonList>
 

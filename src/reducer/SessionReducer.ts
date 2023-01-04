@@ -1,4 +1,4 @@
-export type Actions =
+export type ActionsSession =
   | {
       type: "LOGIN";
       name: string;
@@ -25,7 +25,7 @@ export interface Session {
 
 type State = Session;
 
-export const SessionReducer = (state: State, action: Actions) => {
+export const SessionReducer = (state: State, action: ActionsSession) => {
   switch (action.type) {
     case "LOGIN":
       return {

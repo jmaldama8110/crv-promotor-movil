@@ -1,12 +1,15 @@
 import { createContext, useReducer } from "react";
-import { SessionReducer, Session, Actions } from "../reducer/SessionReducer";
+import { SessionReducer, Session, ActionsSession } from "../reducer/SessionReducer";
+import { GuaranteesReducer, Guarantee, ActionsGuarantee } from "../reducer/GuaranteesReducer";
 
 type AppContextProviderProps = {
   children: React.ReactNode
 }
 interface SharedContext {
   session: Session;
-  dispatchSession: React.Dispatch<Actions>;
+  dispatchSession: React.Dispatch<ActionsSession>;
+  guaranteesList: Guarantee[];
+  dispatchGuaranteesList: React.Dispatch<ActionsGuarantee>;
 }
 
 
@@ -24,11 +27,15 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
     loading_msg: ''
   }
   
-  const [ session, dispatchSession] = useReducer(SessionReducer,sessionInit )
-  
+
+  const [ session, dispatchSession] = useReducer(SessionReducer,sessionInit );
+  const [ guaranteesList, dispatchGuaranteesList] = useReducer( GuaranteesReducer, [] );  
+
   const sharedCtx: SharedContext = {
     session,
-    dispatchSession
+    dispatchSession,
+    guaranteesList,
+    dispatchGuaranteesList
   }
 
   return (

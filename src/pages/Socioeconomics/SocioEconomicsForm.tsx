@@ -280,7 +280,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
       sales_quicenal:[ {saleQuincenaOne, saleQuincenaTwo}],
       sales_monthly:saleMonthly,
       seasonly:[{ monthSaleJan, monthSaleFeb,monthSaleMar, monthSaleApr, monthSaleMay, monthSaleJun, 
-                  monthSaleJul, monthSaleAug, monthSaleSep, monthSaleNov, monthSaleDic }],
+                  monthSaleJul, monthSaleAug, monthSaleSep, monthSaleOct, monthSaleNov, monthSaleDic }],
       bis_sales: [...bisSales],
       bis_sales_in_cash: bisSalesMonthCash,
       bis_sales_in_credit: bisSalesMonthCredit ,
