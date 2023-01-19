@@ -4,6 +4,7 @@ import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
 import { AppContext } from "../../../store/store";
 import { GuaranteesFormEq } from "./GuaranteesFormEq";
+import { Guarantee } from '../../../reducer/GuaranteesReducer';
 
 
 export const GuaranteeAddEq:React.FC<RouteComponentProps> = ( props )=>{
@@ -12,19 +13,25 @@ export const GuaranteeAddEq:React.FC<RouteComponentProps> = ( props )=>{
     const { session, dispatchGuaranteesList } = useContext(AppContext);
     
     const onAdd = async (data: any) => {
-        const client_id = props.match.url.split("/")[2]
-        db.put({
+        const client_id = props.match.url.split("/")[2];
+        const guaranteeItem: Guarantee = {
+            _id: Date.now().toString(),
             couchdb_type: 'GUARANTEE',
             guarantee_type: 'equipment',
             client_id,
             created_by: session.user,
             created_at: new Date(),
-            _id: Date.now().toString(),
+            equipment: data.equipment
+        }
+        dispatchGuaranteesList({
+            type: "ADD_GUARANTEE",
+            item: guaranteeItem
+        })
+        db.put({
+            ...guaranteeItem,
             ...data
         }).then( ()=>{
-            
             props.history.goBack();
-            alert('Se guardo informacion de la propiedad!');
         }).catch( e =>{
             alert('No se pudo guardar el dato de la propiedad')
         })

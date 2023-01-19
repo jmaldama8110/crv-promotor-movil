@@ -2,15 +2,19 @@ export type ActionsGuarantee =
   | {
       type: "POPULATE_GUARANTEES";
       data: Guarantee[]
-    };
+    }
+  | {
+    type: "ADD_GUARANTEE",
+    item: Guarantee
+  }
 
 
 export interface Guarantee {
   _id: string;
   client_id: string;
-  coordinates: [number, number];
+  coordinates?: [number, number];
   couchdb_type: "GUARANTEE";
-  created_at: string;
+  created_at: Date;
   created_by: string;
   guarantee_type: "vehicle" | "property" | "equipment"
   vehicle?: any;
@@ -25,6 +29,8 @@ export const GuaranteesReducer = (state: State, action: ActionsGuarantee) => {
   switch (action.type) {
     case "POPULATE_GUARANTEES":
       return action.data;
+    case "ADD_GUARANTEE":
+      return [ ...state, action.item]
     default:
       return state;
   }

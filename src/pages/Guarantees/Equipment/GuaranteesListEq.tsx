@@ -9,10 +9,10 @@ export const GuaranteesListEq = () => {
 
   return (
     <div>
-      {guaranteesList
+      { guaranteesList
         .filter((i: Guarantee) => i.guarantee_type === "equipment")
         .map((item: Guarantee) => (
-          <IonItem routerLink={`/guarantees/equipment/edit/${item._id}`} key={item._id}>
+          <IonItem routerLink={`guarantees/equipment/edit/${item._id}`} key={item._id}>
             <IonButton color="light">Ver</IonButton>
             <p> {item.equipment.description}</p>
           </IonItem>

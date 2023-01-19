@@ -73,7 +73,7 @@ export const GuaranteesFormVh: React.FC<GuaranteeVhFormProps> = (props) => {
         loadCoordinates();
         //// checamos si estamos en modo edicion
         if( props.vehicle ) {
-
+            
             setDescription(props.vehicle.description);
             setColor(props.vehicle.color);
             setModel(props.vehicle.model);
@@ -121,6 +121,7 @@ export const GuaranteesFormVh: React.FC<GuaranteeVhFormProps> = (props) => {
         }
 
     },[props.vehicle]);
+
     const onAddDeprecItem = ()=>{
         const newItem: DeprecData = {
             year: deprec_year,

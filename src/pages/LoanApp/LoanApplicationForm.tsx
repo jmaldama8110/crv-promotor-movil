@@ -80,19 +80,23 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
 
 
     useEffect( ()=>{
-        db.createIndex( {
-            index: { fields: [ "couchdb_type"] }
-           }).then( function (){
-              db.find({
-                selector: {
-                  couchdb_type: "LOANDEST"
-                }
-              }).then( (data:any) =>{
-                /// converts from loanDestinatios Catalog to locally have an array of selected destinations and its status TRUE or FALSE
-                const newDestinationsData: LoanDestination[] = data.docs.map((i:any)=> ({ _id: i._id, description:i.descripcion, status:false  }) )
-                setDestinations(newDestinationsData);
+
+        if( !props.loanapp ){
+                /// only when form is in new Loan app
+            db.createIndex( {
+                index: { fields: [ "couchdb_type"] }
+            }).then( function (){
+                db.find({
+                    selector: {
+                    couchdb_type: "LOANDEST"
+                    }
+                }).then( (data:any) =>{
+                    /// converts from loanDestinatios Catalog to locally have an array of selected destinations and its status TRUE or FALSE
+                    const newDestinationsData: LoanDestination[] = data.docs.map((i:any)=> ({ _id: i._id, description:i.descripcion, status:false  }) )
+                    setDestinations(newDestinationsData);
+                })
             })
-           })
+            }
     },[])
 
     useEffect( ()=> {
@@ -110,7 +114,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
             setPics( props.loanapp.pics);
             }
             if(props.loanapp.loandests){
-            setDestinations(props.loanapp.loandests);
+                setDestinations(props.loanapp.loandests);
+                
             }
             
             if( props.loanapp.product){
@@ -460,7 +465,6 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                         <IonItem>
                             <IonLabel>Resumen de Tu Solicitud</IonLabel>
                         </IonItem>
-                        
                         <IonGrid>
                             <IonRow>
                                 <IonCol size="4">Importe Solicitado:</IonCol>

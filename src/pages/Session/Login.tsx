@@ -22,6 +22,7 @@ interface UserInfo {
   second_lastname: string;
   email: string;
   current_token: string;
+  branch: [number, string];
 }
 
 interface UserSession {
@@ -65,6 +66,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
           name: usrInfo.user.name,
           lastname: usrInfo.user.lastname,
           user: usrInfo.user.email,
+          branch: apiResponse.data.user.employee_id.branch,
           current_token: usrInfo.token,
           token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
         });
@@ -87,12 +89,13 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
           const userLocalStorage = JSON.parse(value);
           const decoded:any = jwt_decode(userLocalStorage.token);
           const localDate = new Date(decoded.sync_info.sync_expiration);
-
+          
           dispatchSession({
             type: "LOGIN",
             name: userLocalStorage.user.name,
             lastname: userLocalStorage.user.lastname,
             user: userLocalStorage.user.email,
+            branch: userLocalStorage.user.employee_id.branch,
             current_token: userLocalStorage.token,
             token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
           });

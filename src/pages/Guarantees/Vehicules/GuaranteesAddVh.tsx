@@ -5,26 +5,34 @@ import { AppContext } from "../../../store/store";
 import { GuaranteesFormVh } from "./GuaranteesFormVh";
 import { db } from "../../../db";
 import { useContext } from "react";
+import { Guarantee } from "../../../reducer/GuaranteesReducer";
 
 export const GuaranteeAddVh:React.FC<RouteComponentProps> = ( props )=>{
 
     
-    const { session} = useContext(AppContext);
+    const { session, dispatchGuaranteesList} = useContext(AppContext);
 
     const onAdd = async (data:any)=> {
         /// Save new record
         const client_id = props.match.url.split("/")[2]
-        db.put({
+        const guaranteeItem: Guarantee = {
+            _id: Date.now().toString(),
             couchdb_type: 'GUARANTEE',
             guarantee_type: 'vehicle',
             client_id,
             created_by: session.user,
             created_at: new Date(),
-            _id: Date.now().toString(),
+            vehicle: data.vehicle
+        }
+        dispatchGuaranteesList( {
+            type: "ADD_GUARANTEE",
+            item: guaranteeItem
+        })
+        db.put({
+            ...guaranteeItem,
             ...data
         }).then( ()=>{
             props.history.goBack();
-            alert('Se guardo informacion del Vehiculo!');
         }).catch( e =>{
             alert('No se pudo guardar el dato del Vehiculo')
         })

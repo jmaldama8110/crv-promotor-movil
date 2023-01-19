@@ -1,5 +1,5 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../../components/ExploreContainer';
+
 import './SupervisorHome.css';
 
 const SupervisorHome: React.FC = () => {
@@ -16,7 +16,7 @@ const SupervisorHome: React.FC = () => {
             <IonTitle size="large">Supervisor</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Supervisor, sin actividad..." />
+
       </IonContent>
     </IonPage>
   );

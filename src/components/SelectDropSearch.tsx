@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./SelectDropSearch.css";
 
 export interface SearchData{
-  id: number;
+  id: string;
   rev?: string;
   etiqueta: string;
 }

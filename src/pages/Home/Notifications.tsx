@@ -1,5 +1,5 @@
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from "@ionic/react";
-import ExploreContainer from "../../components/ExploreContainer";
+
 
 
 export const Notifications: React.FC = () => {
@@ -16,7 +16,7 @@ export const Notifications: React.FC = () => {
             <IonTitle size="large">Notificaciones</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Notifications, sin actividad..." />
+        
 
     </IonContent>
 </IonPage>

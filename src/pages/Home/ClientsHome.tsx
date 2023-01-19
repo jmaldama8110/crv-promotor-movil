@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonActionSheet } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { db } from '../../db';
 import type { OverlayEventDetail } from '@ionic/core';
 
@@ -9,8 +9,7 @@ import {
   SelectDropSearch,
 } from "../../components/SelectDropSearch";
 import { useHistory } from 'react-router';
-
-import { Guarantee } from '../../reducer/GuaranteesReducer';
+import { AppContext } from '../../store/store';
 
 
 const ClientsHome: React.FC = () => {
@@ -19,23 +18,20 @@ const ClientsHome: React.FC = () => {
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
   
+  const { dispatchClientData,session } = useContext(AppContext);
   let history = useHistory();
   let render = true;
 
   const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
-    id: 0,
+    id: '',
     rev: "",
     etiqueta: "",
   });
 
 
-  
-
-  useEffect( ()=>{
-
-    
-
+  useEffect( ()=>{    
+    console.log('Sesion:', session)
     if( render ){
      db.createIndex( {
       index: { fields: [ "couchdb_type"] }
@@ -61,14 +57,16 @@ const ClientsHome: React.FC = () => {
     [
       { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
       { text: 'Editar', data: { action:"edit", routerLink: `/clients/edit/${clientSelected.id}` } },
-      { text: 'Ver Solicitudes', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps`} },
+      { text: 'Solicitudes & Creditos', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps`} },
       { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
-      { text: 'Ver Garantias', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
-      { text: 'Personas Relacionadas', data: { action: '' } },
+      { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
+      { text: 'Referencias & Personas', data: { action: 'related-people', routerLink:  `/clients/${clientSelected.id}/related-people` } },
+      { text: 'Datos Bancarios', data: { action: '' } },
       { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
+        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/clients/add-from-hf' } },
         { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },  
       ]
       present(
@@ -82,7 +80,11 @@ const ClientsHome: React.FC = () => {
   useEffect( ()=>{
     if( actions ){
       if( actions.data){
-        if(actions.data.action === 'add')
+        if(actions.data.action === 'add'){
+          dispatchClientData({type:'RESET'});
+          history.push(actions.data.routerLink);
+        }
+        if(actions.data.action === 'add-hf')
           history.push(actions.data.routerLink);
         if(actions.data.action === 'edit')
           history.push(actions.data.routerLink);
@@ -91,6 +93,8 @@ const ClientsHome: React.FC = () => {
         if( actions.data.action === 'loanapps')
             history.push(actions.data.routerLink);
         if( actions.data.action === 'guarantees')
+            history.push(actions.data.routerLink);
+        if( actions.data.action === 'related-people')
             history.push(actions.data.routerLink);
 
         

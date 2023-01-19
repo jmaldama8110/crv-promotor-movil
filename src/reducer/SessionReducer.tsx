@@ -4,6 +4,7 @@ export type ActionsSession =
       name: string;
       lastname: string;
       user: string;
+      branch: [number, string];
       current_token: string;
       token_expiration: string;
     }
@@ -17,6 +18,7 @@ export interface Session {
   name: string;
   lastname: string;
   user: string;
+  branch: [number, string];
   current_token: string;
   token_expiration: string;
   loading: boolean;
@@ -33,6 +35,7 @@ export const SessionReducer = (state: State, action: ActionsSession) => {
         name: action.name,
         lastname: action.lastname,
         user: action.user,
+        branch: action.branch,
         current_token: action.current_token,
         token_expiration: action.token_expiration
       };

@@ -1,5 +1,5 @@
 import {
-  IonBackButton,IonButton,IonButtons,IonContent,IonHeader,IonLabel,IonPage,IonSegment,IonSegmentButton,IonTitle,IonToolbar, useIonLoading } from "@ionic/react";
+  IonBackButton,IonButton,IonButtons,IonContent,IonHeader,IonLabel,IonPage,IonSegment,IonSegmentButton,IonTitle,IonToolbar } from "@ionic/react";
 import React, { useContext, useEffect } from "react";
 import { useState } from "react";
 import { RouteComponentProps } from "react-router";
@@ -11,10 +11,6 @@ import { db } from "../../db";
 
 export const GuaranteesHome :React.FC<RouteComponentProps> = ( props )=>{
   const [currSegment, setSegment] = useState<string>("vehicles");
-  const [present,dismiss] = useIonLoading();
-  // const { dispatchGuaranteesEquipment, 
-  //         dispatchGuaranteesVehicle,
-  //         dispatchGuaranteesProperty } = useContext(AppContext);
   
   const { dispatchGuaranteesList } = useContext( AppContext);
 
@@ -26,46 +22,13 @@ export const GuaranteesHome :React.FC<RouteComponentProps> = ( props )=>{
       db.find({
         selector: { couchdb_type: "GUARANTEE"}
       }).then( (data:any) =>{
-        console.log(data.docs)
+        const clientId = props.match.url.split("/")[2]
         dispatchGuaranteesList({
           type:"POPULATE_GUARANTEES",
-          data: data.docs
+          data: data.docs.filter( (i:any) => i.client_id === clientId)
         })
       })
     })
-
-    // async function loadData () {
-    //   present({message:'Cargando...'})
-    //   try {
-    //     const apiRes = await api.get('/guarantees');
-        
-    //     const equipmentData = apiRes.data.filter( (i:any)=> i.guarantee_type === 'equipment');
-    //     const propsData = apiRes.data.filter( (i:any)=> i.guarantee_type === 'property');
-    //     const vehiclesData = apiRes.data.filter( (i:any)=> i.guarantee_type === 'vehicle');
-  
-    //     dispatchGuaranteesEquipment({
-    //       type: 'POPULATE_GUARANTEE_EQ',  
-    //       data: equipmentData.map( (i:any)=> ( {_id: i._id,...i.equipment} ) )
-    //     });
-    //     dispatchGuaranteesVehicle({
-    //       type: 'POPULATE_GUARANTEE_VH',
-    //       data: vehiclesData.map( (i:any) =>( {_id: i._id,...i.vehicle } ) )
-    //     })
-    //     dispatchGuaranteesProperty( {
-    //       type: 'POPULATE_GUARANTEE_PROP',
-    //       data: propsData.map( (i:any) => ( { _id: i._id,...i.property} ) )
-    //     })
-
-    //     dismiss();
-    //   }
-    //   catch(error){
-    //     dismiss();
-    //     console.log(error);
-    //     alert('No fue posible recuperar informacion de Garantias')
-    //   }
-    // }
-    // loadData();
-
   },[])
 
 

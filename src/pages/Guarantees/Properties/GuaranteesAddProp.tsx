@@ -10,33 +10,38 @@ import {
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { AppContext } from "../../../store/store";
 import { GuaranteesFormProp } from "./GuaranteesFormProp";
 
 export const GuaranteeAddProp: React.FC<RouteComponentProps> = (props) => {
 
-
-    const { session} = useContext(AppContext);
+    const { session, dispatchGuaranteesList } = useContext(AppContext);
     
     const onAdd = async (data: any) => {
         const client_id = props.match.url.split("/")[2]
+        const guaranteeItem: Guarantee = {
+          _id: Date.now().toString(),
+          couchdb_type: 'GUARANTEE',
+          guarantee_type: 'property',
+          client_id,
+          created_by: session.user,
+          created_at: new Date(),
+          property: data.property
+        }
+        dispatchGuaranteesList( {
+          type: "ADD_GUARANTEE",
+          item: guaranteeItem
+        })
         db.put({
-            couchdb_type: 'GUARANTEE',
-            guarantee_type: 'property',
-            client_id,
-            created_by: session.user,
-            created_at: new Date(),
-            _id: Date.now().toString(),
+            ...guaranteeItem,
             ...data
         }).then( ()=>{
             props.history.goBack();
-            alert('Se guardo informacion de la propiedad!');
         }).catch( e =>{
             alert('No se pudo guardar el dato de la propiedad')
         })
     };
-
-
 
   return (
     <IonPage>

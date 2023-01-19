@@ -8,9 +8,8 @@ import {
   IonList,
   IonButton,
 } from "@ionic/react";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
-import { startReplication } from "../../db";
 import { AppContext } from "../../store/store";
 import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
 
@@ -40,6 +39,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
         name: "",
         lastname: "",
         user: "",
+        branch: [0,""],
         current_token: "",
         token_expiration: ""
       });
@@ -47,9 +47,6 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
     },3000)
   }
 
-  useEffect( ()=>{
-    startReplication();
-  },[]) 
   
   return (
     <IonPage>
@@ -73,6 +70,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
           <p>Nombre: {session.name} {session.lastname}</p>
           <p>Usuario: {session.user}</p>
           <p>Expira el: {session.token_expiration}</p>
+          <p>Centro de Costo: { !!session.branch ? session.branch[1]: '<No  />'}</p>
           
           <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
 

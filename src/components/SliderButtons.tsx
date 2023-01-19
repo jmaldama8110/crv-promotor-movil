@@ -13,6 +13,23 @@ interface SliderButtonProps {
     onAction?: any; 
 }
 
+
+export const ButtonSlider: React.FC< { slideDirection : "F"|"B", onClick: any, label: string, color: string, expand: 'full' |'block' }> = ( { slideDirection, onClick, label, color,expand} ) => {
+  
+    const slider = useSwiper();
+  
+    function onMove(){
+      if( slideDirection === 'F')
+        slider.slideNext();
+      if( slideDirection === 'B')
+        slider.slidePrev();
+      onClick();
+    }
+    return(
+     <IonButton onClick={onMove} color={color} expand={expand}>{label}</IonButton>
+    );
+}
+
 export const IonButtonNext: React.FC<SliderButtonProps> = ( props ) => {
     const swiper = useSwiper();
     const onNextAction = () => {

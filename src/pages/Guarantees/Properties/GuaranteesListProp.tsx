@@ -12,7 +12,7 @@ export const GuaranteesListProp = () => {
       {guaranteesList
         .filter((i: Guarantee) => i.guarantee_type === "property")
         .map((item: Guarantee) => (
-          <IonItem routerLink={`/guarantees/property/edit/${item._id}`} key={item._id}>
+          <IonItem routerLink={`guarantees/property/edit/${item._id}`} key={item._id}>
             <IonButton color="light">Ver</IonButton>
             <p> {item.property.description}</p>
           </IonItem>
