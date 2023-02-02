@@ -1,36 +1,38 @@
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonLoading, useIonToast } from "@ionic/react";
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react";
 import { RouteComponentProps } from "react-router";
-import { LoanApplicationForm } from "./LoanApplicationForm";
 
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
 import { useContext } from "react";
+import { LoanAppGroupForm } from "./LoanAppGroupForm";
+import { LoanAppGroup } from "../../reducer/LoanAppGroupReducer";
 import { useDBSync } from "../../hooks/useDBSync";
 
-export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
+export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
 
-    
-    const { session } = useContext(AppContext);
+    const { session,groupMemberList } = useContext(AppContext);
     const { couchDBSync } = useDBSync();
     
     const onAdd = async (data:any) =>{
         const clientId = props.match.url.split("/")[2];
-        
-        db.put({
+        const newLoanAppGroup: LoanAppGroup = {
+            ...data,
+            members: groupMemberList,
             _id: Date.now().toString(),
             apply_by: clientId,
-            apply_at: new Date(),
+            apply_at: (new Date()).toISOString(),
             created_by: session.user,
-            status:[1, "Pendiente"],
+            created_at: (new Date()).toISOString(),
             branch: session.branch,
-            couchdb_type: "LOANAPP",
-            ...data
+            status:[1, "Pendiente"],
+        }
+        db.put({
+            ...newLoanAppGroup
           }).then( async (doc)=>{
               await couchDBSync();
               props.history.goBack();
-
-            }).catch( e =>{
-            alert('No se pudo guardar el dato del cliente')
+          }).catch( e =>{
+            alert('No se pudo guardar la solicitud...')
           })
         
     }
@@ -40,18 +42,20 @@ export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
         <IonHeader>
             <IonToolbar>
             <IonButtons slot="start">
-                <IonBackButton defaultHref="/guarantees" />
+                <IonBackButton />
             </IonButtons>
             <IonTitle>Nueva Solicitud</IonTitle>
             </IonToolbar>
       </IonHeader>
       <IonContent>
-                <LoanApplicationForm 
+                <LoanAppGroupForm 
                 onSubmit={onAdd}
-                {...props}
+                
                 />
             </IonContent>
         </IonPage>
     )
 
 }
+
+

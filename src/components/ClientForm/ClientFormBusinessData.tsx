@@ -35,6 +35,7 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
         setBusinessPhone( clientData.business_data.business_phone);
         setTributaryRegime( clientData.tributary_regime[0]);
         setRfc( clientData.rfc);
+        setNotBis( clientData.not_bis);
       }
   },[clientData]);
 

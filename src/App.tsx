@@ -72,6 +72,13 @@ import { Preferences } from "@capacitor/preferences";
 import { ClientsFromHF } from "./pages/Clients/ClientsFromHF";
 import { GroupAdd } from "./pages/Groups/GroupAdd";
 import { db, remoteDB } from "./db";
+import { LoanAppGroupHome } from "./pages/LoanAppGroup/LoanAppGroupHome";
+import { GroupEdit } from "./pages/Groups/GroupEdit";
+import { LoanAppGroupAdd } from "./pages/LoanAppGroup/LoanAppGroupAdd";
+import { LoanAppGroupEdit } from "./pages/LoanAppGroup/LoanAppGroupEdit";
+import { LoanAppMemberAdd } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberAdd";
+import { LoanAppMemberEdit } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberEdit";
+import { GroupFromHF } from "./pages/Groups/GroupFromHF";
 
 setupIonicReact();
 
@@ -201,9 +208,23 @@ const App: React.FC = () => {
             <Route exact path="/clients/:id/related-people/beneficiaries/add" component={BeneficiariesAdd}></Route>
             <Route exact path="/clients/:id/related-people/beneficiaries/edit/:id" component={BeneficiariesEdit}></Route>
 
-          
-            <Route exact path="/groups" component={GroupsHome}></Route>
+            <Route exact path="/groups" component={GroupsHome}></Route>   
             <Route exact path="/groups/add" component={GroupAdd}></Route>
+            <Route exact path="/groups/add-from-hf" component={GroupFromHF}></Route>
+            <Route exact path="/groups/edit/:id" component={GroupEdit}></Route>
+
+            <Route exact path="/groups/:id/loanapps" component={LoanAppGroupHome}></Route>
+            <Route exact path="/groups/:id/loanapps/add" component={LoanAppGroupAdd}></Route>
+            <Route exact path="/groups/:id/loanapps/edit/:id" component={LoanAppGroupEdit}></Route>
+
+            <Route exact path="/groups/:id/loanapps/add/members/add" component={LoanAppMemberAdd}></Route>
+            <Route exact path="/groups/:id/loanapps/add/members/edit/:id" component={LoanAppMemberEdit}></Route>
+
+            <Route exact path="/groups/:id/loanapps/edit/:id/members/add" component={LoanAppMemberAdd}></Route>
+            <Route exact path="/groups/:id/loanapps/edit/:id/members/edit/:id" component={LoanAppMemberEdit}></Route>
+
+
+
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>
             <Route exact path="/" component={MyProfile}></Route>

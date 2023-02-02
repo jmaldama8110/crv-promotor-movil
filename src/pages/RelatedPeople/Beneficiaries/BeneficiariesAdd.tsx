@@ -1,7 +1,8 @@
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonLoading, useIonToast } from "@ionic/react";
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react";
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { RelatedPeople } from "../../../reducer/RelatedpeopleReducer";
 import { AppContext } from "../../../store/store";
 import { BeneficiariesForm } from "./BeneficiariesForm";
@@ -10,7 +11,8 @@ export const BeneficiariesAdd:React.FC<RouteComponentProps> = ( props )=>{
 
     
     const { dispatchRelatedPeople, session } = useContext(AppContext);
-    const [showToast] = useIonToast();
+    
+    const { couchDBSync } = useDBSync();
 
     const onAdd = async (data:any)=> {
         const client_id = props.match.url.split("/")[2];
@@ -27,12 +29,12 @@ export const BeneficiariesAdd:React.FC<RouteComponentProps> = ( props )=>{
         db.put({
             ...beneficiary,
             ...data,
-        }).then( ()=>{
+        }).then( async ()=>{
             dispatchRelatedPeople( {
                 type: "ADD_RP",
                 item: beneficiary
             })
-            showToast("Informacion guardada!",1500);
+            await couchDBSync();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar informacion del Aval')

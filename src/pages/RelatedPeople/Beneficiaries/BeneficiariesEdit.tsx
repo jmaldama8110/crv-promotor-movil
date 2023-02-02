@@ -2,12 +2,15 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, Io
 import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { RelatedPeople } from "../../../reducer/RelatedpeopleReducer";
 import { BeneficiariesForm } from "./BeneficiariesForm";
 
 
 export const BeneficiariesEdit:React.FC<RouteComponentProps> = ( props )=>{
 
+
+    const { couchDBSync } = useDBSync();
     const [editItem, setEditItem] = useState<RelatedPeople >({
         _id: "",
         client_id: "",
@@ -39,7 +42,17 @@ export const BeneficiariesEdit:React.FC<RouteComponentProps> = ( props )=>{
   
 
     const onSubmit = async (data:any) => {
-        props.history.goBack();
+        const itemId = props.match.url.split("/")[6];
+        db.get(itemId).then( (doc:any) => {
+            return db.put({
+              ...doc,
+              ...data,
+              updated_at: Date.now()
+            }).then( async ()=>{
+                await couchDBSync();
+                props.history.goBack();
+            })
+          })
     }
 
     return (

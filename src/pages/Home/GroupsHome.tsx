@@ -1,24 +1,50 @@
 import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonActionSheet } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { SearchData, SelectDropSearch } from '../../components/SelectDropSearch';
+import { db } from '../../db';
+import { AppContext } from '../../store/store';
 import './GroupsHome.css';
 
 const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
-
+  const { dispatchGroupData } = useContext(AppContext);
   const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
     rev: "",
     etiqueta: "",
   });
+  let render = true;
+
+  useEffect( ()=>{
+    if( render ){
+     db.createIndex( {
+      index: { fields: [ "couchdb_type"] }
+     }).then( function (){
+        console.log('Index, created...');
+        db.find({
+          selector: {
+            couchdb_type: "GROUP"
+          }
+        }).then( data =>{
+          const newData = data.docs.map( (i:any)=>( {id: i._id, rev: i._rev, etiqueta: `${i.group_name}`} ))
+          
+          setClientSearchData( newData);
+          console.log('Groups Loaded: ', newData.length)
+      })
+     })
+      render = false;
+    }
+  },[])
+
 
   function onShowActions(){
+
     const buttons = clientSelected.id ? 
     [
       { text: 'Nuevo Grupo', role:"destructive",data: { action: 'add', routerLink:'/groups/add' } },
@@ -40,11 +66,15 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
           })
   }
 
+  
+
   useEffect( ()=>{
     if( actions ){
       if( actions.data){
-        if(actions.data.action === 'add')
+        if(actions.data.action === 'add'){
+          dispatchGroupData({ type: "RESET_GROUP_DATA"});
           history.push(actions.data.routerLink);
+        }
         if(actions.data.action === 'add-hf')
           history.push(actions.data.routerLink);
         if(actions.data.action === 'edit')

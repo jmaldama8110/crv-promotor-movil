@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { RelatedPeople } from "../../../reducer/RelatedpeopleReducer";
 
 import { GuarantorForm } from "./GuarantorForm";
@@ -36,6 +37,7 @@ export const GuarantorEdit: React.FC<RouteComponentProps> = (props) => {
     relationship: "",
     
   });
+  const { couchDBSync } = useDBSync();
   
   let render = true;
 
@@ -50,7 +52,17 @@ export const GuarantorEdit: React.FC<RouteComponentProps> = (props) => {
   }, []);
 
   const onSubmit = async (data: any) => {
-
+    const itemId = props.match.url.split("/")[6];
+    db.get(itemId).then( (doc:any) => {
+        return db.put({
+          ...doc,
+          ...data,
+          updated_at: Date.now()
+        }).then( async ()=>{
+            await couchDBSync();
+            props.history.goBack();
+        })
+      })
   };
 
   return (

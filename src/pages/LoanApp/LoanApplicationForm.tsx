@@ -1,6 +1,6 @@
 
 import { IonButton, IonChip, IonCol, IonFab, IonFabButton, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonListHeader, IonRadio, IonRadioGroup, IonRange, IonRow, IonSegment, IonSegmentButton } from "@ionic/react";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 
 import { Geolocation } from "@capacitor/geolocation";
@@ -9,23 +9,18 @@ import 'swiper/css';
 
 import { useCameraTaker } from "../../hooks/useCameraTaker";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
-import { IonButtonNext, IonButtonPrev } from "../../components/SliderButtons";
+import { ButtonSlider } from "../../components/SliderButtons";
 import './LoanApplicationForm.css';
 import { getRound } from "../../utils/math";
-import { AppContext } from "../../store/store";
 import { camera } from "ionicons/icons";
 import { db } from "../../db";
+import { TermType } from "../../reducer/LoanAppGroupReducer";
 
 interface LoanApplicationFormProps extends RouteComponentProps {
     loanapp?: any;
     onSubmit: any;
 }
 
-interface TermType {
-    identifier: string;
-    value: string;
-    year_periods: string;
-}
 
 interface LoanDestination {
     _id: number;
@@ -39,7 +34,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
 
     const [ productsList, setProductList] = useState([]);  
 
-    const [currSegment, setSegment] = useState<string>("5");
+    const [currSegment, setSegment] = useState<number>(5);
     const [apply_amount, setApplyAmount] = useState(0);
     const [lat,setLat] = useState(0);
     const [lng, setLng] = useState(0);
@@ -71,8 +66,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                   couchdb_type: "PRODUCT"
                 }
               }).then( (data:any) =>{
-                // const newData = data.docs.map( (i:any)=>( {id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`} ))
-                setProductList(data.docs);
+                const newData = data.docs.filter( (i:any) => ( (i.external_id === 5 || i.external_id === 12 ) ))
+                setProductList( newData);
             })
            })
 
@@ -80,7 +75,6 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
 
 
     useEffect( ()=>{
-
         if( !props.loanapp ){
                 /// only when form is in new Loan app
             db.createIndex( {
@@ -235,6 +229,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
 
         if( currSegment ){
             const selectedProduct:any = productsList.find( (i:any) => i.external_id == currSegment )
+            
             if( selectedProduct ){
                 setMinAmount(selectedProduct.min_amount);
                 setMaxAmount(selectedProduct.max_amount);
@@ -249,7 +244,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
             }
         }
 
-    },[currSegment]);
+    },[productsList,currSegment]);
 
     const onPhotoTitleUpdate = (e:any) =>{
         const itemPosition = pics.length - 1;
@@ -266,8 +261,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                 <IonList className="ion-padding">
                     <div className="contenido-loanform">
                         <IonSegment
-                            value={currSegment}
-                            onIonChange={(e) => setSegment(e.detail.value!)}
+                            value={currSegment.toString()}
+                            onIonChange={(e) => setSegment(parseFloat(e.detail.value!))}
                             >
                         {
                             productsList.map( (i:any)=>(
@@ -277,7 +272,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                             ))
                         }
                         </IonSegment>                        
-                        { currSegment === "5" && /// Tu Negocio
+                        { currSegment === 5 && /// Tu Negocio
                             <div>
                                 <div className="texto-centrado">
                                     <h1 className="clr-tnc">TU NEGOCIO CON CONSERVA</h1>
@@ -308,7 +303,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                             </div>
                         
                         }
-                        { currSegment === "12" && /// Tu Hogar
+                        { currSegment === 12 && /// Tu Hogar
                             <div>
                                 <div className="texto-centrado">
                                     <h1 className="clr-tuhogar">TU HOGAR CON CONSERVA</h1>
@@ -337,7 +332,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                                 </div>                                
                             </div>
                         }
-                        { currSegment === "4" && // Especial
+                        { currSegment === 4 && // Especial
                             <div>
                                 <div className="texto-centrado">
                                     <h1 className="clr-especial">CREDITO ESPECIAL CONSERVA</h1>
@@ -367,7 +362,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                             </div>
                         }
                     </div>
-                    <IonButtonNext enabled={true} color='primary' expand="block" text='Siguiente'></IonButtonNext>
+                    <ButtonSlider color="primary" expand="block" label='Siguiente' onClick={() => {} } slideDirection={"F"}></ButtonSlider>
                 </IonList>
     
             </SwiperSlide>}
@@ -401,8 +396,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                         </IonItem>
 
                     </div>
-                    <IonButtonNext enabled={true} color='primary' expand="block" text='Siguiente' ></IonButtonNext>
-                    <IonButtonPrev enabled={true} color='light' expand="block" text='Anterior' ></IonButtonPrev>
+                    <ButtonSlider color="primary" expand="block" label='Siguiente' onClick={() => {} } slideDirection={"F"}></ButtonSlider>
+                    <ButtonSlider color="medium" expand="block" label='Anterior' onClick={() => {} } slideDirection={"B"}></ButtonSlider>
                 </IonList>
 
             </SwiperSlide>
@@ -424,8 +419,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                             ))
                         }
                     </div>
-                    <IonButtonNext enabled={true} color='primary' expand="block" text='Siguiente' ></IonButtonNext>
-                    <IonButtonPrev enabled={true} color='light' expand="block" text='Anterior' ></IonButtonPrev>
+                    <ButtonSlider color="primary" expand="block" label='Siguiente' onClick={() => {} } slideDirection={"F"}></ButtonSlider>
+                    <ButtonSlider color="medium" expand="block" label='Anterior' onClick={() => {} } slideDirection={"B"}></ButtonSlider>
                 </IonList>
             </SwiperSlide>
             <SwiperSlide>
@@ -453,9 +448,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                             </IonRow>
                         </IonGrid>
                     </div>
-
-                    <IonButtonNext enabled={true} color='primary' expand="block" text='Siguiente' ></IonButtonNext>
-                    <IonButtonPrev enabled={true} color='light' expand="block" text='Anterior' ></IonButtonPrev>
+                    <ButtonSlider color="primary" expand="block" label='Siguiente' onClick={() => {} } slideDirection={"F"}></ButtonSlider>
+                    <ButtonSlider color="medium" expand="block" label='Anterior' onClick={() => {} } slideDirection={"B"}></ButtonSlider>
                 </IonList>
             </SwiperSlide>
             <SwiperSlide>
@@ -488,7 +482,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                     </div>
                     
                     <IonButton onClick={onSend} type="submit" color="primary" expand="block" className="margen-abajo">Confirmar</IonButton>
-                    <IonButtonPrev enabled={true} color='light' expand="block" text='Anterior' ></IonButtonPrev>
+                    <ButtonSlider color="medium" expand="block" label='Anterior' onClick={() => {} } slideDirection={"B"}></ButtonSlider>
                 </IonList>
             </SwiperSlide>
         </Swiper>

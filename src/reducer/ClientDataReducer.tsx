@@ -33,7 +33,7 @@ export type ActionsClientData = {
   ine_clave: string;
   ine_doc_number: string;
   ine_duplicates: string;
-  loan_cycle: string;
+  loan_cycle: number;
   marital_status: [number, string];
   nationality: [number, string];
   not_bis: boolean;
@@ -45,7 +45,7 @@ export type ActionsClientData = {
   _rev?: string;
 } |
 {
-  type: 'RESET'
+  type: 'RESET_CLIENT'
 }
 
 export interface ClientData {
@@ -82,7 +82,7 @@ export interface ClientData {
     ine_clave: string;
     ine_doc_number: string;
     ine_duplicates: string;
-    loan_cycle: string;
+    loan_cycle: number;
     marital_status: [number, string];
     nationality: [number, string];
     not_bis: boolean;
@@ -121,7 +121,7 @@ export const clientDataDef: ClientData = {
   ine_duplicates: "",
   email: '',
   lastname: "",
-  loan_cycle: "",
+  loan_cycle: 0,
   marital_status: [1, ''],
   name: "",
   nationality: [0, ''],
@@ -190,7 +190,7 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         _id: action._id,
         _rev: action._rev
       };
-    case 'RESET': 
+    case 'RESET_CLIENT': 
       return {
         ...state, ...clientDataDef
       }

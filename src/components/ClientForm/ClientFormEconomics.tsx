@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
 import { SearchData, SelectDropSearch } from "../SelectDropSearch";
-import { ButtonSlider, IonButtonNext, IonButtonPrev } from "../SliderButtons";
+import { ButtonSlider } from "../SliderButtons";
 
 export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
 

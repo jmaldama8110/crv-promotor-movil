@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonAlert, useIonLoading, useIonToast } from "@ionic/react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import api from "../../api/api";
 import { db, remoteDB } from "../../db";
@@ -41,9 +41,12 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history}) => {
               throw new Error('Fallo la busqueda');
             } else  {
               const apiRes2 = await api.get(`/clients/hf?identityNumber=${curp}&externalId=${apiRes.data.id_cliente}`);
-              console.log(apiRes2.data);
               const newData = apiRes2.data as ClientData
               
+              if( !(newData.branch[0] == session.branch[0]) )
+              {
+                throw new Error('No puedes modificar datos fuera de tu sucursal');
+              }
               dispatchClientData({
                   type: 'SET_CLIENT',
                   ...newData,

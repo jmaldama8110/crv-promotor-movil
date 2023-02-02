@@ -18,11 +18,7 @@ import { Geolocation } from "@capacitor/geolocation";
 interface ClientFormProps {
   onSubmit: any;
 }
- /**
-  * RODO960112HCSMZS00
-  * PEAL940702HCSRGS01
-  * 
-  */
+
 export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
   
   
@@ -50,15 +46,32 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
     })
   };
 
+
+  function updateAddressBasedOnType ( typeAdd: string, newAddressData:any){
+    /// 1. determines whether a HOME address exists
+    let newAddressList = clientData.address
+    const homeAddress = newAddressList.find( (i:any) => i.type=== typeAdd );
+    ///2. if exists, update it
+    if( homeAddress)
+      newAddressList = clientData.address.map( (add:any) => (
+          add._id === homeAddress._id ? {...add,...newAddressData} : { ...add } ))
+     else // 3. If not, add it
+      newAddressList.push({
+        _id: Date.now().toString(),
+        ...newAddressData
+      })
+    
+    return newAddressList
+
+  }
+
   function onHomeAddressNext( data:any){
   
     dispatchClientData({ 
       type:"SET_CLIENT",
       ...clientData,
       coordinates: [lat,lng],
-      address: [{
-          _id: Date.now().toString(),
-          ...data }]
+      address:  updateAddressBasedOnType('DOMICILIO',data)
     })
     
   }
@@ -103,12 +116,7 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
     dispatchClientData({ 
       type:"SET_CLIENT",
       ...clientData,
-      address: [
-        clientData.address[0],
-        {
-          _id: Date.now().toString(),
-          ...data 
-        }]
+      address: updateAddressBasedOnType('NEGOCIO',data)
     })
   }
   function sendData() {

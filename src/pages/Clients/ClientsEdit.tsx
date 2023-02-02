@@ -9,16 +9,21 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db, remoteDB } from "../../db";
+import { useDBSync } from "../../hooks/useDBSync";
 import { ClientData } from "../../reducer/ClientDataReducer";
 import { AppContext } from "../../store/store";
 import { ClientForm } from "./ClientForm";
 
 export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) => {
 
-  const { dispatchSession , dispatchClientData} = useContext(AppContext);
-  const [showToast] = useIonToast();
+  const {  dispatchClientData} = useContext(AppContext);
+  const { couchDBSync } = useDBSync();
+
   let render = true;
   useEffect(() => {
+
+    if( render ){
+      render = false;
       const itemId = match.url.replace("/clients/edit/", "");
       
         db.get(itemId)
@@ -32,9 +37,9 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
           .catch((err) => {
             alert("No fue posible recuperar el cliente: " + itemId);
           });
-          return () =>{
-            dispatchClientData({ type:'RESET' });
-          }
+        
+    }
+
       
   }, []);
 
@@ -46,26 +51,9 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
       return db.put({
         ...clientDbData,
         ...data
-      }).then( ()=>{
-        try{
-          dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Subiendo datos..."});
-          db.replicate.to(remoteDB).on('complete', function () {
-            console.log('Local => RemoteDB, Ok!')
-            dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "" });
-            history.goBack();
-            alert('Se guardo el cliente!');
-    
-          }).on('error', function (err) {
-            dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "" });
-            history.goBack();
-            alert('Se guardo el cliente!, pero estas sin conexion...');
-            throw new Error();
-          });
-        }
-        catch(e){
-          console.log(e);
-        }
-        
+      }).then( async ()=>{
+        await couchDBSync();
+        history.goBack();
       })
     })
     

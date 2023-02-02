@@ -6,10 +6,12 @@ import { AppContext } from "../../../store/store";
 import { GuaranteesFormEq } from "./GuaranteesFormEq";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 
 export const GuaranteesEditEq:React.FC<RouteComponentProps> = ( props )=>{
 
     const [editItem, setEditItem] = useState<Guarantee>();
+    const { couchDBSync } = useDBSync();
 
     useEffect( ()=>{
         const itemId = props.match.url.split("/")[6];
@@ -20,15 +22,19 @@ export const GuaranteesEditEq:React.FC<RouteComponentProps> = ( props )=>{
     },[]);
 
     const onSubmit = async (data:any) => {
+        
         const itemId = props.match.url.split("/")[6];
-        db.get(itemId).then( (guarantee:any) => {
+
+        db.get(itemId).then( async (guarantee:any) => {
             return db.put({
               ...guarantee,
               ...data,
               updated_at: Date.now()
+            }).then(async  ()=>{
+                await couchDBSync();
+                props.history.goBack();
             })
           })
-          props.history.goBack();
     }
 
     return (

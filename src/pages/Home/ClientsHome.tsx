@@ -12,13 +12,14 @@ import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
 
 
+
 const ClientsHome: React.FC = () => {
 
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
   
-  const { dispatchClientData,session } = useContext(AppContext);
+  const { dispatchClientData } = useContext(AppContext);
   let history = useHistory();
   let render = true;
 
@@ -31,7 +32,7 @@ const ClientsHome: React.FC = () => {
 
 
   useEffect( ()=>{    
-    console.log('Sesion:', session)
+    
     if( render ){
      db.createIndex( {
       index: { fields: [ "couchdb_type"] }
@@ -81,7 +82,7 @@ const ClientsHome: React.FC = () => {
     if( actions ){
       if( actions.data){
         if(actions.data.action === 'add'){
-          dispatchClientData({type:'RESET'});
+          dispatchClientData({type:'RESET_CLIENT'});
           history.push(actions.data.routerLink);
         }
         if(actions.data.action === 'add-hf')
@@ -124,8 +125,7 @@ const ClientsHome: React.FC = () => {
                   dataList={clientSearchData}
                   setSelectedItemFx={setClientSelected}
                   currentItem={clientSelected}
-                  description={'Buscar...'}
-                  
+                  description={'Buscar...'}                  
                 />
         </IonItemGroup>
 

@@ -5,6 +5,7 @@ import { getRound } from "../../utils/math";
 import { db } from "../../db";
 
 import { formatLocalCurrency } from "../../utils/numberFormatter";
+import { useDBSync } from "../../hooks/useDBSync";
 
 interface SocioEconomicData {
   id: number;
@@ -170,8 +171,8 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
   const [bisInventoryPrice, setBisInventoryPrice] = useState("");
   const [bisInventoryQuantity, setBisInventoryQuantity] = useState("");
 
-  const [presentLoading, dismissLoading] = useIonLoading();
   const [ addEdit, setAddEdit] = useState<boolean>(false); // TRUE = Adding, FALSE = Edit socioeconomic record
+  const { couchDBSync } = useDBSync();
 
   const [itemId, setItemId] = useState('');
 
@@ -313,10 +314,13 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
             return db.put({
               ...clientData,
               socioeconomic_id: newId
+            }).then( async ()=>{
+              await couchDBSync();
+              history.goBack();
+
             })
           })
-          history.push('/clients');
-          alert('Se guardo informacion Socioeconomica!');
+          
 
         }).catch( e =>{
           alert('No se pudo guardar el dato del cliente')
@@ -329,12 +333,13 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
           return db.put({
             ...socioeconomicInfo,
             ...data
-          });
+          }).then( async ()=>{
+            await couchDBSync();
+            history.goBack();
+          })
         })
 
       })
-      alert('Se guardo informacion Socioeconomica!')
-      history.push('/clients');
   
     }
     

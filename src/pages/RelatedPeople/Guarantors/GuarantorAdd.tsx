@@ -2,6 +2,7 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, Io
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { RelatedPeople } from "../../../reducer/RelatedpeopleReducer";
 import { AppContext } from "../../../store/store";
 import { GuarantorForm } from "./GuarantorForm";
@@ -9,7 +10,7 @@ import { GuarantorForm } from "./GuarantorForm";
 export const GuarantorAdd:React.FC<RouteComponentProps> = ( props )=>{
 
     const { session, dispatchRelatedPeople } = useContext(AppContext);
-    const [showToast] = useIonToast();
+    const { couchDBSync } = useDBSync();
 
     const onAdd = async (data:any)=> {
         const client_id = props.match.url.split("/")[2];
@@ -26,12 +27,12 @@ export const GuarantorAdd:React.FC<RouteComponentProps> = ( props )=>{
         db.put({
             ...guarantor,
             ...data,
-        }).then( ()=>{
+        }).then(async ()=>{
             dispatchRelatedPeople( {
                 type: "ADD_RP",
                 item: guarantor
             })
-            showToast("Informacion guardada!",1500);
+            await couchDBSync();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar informacion del Aval')

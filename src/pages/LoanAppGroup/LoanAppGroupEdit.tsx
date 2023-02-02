@@ -1,51 +1,44 @@
-import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, useIonLoading, useIonToast } from "@ionic/react";
-import { useContext, useEffect, useState } from "react";
+import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, useIonLoading } from "@ionic/react";
+import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
-import { db, remoteDB } from "../../db";
+import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
+import { LoanAppGroupForm } from "./LoanAppGroupForm";
 
-import { LoanApplicationForm } from "./LoanApplicationForm";
 
-export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
+export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
 
-    const [loan,setLoan] = useState({})
-    const [showToast] = useIonToast();
-    const { dispatchSession } = useContext(AppContext);
+   
+    const { dispatchLoanAppGroup, groupMemberList } = useContext(AppContext);
     const { couchDBSync } = useDBSync();
-
     useEffect( ()=>{
 
       const itemId = props.match.url.split("/")[5];
       db.get(itemId)
         .then( (loan:any) => {
-          db.get(loan.product).then( (prod) =>{
-            const newData = {
-              ...loan,
-              product: prod
-            }
-            setLoan(newData);
-          })
+          dispatchLoanAppGroup( {type: 'SET_LOAN_APP_GROUP', ...loan})
         })
         .catch((err) => {
-          alert("No fue posible recuperar datos del cliente: " + itemId);
+          alert("No fue posible recuperar datos de la solicitud del grupo..: " + itemId);
         });
     },[])
     
     const onSave = async (data:any) => {
       const itemId = props.match.url.split("/")[5];
 
-      db.get(itemId).then( (loanInfo:any) => {
+      db.get(itemId).then( async (loanInfo:any) => {
         return db.put({
           ...loanInfo,
           ...data,
+          members: groupMemberList,
           updated_at: Date.now()
-        }).then(async ()=> {
+        }).then( async function(){
           await couchDBSync();
           props.history.goBack();
         })
       })
-
+      
     }
   return (
     <IonPage>
@@ -58,7 +51,7 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-       <LoanApplicationForm onSubmit={onSave} loanapp={loan} {...props} />
+       <LoanAppGroupForm  onSubmit={onSave} />
       </IonContent>
     </IonPage>
   );

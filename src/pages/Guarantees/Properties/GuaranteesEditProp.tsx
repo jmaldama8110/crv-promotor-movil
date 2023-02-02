@@ -2,6 +2,7 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, Io
 import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { GuaranteesFormProp } from "./GuaranteesFormProp";
 
@@ -9,6 +10,7 @@ import { GuaranteesFormProp } from "./GuaranteesFormProp";
 export const GuaranteesEditProp:React.FC<RouteComponentProps> = ( props )=>{
 
     const [editItem, setEditItem] = useState<Guarantee>();
+    const { couchDBSync } = useDBSync();
 
     useEffect( ()=>{
         const itemId = props.match.url.split("/")[6];
@@ -26,9 +28,12 @@ export const GuaranteesEditProp:React.FC<RouteComponentProps> = ( props )=>{
               ...guarantee,
               ...data,
               updated_at: Date.now()
-            });
+            }).then( async ()=>{
+                await couchDBSync();
+                props.history.goBack();
+
+            })
           })
-          props.history.goBack();
     }
 
     return (

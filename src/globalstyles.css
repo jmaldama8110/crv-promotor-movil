@@ -20,3 +20,11 @@
 .width-lg {
     width: 100%;
 }
+
+
+.xs {
+    font-size: 0.8rem
+}
+.cl-warning {
+    color: red;
+}

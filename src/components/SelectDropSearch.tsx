@@ -6,6 +6,7 @@ export interface SearchData{
   id: string;
   rev?: string;
   etiqueta: string;
+  data?:any;
 }
 interface SearchToolProps {
   description: string;

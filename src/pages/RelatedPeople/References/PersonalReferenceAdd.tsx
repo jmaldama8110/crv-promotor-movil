@@ -2,15 +2,17 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, Io
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { RelatedPeople } from "../../../reducer/RelatedpeopleReducer";
 import { AppContext } from "../../../store/store";
 import { PersonalReferenceForm } from "./PersonalReferenceForm";
 
 export const PersonalReferenceAdd:React.FC<RouteComponentProps> = ( props )=>{
 
-    const [present, dismiss] = useIonLoading();
-    const { dispatchRelatedPeople, session} = useContext(AppContext);
-    const [showToast] = useIonToast();
+    
+    const { session} = useContext(AppContext);
+    
+    const { couchDBSync } = useDBSync();
 
     const onAdd = async (data:any)=> {
         
@@ -28,9 +30,8 @@ export const PersonalReferenceAdd:React.FC<RouteComponentProps> = ( props )=>{
         db.put({
             ...reference,
             ...data,
-        }).then( ()=>{
-            dispatchRelatedPeople({ type: "ADD_RP", item: reference})
-            showToast("Informacion guardada!",1500);
+        }).then( async ()=>{
+            await couchDBSync();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar informacion de la Referencias personal')

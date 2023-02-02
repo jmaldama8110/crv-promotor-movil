@@ -6,11 +6,13 @@ import { GuaranteesFormVh } from "./GuaranteesFormVh";
 import { db } from "../../../db";
 import { useContext } from "react";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
+import { useDBSync } from "../../../hooks/useDBSync";
 
 export const GuaranteeAddVh:React.FC<RouteComponentProps> = ( props )=>{
 
     
     const { session, dispatchGuaranteesList} = useContext(AppContext);
+    const { couchDBSync } = useDBSync();
 
     const onAdd = async (data:any)=> {
         /// Save new record
@@ -31,7 +33,8 @@ export const GuaranteeAddVh:React.FC<RouteComponentProps> = ( props )=>{
         db.put({
             ...guaranteeItem,
             ...data
-        }).then( ()=>{
+        }).then( async ()=>{
+            await couchDBSync();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar el dato del Vehiculo')

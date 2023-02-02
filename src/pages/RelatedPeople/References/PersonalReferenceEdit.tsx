@@ -6,12 +6,13 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-  useIonLoading,
+  
 } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
-import api from "../../../api/api";
+
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { RelatedPeople } from "../../../reducer/RelatedpeopleReducer";
 import { PersonalReferenceForm } from "./PersonalReferenceForm";
 
@@ -33,8 +34,9 @@ export const PersonalReferenceEdit: React.FC<RouteComponentProps> = (props) => {
     relationship: "",
     
   });
-  const [present, dismiss] = useIonLoading();
+  
   let render = true;
+  const { couchDBSync } = useDBSync();
 
   useEffect(() => {
     if( render ){    
@@ -46,8 +48,19 @@ export const PersonalReferenceEdit: React.FC<RouteComponentProps> = (props) => {
      render = false;
   }, []);
 
+
   const onSubmit = async (data: any) => {
-   
+    const itemId = props.match.url.split("/")[6];
+    db.get(itemId).then( (doc:any) => {
+        return db.put({
+          ...doc,
+          ...data,
+          updated_at: Date.now()
+        }).then( async ()=>{
+            await couchDBSync();
+            props.history.goBack();
+        })
+      })
   };
 
   return (

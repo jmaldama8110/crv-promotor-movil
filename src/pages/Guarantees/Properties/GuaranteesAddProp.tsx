@@ -10,6 +10,7 @@ import {
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
+import { useDBSync } from "../../../hooks/useDBSync";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { AppContext } from "../../../store/store";
 import { GuaranteesFormProp } from "./GuaranteesFormProp";
@@ -17,7 +18,8 @@ import { GuaranteesFormProp } from "./GuaranteesFormProp";
 export const GuaranteeAddProp: React.FC<RouteComponentProps> = (props) => {
 
     const { session, dispatchGuaranteesList } = useContext(AppContext);
-    
+    const { couchDBSync } = useDBSync();
+
     const onAdd = async (data: any) => {
         const client_id = props.match.url.split("/")[2]
         const guaranteeItem: Guarantee = {
@@ -36,7 +38,8 @@ export const GuaranteeAddProp: React.FC<RouteComponentProps> = (props) => {
         db.put({
             ...guaranteeItem,
             ...data
-        }).then( ()=>{
+        }).then( async ()=>{
+            await couchDBSync();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar el dato de la propiedad')
