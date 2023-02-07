@@ -1,10 +1,11 @@
-import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonActionSheet } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
 import { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 import { SearchData, SelectDropSearch } from '../../components/SelectDropSearch';
 import { db } from '../../db';
+import { useDBSync } from '../../hooks/useDBSync';
 import { AppContext } from '../../store/store';
 import './GroupsHome.css';
 
@@ -12,36 +13,21 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
+  const { prepareIndex } = useDBSync();
   const { dispatchGroupData } = useContext(AppContext);
-  const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
+  const [clientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
     rev: "",
     etiqueta: "",
   });
-  let render = true;
 
-  useEffect( ()=>{
-    if( render ){
-     db.createIndex( {
-      index: { fields: [ "couchdb_type"] }
-     }).then( function (){
-        console.log('Index, created...');
-        db.find({
-          selector: {
-            couchdb_type: "GROUP"
-          }
-        }).then( data =>{
-          const newData = data.docs.map( (i:any)=>( {id: i._id, rev: i._rev, etiqueta: `${i.group_name}`} ))
-          
-          setClientSearchData( newData);
-          console.log('Groups Loaded: ', newData.length)
-      })
-     })
-      render = false;
-    }
-  },[])
-
+  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    setTimeout(async () => {
+      await prepareIndex("GROUP", ["couchdb_type"])
+      event.detail.complete();
+    }, 2000);
+  }
 
   function onShowActions(){
 
@@ -55,7 +41,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
     ] :
       [
         { text: 'Nuevo Grupo', role:"destructive",data: { action: 'add', routerLink:'/groups/add' } },
-        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/groups/add-from-hf' } },
+        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/groups/import' } },
         { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },  
       ]
       present(
@@ -100,7 +86,11 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
           <IonTitle>Grupos</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent>
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
+
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Grupos</IonTitle>

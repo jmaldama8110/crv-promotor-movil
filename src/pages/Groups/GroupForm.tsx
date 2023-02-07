@@ -352,18 +352,9 @@ export const GroupForm: React.FC<GroupFormProps> = (props) => {
               ))}
             </IonSelect>
           </IonItem>
-            <ButtonSlider label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={() => {}}/>
-            <ButtonSlider label="Anterior" color="light" slideDirection="B" expand="block" onClick={() => {}} />
-        </IonList>
-      </SwiperSlide>
-
-      <SwiperSlide>
-          <IonList className="ion-padding">
-                <p>Resumen va aqui!</p>
-          
             <IonButton expand="block" color="success" onClick={onSubmit}>Guardar</IonButton>
             <ButtonSlider label="Anterior" color="light" slideDirection="B" expand="block" onClick={() => {}} />
-          </IonList>
+        </IonList>
       </SwiperSlide>
     </Swiper>
   );

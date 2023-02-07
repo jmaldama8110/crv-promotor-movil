@@ -172,7 +172,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
   const [bisInventoryQuantity, setBisInventoryQuantity] = useState("");
 
   const [ addEdit, setAddEdit] = useState<boolean>(false); // TRUE = Adding, FALSE = Edit socioeconomic record
-  const { couchDBSync } = useDBSync();
+  const { couchDBSyncUpload } = useDBSync();
 
   const [itemId, setItemId] = useState('');
 
@@ -315,7 +315,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
               ...clientData,
               socioeconomic_id: newId
             }).then( async ()=>{
-              await couchDBSync();
+              await couchDBSyncUpload();
               history.goBack();
 
             })
@@ -334,7 +334,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
             ...socioeconomicInfo,
             ...data
           }).then( async ()=>{
-            await couchDBSync();
+            await couchDBSyncUpload();
             history.goBack();
           })
         })

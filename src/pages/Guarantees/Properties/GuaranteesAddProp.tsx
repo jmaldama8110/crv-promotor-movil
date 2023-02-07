@@ -18,7 +18,7 @@ import { GuaranteesFormProp } from "./GuaranteesFormProp";
 export const GuaranteeAddProp: React.FC<RouteComponentProps> = (props) => {
 
     const { session, dispatchGuaranteesList } = useContext(AppContext);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
 
     const onAdd = async (data: any) => {
         const client_id = props.match.url.split("/")[2]
@@ -39,7 +39,7 @@ export const GuaranteeAddProp: React.FC<RouteComponentProps> = (props) => {
             ...guaranteeItem,
             ...data
         }).then( async ()=>{
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar el dato de la propiedad')

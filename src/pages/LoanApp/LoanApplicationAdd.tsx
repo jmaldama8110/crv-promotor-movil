@@ -11,7 +11,7 @@ export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
 
     
     const { session } = useContext(AppContext);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
     
     const onAdd = async (data:any) =>{
         const clientId = props.match.url.split("/")[2];
@@ -26,7 +26,7 @@ export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
             couchdb_type: "LOANAPP",
             ...data
           }).then( async (doc)=>{
-              await couchDBSync();
+              await couchDBSyncUpload();
               props.history.goBack();
 
             }).catch( e =>{

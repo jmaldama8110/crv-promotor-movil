@@ -12,7 +12,7 @@ export const BeneficiariesAdd:React.FC<RouteComponentProps> = ( props )=>{
     
     const { dispatchRelatedPeople, session } = useContext(AppContext);
     
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
 
     const onAdd = async (data:any)=> {
         const client_id = props.match.url.split("/")[2];
@@ -34,7 +34,7 @@ export const BeneficiariesAdd:React.FC<RouteComponentProps> = ( props )=>{
                 type: "ADD_RP",
                 item: beneficiary
             })
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar informacion del Aval')

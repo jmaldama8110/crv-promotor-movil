@@ -10,7 +10,7 @@ import { BeneficiariesForm } from "./BeneficiariesForm";
 export const BeneficiariesEdit:React.FC<RouteComponentProps> = ( props )=>{
 
 
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
     const [editItem, setEditItem] = useState<RelatedPeople >({
         _id: "",
         client_id: "",
@@ -49,7 +49,7 @@ export const BeneficiariesEdit:React.FC<RouteComponentProps> = ( props )=>{
               ...data,
               updated_at: Date.now()
             }).then( async ()=>{
-                await couchDBSync();
+                await couchDBSyncUpload();
                 props.history.goBack();
             })
           })

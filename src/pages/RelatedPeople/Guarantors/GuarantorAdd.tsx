@@ -10,7 +10,7 @@ import { GuarantorForm } from "./GuarantorForm";
 export const GuarantorAdd:React.FC<RouteComponentProps> = ( props )=>{
 
     const { session, dispatchRelatedPeople } = useContext(AppContext);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
 
     const onAdd = async (data:any)=> {
         const client_id = props.match.url.split("/")[2];
@@ -32,7 +32,7 @@ export const GuarantorAdd:React.FC<RouteComponentProps> = ( props )=>{
                 type: "ADD_RP",
                 item: guarantor
             })
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar informacion del Aval')

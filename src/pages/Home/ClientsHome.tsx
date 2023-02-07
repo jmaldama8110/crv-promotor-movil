@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonActionSheet } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet } from '@ionic/react';
 import { useContext, useEffect, useState } from 'react';
 import { db } from '../../db';
 import type { OverlayEventDetail } from '@ionic/core';
@@ -10,6 +10,7 @@ import {
 } from "../../components/SelectDropSearch";
 import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
+import { useDBSync } from '../../hooks/useDBSync';
 
 
 
@@ -20,9 +21,9 @@ const ClientsHome: React.FC = () => {
   const [actions, setActions] = useState<OverlayEventDetail>();
   
   const { dispatchClientData } = useContext(AppContext);
+  const { prepareIndex } = useDBSync();
   let history = useHistory();
-  let render = true;
-
+  
   const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
@@ -31,27 +32,13 @@ const ClientsHome: React.FC = () => {
   });
 
 
-  useEffect( ()=>{    
-    
-    if( render ){
-     db.createIndex( {
-      index: { fields: [ "couchdb_type"] }
-     }).then( function (){
-        console.log('Index, created...');
-        db.find({
-          selector: {
-            couchdb_type: "CLIENT"
-          }
-        }).then( data =>{
-          const newData = data.docs.map( (i:any)=>( {id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`} ))
-          setClientSearchData( newData);
-          console.log('Clients Loaded: ', newData.length)
-      })
-     })
-      render = false;
-    }
-  },[])
 
+  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    setTimeout(async () => {
+      await prepareIndex("CLIENT", ["couchdb_type"])
+      event.detail.complete();
+    }, 2000);
+  }
 
   function onShowActions(){
     const buttons = clientSelected.id ? 
@@ -67,7 +54,7 @@ const ClientsHome: React.FC = () => {
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
-        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/clients/add-from-hf' } },
+        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/clients/add-from-hf/0' } },
         { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },  
       ]
       present(
@@ -110,7 +97,11 @@ const ClientsHome: React.FC = () => {
           <IonTitle>Clientes</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent>
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
+
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Mis Clientes</IonTitle>

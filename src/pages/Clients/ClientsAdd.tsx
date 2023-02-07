@@ -1,16 +1,16 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonToast } from "@ionic/react";
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
-import { db, remoteDB } from "../../db";
+import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
 import { ClientForm } from "./ClientForm";
 
 export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
   
-  const { dispatchSession, session } = useContext(AppContext);
+  const {  session } = useContext(AppContext);
   const [showToast] = useIonToast();
-  const { couchDBSync }  = useDBSync();
+  const { couchDBSyncUpload }  = useDBSync();
   function onClientAdd (data: any){
     
     /// Save new record
@@ -23,7 +23,7 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
       status: [1,'Pendiente'],
       branch: session.branch,
     }).then( async (doc)=>{
-        await couchDBSync();
+        await couchDBSyncUpload();
         history.goBack();
     }).catch( e =>{
       showToast("NO se guardo el registro!",1500);

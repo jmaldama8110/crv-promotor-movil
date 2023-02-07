@@ -5,10 +5,11 @@ import { TermType } from "../../reducer/LoanAppGroupReducer";
 import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
+import productProfile from '../../assets/producto-req03.svg';
 
 export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) => {
 
-  const [currSegment, setSegment] = useState<string>("776");
+  const [currSegment, setSegment] = useState<number>(1);
   const [productList, setProductList] = useState<any[]>([]);
 
     
@@ -106,8 +107,8 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
   return (
     <IonList className="ion-padding">
       <IonSegment
-        value={currSegment}
-        onIonChange={(e) => setSegment(e.detail.value!)}
+        value={currSegment.toString()}
+        onIonChange={(e) => setSegment(parseInt(e.detail.value!))}
       >
         {productList.map((i: any) => (
           <IonSegmentButton key={i._id} value={i.external_id}>

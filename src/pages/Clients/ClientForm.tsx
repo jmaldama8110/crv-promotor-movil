@@ -134,11 +134,11 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
        <SwiperSlide>
         <ClientFormAddress addressType={"DOMICILIO"} onNext={onHomeAddressNext} />
       </SwiperSlide>
-      
+     
       <SwiperSlide>
         <ClientFormEconomics onNext={onEconomicsData}  />
       </SwiperSlide>
-
+ 
       <SwiperSlide>
 
         <ClientFormBusinessData onNext={onBisDataNext} />
@@ -150,7 +150,7 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
         <SwiperSlide>
           <ClientFormAddress addressType={"NEGOCIO"} onNext={onBisAddressNext} />
       </SwiperSlide>}
-      
+       
       <SwiperSlide>
         <ClientFormSummary />
         <IonList className="ion-padding">

@@ -25,7 +25,7 @@ export type ActionsLoanAppGroup =
       status: [number, string];
       members: GroupMember [];
       product: {
-        external_id: string;
+        external_id: number;
         min_amount: number;
         max_amount: number;
         step_amount: number;
@@ -73,7 +73,7 @@ export interface LoanAppGroup{
     status: [number, string];
     members: GroupMember [];
     product: {
-      external_id: string;
+      external_id: number;
       min_amount: number;
       max_amount: number;
       step_amount: number;
@@ -111,7 +111,7 @@ export const loanAppGroupDef: LoanAppGroup = {
   status: [0, ""],
   members: [],
   product: {
-    external_id: "",
+    external_id: 0,
     min_amount: 1000,
     max_amount: 1000000,
     step_amount: 1000,

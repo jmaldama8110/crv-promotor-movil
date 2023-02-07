@@ -22,7 +22,7 @@ import { useDBSync } from "../../hooks/useDBSync";
     const { dispatchGroupData, dispatchSession } = useContext(AppContext);
     const [showToast] = useIonToast();
     const [progress, setProgress] = useState(0.1);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
   
     let render = true;
     useEffect(() => {
@@ -54,7 +54,7 @@ import { useDBSync } from "../../hooks/useDBSync";
             ...data,
             
           }).then( async ()=>{
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
           })
         })

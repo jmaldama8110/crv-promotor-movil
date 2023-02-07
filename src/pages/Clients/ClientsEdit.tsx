@@ -17,7 +17,7 @@ import { ClientForm } from "./ClientForm";
 export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) => {
 
   const {  dispatchClientData} = useContext(AppContext);
-  const { couchDBSync } = useDBSync();
+  const { couchDBSyncUpload } = useDBSync();
 
   let render = true;
   useEffect(() => {
@@ -52,7 +52,7 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
         ...clientDbData,
         ...data
       }).then( async ()=>{
-        await couchDBSync();
+        await couchDBSyncUpload();
         history.goBack();
       })
     })

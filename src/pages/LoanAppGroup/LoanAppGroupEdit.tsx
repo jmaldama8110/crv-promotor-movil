@@ -11,7 +11,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
 
    
     const { dispatchLoanAppGroup, groupMemberList } = useContext(AppContext);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
     useEffect( ()=>{
 
       const itemId = props.match.url.split("/")[5];
@@ -34,7 +34,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
           members: groupMemberList,
           updated_at: Date.now()
         }).then( async function(){
-          await couchDBSync();
+          await couchDBSyncUpload();
           props.history.goBack();
         })
       })

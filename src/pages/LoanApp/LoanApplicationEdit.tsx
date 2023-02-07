@@ -12,7 +12,7 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
     const [loan,setLoan] = useState({})
     const [showToast] = useIonToast();
     const { dispatchSession } = useContext(AppContext);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
 
     useEffect( ()=>{
 
@@ -41,7 +41,7 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
           ...data,
           updated_at: Date.now()
         }).then(async ()=> {
-          await couchDBSync();
+          await couchDBSyncUpload();
           props.history.goBack();
         })
       })

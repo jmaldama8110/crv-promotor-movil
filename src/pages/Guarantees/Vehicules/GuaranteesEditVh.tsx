@@ -11,7 +11,7 @@ import { GuaranteesFormVh } from "./GuaranteesFormVh";
 export const GuaranteesEditVh:React.FC<RouteComponentProps> = ( props )=>{
 
     const [editItem, setEditItem] = useState<Guarantee>();
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
     
     useEffect( ()=>{
         const itemId = props.match.url.split("/")[6];
@@ -28,7 +28,7 @@ export const GuaranteesEditVh:React.FC<RouteComponentProps> = ( props )=>{
               ...data,
               updated_at: Date.now()
             }).then( async ()=>{
-                await couchDBSync();
+                await couchDBSyncUpload();
                 props.history.goBack();
             })
           })

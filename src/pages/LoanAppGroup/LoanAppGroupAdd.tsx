@@ -11,7 +11,7 @@ import { useDBSync } from "../../hooks/useDBSync";
 export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
 
     const { session,groupMemberList } = useContext(AppContext);
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
     
     const onAdd = async (data:any) =>{
         const clientId = props.match.url.split("/")[2];
@@ -29,7 +29,7 @@ export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
         db.put({
             ...newLoanAppGroup
           }).then( async (doc)=>{
-              await couchDBSync();
+              await couchDBSyncUpload();
               props.history.goBack();
           }).catch( e =>{
             alert('No se pudo guardar la solicitud...')

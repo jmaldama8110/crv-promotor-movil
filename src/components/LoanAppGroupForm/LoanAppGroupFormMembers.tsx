@@ -6,9 +6,9 @@ import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import avatar from '../../../src/assets/avatar.svg';
+
 export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit }) => {
 
-    
     const { groupMemberList, loanAppGroup, dispatchLoanAppGroup, dispatchGroupMember, dispatchMember } = useContext( AppContext);
     const [sumTotal, setSumTotal] = useState<number>(0)
     const [remaining, setRemaining] = useState<number>(loanAppGroup.apply_amount)

@@ -37,7 +37,7 @@ export const GuarantorEdit: React.FC<RouteComponentProps> = (props) => {
     relationship: "",
     
   });
-  const { couchDBSync } = useDBSync();
+  const { couchDBSyncUpload } = useDBSync();
   
   let render = true;
 
@@ -59,7 +59,7 @@ export const GuarantorEdit: React.FC<RouteComponentProps> = (props) => {
           ...data,
           updated_at: Date.now()
         }).then( async ()=>{
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
         })
       })

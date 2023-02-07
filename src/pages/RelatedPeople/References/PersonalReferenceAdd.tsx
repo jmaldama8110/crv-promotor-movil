@@ -12,7 +12,7 @@ export const PersonalReferenceAdd:React.FC<RouteComponentProps> = ( props )=>{
     
     const { session} = useContext(AppContext);
     
-    const { couchDBSync } = useDBSync();
+    const { couchDBSyncUpload } = useDBSync();
 
     const onAdd = async (data:any)=> {
         
@@ -31,7 +31,7 @@ export const PersonalReferenceAdd:React.FC<RouteComponentProps> = ( props )=>{
             ...reference,
             ...data,
         }).then( async ()=>{
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
         }).catch( e =>{
             alert('No se pudo guardar informacion de la Referencias personal')

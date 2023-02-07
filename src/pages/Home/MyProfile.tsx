@@ -7,6 +7,9 @@ import {
   IonContent,
   IonList,
   IonButton,
+  RefresherEventDetail,
+  IonRefresher,
+  IonRefresherContent,
 } from "@ionic/react";
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
@@ -47,6 +50,13 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
     },3000)
   }
 
+  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    setTimeout(() => {
+      
+      event.detail.complete();
+    }, 2000);
+  }
+
   
   return (
     <IonPage>
@@ -55,7 +65,10 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
           <IonTitle>Mi Perfil</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent >
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Mi Perfil</IonTitle>

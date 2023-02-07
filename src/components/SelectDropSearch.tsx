@@ -17,14 +17,15 @@ interface SearchToolProps {
 
 export const SelectDropSearch: React.FC<SearchToolProps> = ({ dataList,setSelectedItemFx, currentItem, description }) => {
 
-  const [searchText, setSearchText] = useState< string >('');
+  const [searchText, setSearchText] = useState<string>('');
   const [searchList, setSearchList] = useState<SearchData[]>([])
   const [visibleList, setVisibleList] = useState<boolean>(true);
 
   function onFilter (){
     let searchResult = [];
+    
     const keyWord = searchText?.toUpperCase().trim();
-  
+     
     for( let i=0; (i < dataList.length) ; i++){
       const itemText = dataList[i].etiqueta.toUpperCase();
       const item = dataList[i];

@@ -36,7 +36,7 @@ export const PersonalReferenceEdit: React.FC<RouteComponentProps> = (props) => {
   });
   
   let render = true;
-  const { couchDBSync } = useDBSync();
+  const { couchDBSyncUpload } = useDBSync();
 
   useEffect(() => {
     if( render ){    
@@ -57,7 +57,7 @@ export const PersonalReferenceEdit: React.FC<RouteComponentProps> = (props) => {
           ...data,
           updated_at: Date.now()
         }).then( async ()=>{
-            await couchDBSync();
+            await couchDBSyncUpload();
             props.history.goBack();
         })
       })

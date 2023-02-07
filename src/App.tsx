@@ -19,7 +19,6 @@ import {
   notificationsCircleOutline,
 } from "ionicons/icons";
 
-import jwt_decode from "jwt-decode";
 import ClientsHome from "./pages/Home/ClientsHome";
 import GroupsHome from "./pages/Home/GroupsHome";
 import SupervisorHome from "./pages/Home/SupervisorHome";
@@ -67,11 +66,9 @@ import { PersonalReferenceAdd } from "./pages/RelatedPeople/References/PersonalR
 import { PersonalReferenceEdit } from "./pages/RelatedPeople/References/PersonalReferenceEdit";
 import { BeneficiariesAdd } from "./pages/RelatedPeople/Beneficiaries/BeneficiariesAdd";
 import { BeneficiariesEdit } from "./pages/RelatedPeople/Beneficiaries/BeneficiariesEdit";
-import { LOGIN_KEY_PREFERENCES } from "./pages/Session/Login";
-import { Preferences } from "@capacitor/preferences";
+
 import { ClientsFromHF } from "./pages/Clients/ClientsFromHF";
 import { GroupAdd } from "./pages/Groups/GroupAdd";
-import { db, remoteDB } from "./db";
 import { LoanAppGroupHome } from "./pages/LoanAppGroup/LoanAppGroupHome";
 import { GroupEdit } from "./pages/Groups/GroupEdit";
 import { LoanAppGroupAdd } from "./pages/LoanAppGroup/LoanAppGroupAdd";
@@ -79,21 +76,18 @@ import { LoanAppGroupEdit } from "./pages/LoanAppGroup/LoanAppGroupEdit";
 import { LoanAppMemberAdd } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberAdd";
 import { LoanAppMemberEdit } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberEdit";
 import { GroupFromHF } from "./pages/Groups/GroupFromHF";
+import { GroupImport } from "./pages/Groups/GroupImport/GroupImport";
+import { useDBSync } from "./hooks/useDBSync";
 
 setupIonicReact();
 
-interface SyncInfo {
-  local_target: string;
-  remote_target: string;
-  sync_expiration: Date;
-}
 
 
 const App: React.FC = () => {
   let render = true;
   const [present, dismiss] = useIonLoading();
-  const { session, dispatchSession } = useContext(AppContext);
-
+  const { session } = useContext(AppContext);
+  const { couchDBSyncDownload, evaluateTokenExpiration} = useDBSync();
 
   useEffect(() => {
     if (session.loading) {
@@ -104,78 +98,19 @@ const App: React.FC = () => {
   }, [session]);
 
   useEffect(() => {
-    const loadRender = () => {
-
+    const loadRender = async () => {
       if (render) {
-
         ///// what needs to be rendered once goes here!
-        dispatchSession({
-          type: "SET_LOADING",
-          loading: true,
-          loading_msg: "Bajando cambios ...",
-        });
-        db.replicate.from( remoteDB).on('complete', ()=>{
-          
-          dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-          console.log('Remote => Local, Ok!');
-        }).on('error', (err)=>{
-          dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-          alert('No fue posible conectarse a la BD remota! verifique su conexion')
-        })
-
-        render = false;      }
+        await couchDBSyncDownload();
+        render = false;      
+      }
     };
     loadRender();
 
   }, []);
 
   async function onTabChange  (){
-    /**
-     * Evaluar si el token aun esta vigente
-     */
-    let hoursDiff = 0;
-
-    if( session.current_token ){
-      const decoded:any = jwt_decode(session.current_token);
-      const sync: SyncInfo = decoded.sync_info
-      if( sync.sync_expiration ){
-        const queryDate = new Date(sync.sync_expiration);
-        const now = new Date();
-        const timeDiff =  queryDate.getTime() - now.getTime();
-          // To calculate the no. of Hours between two dates
-        hoursDiff = timeDiff / (1000 * 3600 );
-        if( hoursDiff <= 0 ){
-            dispatchSession({
-              type: "SET_LOADING",
-              loading: true,
-              loading_msg: "Cerrando la sesion..."
-            })
-
-            setTimeout( async ()=> {
-              dispatchSession({
-                type: "SET_LOADING",
-                loading: false,
-                loading_msg: ""
-              })
-              await Preferences.remove({ key: LOGIN_KEY_PREFERENCES });
-        
-              dispatchSession({
-                type: "LOGIN",
-                name: "",
-                lastname: "",
-                user: "",
-                branch: [0,""],
-                current_token: "",
-                token_expiration: ""
-              });
-              
-        
-            },3000)
-          
-        }
-      }
-
-    }
+      await evaluateTokenExpiration();
   }
 
   return (
@@ -187,7 +122,7 @@ const App: React.FC = () => {
             <Route exact path="/clients/edit/:id" component={ClientsEdit}></Route>
             <Route exact path="/clients/socioeconomics/edit/:id" component={SocioEconomicsForm}></Route>
             <Route exact path="/clients/add" component={ClientsAdd}></Route>
-            <Route exact path="/clients/add-from-hf" component={ClientsFromHF}></Route>
+            <Route exact path="/clients/add-from-hf/:external_id" component={ClientsFromHF}></Route> 
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
             <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>
             <Route exact path="/clients/:id/loanapps/edit/:id" component={LoanApplicationEdit}></Route>
@@ -223,6 +158,7 @@ const App: React.FC = () => {
             <Route exact path="/groups/:id/loanapps/edit/:id/members/add" component={LoanAppMemberAdd}></Route>
             <Route exact path="/groups/:id/loanapps/edit/:id/members/edit/:id" component={LoanAppMemberEdit}></Route>
 
+            <Route exact path="/groups/import" component={GroupImport}></Route>
 
 
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
@@ -236,7 +172,7 @@ const App: React.FC = () => {
               <IonIcon icon={personCircleOutline} />
               <IonLabel>Mi Perfil</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab1" href="/clients" disabled={!session.user} >
+            <IonTabButton tab="tab1" href="/clients" >
               <IonIcon icon={personAddOutline} />
               <IonLabel>Clientes</IonLabel>
             </IonTabButton>
@@ -248,7 +184,7 @@ const App: React.FC = () => {
               <IonIcon icon={lockClosedOutline} />
               <IonLabel>Supervisor</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab5" href="/notifications">
+            <IonTabButton tab="tab5" href="/notifications" disabled>
               <IonIcon icon={notificationsCircleOutline} />
               <IonLabel>Mensajes</IonLabel>
             </IonTabButton>

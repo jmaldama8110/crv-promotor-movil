@@ -19,7 +19,7 @@ import { GroupForm } from "./GroupForm";
 export const GroupAdd: React.FC<RouteComponentProps> = (props) => {
   
   const { session } = useContext(AppContext);
-  const { couchDBSync } = useDBSync();
+  const { couchDBSyncUpload } = useDBSync();
   const [progress, setProgress] = useState(0.1);
 
   const onAdd = async (data: any) => {
@@ -35,7 +35,7 @@ export const GroupAdd: React.FC<RouteComponentProps> = (props) => {
       ...data,
     })
       .then(async (doc) => {
-        await couchDBSync();
+        await couchDBSyncUpload();
         props.history.goBack();
       })
       .catch((e) => {
