@@ -59,7 +59,7 @@ export const GroupFromHF: React.FC<RouteComponentProps>  = (props)=>{
                     }
                     try{
                         api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
-                        const apiRes = await api.get(`/groups/hf/search?branchId=${session.branch[0]}&groupName=${groupNameSearch}`);
+                        const apiRes = await api.get(`/clients/hf/search?branchId=${session.branch[0]}&clientName=${groupNameSearch}`);
 
                         dismiss();
                         

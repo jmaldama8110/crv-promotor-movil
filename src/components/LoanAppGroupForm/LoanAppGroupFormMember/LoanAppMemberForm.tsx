@@ -95,6 +95,7 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
           setFullname(clientSelected.etiqueta)
           setCurp(clientSelected.data.curp)
           setLoanCycle( clientSelected.data.loan_cycle)
+          
         } else {
             setClientId('');
             setFullname('');
@@ -117,7 +118,9 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
             setApplyAmount( groupMember.apply_amount);
             setLoanCycle( groupMember.loan_cycle);
             setPreviousAmount( groupMember.previous_amount);
-
+            setBeneficiary( groupMember.insurance.beneficiary);
+            setPercentage( groupMember.insurance.percentage);
+            setRelationship( groupMember.insurance.relationship);
           }
 
       },[groupMember]);

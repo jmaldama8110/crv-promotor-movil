@@ -1,4 +1,4 @@
-import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, useIonLoading } from "@ionic/react";
+import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent } from "@ionic/react";
 import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
 
@@ -9,7 +9,7 @@ import { LoanAppMemberForm } from "./LoanAppMemberForm";
 
 export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
 
-    const { dispatchMember, groupMemberList, dispatchGroupMember ,loanAppGroup } = useContext(AppContext);
+    const { dispatchMember, groupMemberList, dispatchGroupMember  } = useContext(AppContext);
 
     useEffect( ()=>{
         //// if edit, URL match string contains member _ID in a differnte position
@@ -18,6 +18,7 @@ export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
         const itemId = urlData[size - 1]
         
         const member = groupMemberList.find( (i:GroupMember) => i._id === itemId) as GroupMember
+        console.log(member);
         dispatchMember( {
           type: "SET_MEMBER",
           member,

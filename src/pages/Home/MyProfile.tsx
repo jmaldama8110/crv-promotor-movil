@@ -13,12 +13,15 @@ import {
 } from "@ionic/react";
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
+import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
 import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
 
 export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
   const { session,dispatchSession } = useContext(AppContext);
+  
+  const { couchDBSyncDownload } = useDBSync();
 
   function onCloseSession (){
 
@@ -50,12 +53,10 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
     },3000)
   }
 
-  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
-    setTimeout(() => {
-      
+  async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    await couchDBSyncDownload();
       event.detail.complete();
-    }, 2000);
-  }
+   }
 
   
   return (

@@ -1,5 +1,5 @@
 
-import { IonButton, IonChip, IonCol, IonFab, IonFabButton, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonListHeader, IonRadio, IonRadioGroup, IonRange, IonRow, IonSegment, IonSegmentButton } from "@ionic/react";
+import { DatetimeChangeEventDetail, IonButton, IonChip, IonCol, IonDatetime, IonDatetimeButton, IonFab, IonFabButton, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonListHeader, IonModal, IonPopover, IonRadio, IonRadioGroup, IonRange, IonRow, IonSegment, IonSegmentButton, IonText, useIonAlert } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 
@@ -20,7 +20,10 @@ interface LoanApplicationFormProps extends RouteComponentProps {
     loanapp?: any;
     onSubmit: any;
 }
-
+interface DatetimeCustomEvent extends CustomEvent {
+    detail: DatetimeChangeEventDetail;
+    target: HTMLIonDatetimeElement;
+  }
 
 interface LoanDestination {
     _id: number;
@@ -53,6 +56,12 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
     const [productTermTypes, setProductTermTypes] = useState<TermType[]>([]);
     const [destinations, setDestinations] = useState<LoanDestination[]>([]);
     const [productRate, setProductRate] = useState('');
+
+    const [validationsStep1, setValidationsStep1] = useState<boolean>(true);
+
+    const [fechaPrimerPago, setFechaPrimerPago] = useState<string>('');
+    const [fechaDesembolso, setFechaDesembolso] = useState<string>('');
+    const [showAlert] = useIonAlert();
 
     /// Pago igual resultante
     const [paymentAmount, setPaymentAmount] = useState<string | undefined | null>("");
@@ -128,10 +137,23 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                 setTax(props.loanapp.product.tax);
             }
             setApplyAmount(props.loanapp.apply_amount);
+            setFechaDesembolso( props.loanapp.disbursment_date);
+            setFechaPrimerPago( props.loanapp.first_repay_date);
             setTerm(props.loanapp.term);
             if( props.loanapp.frequency ){
                 setTermType(props.loanapp.frequency[0]);
             }
+        }
+
+        if(!props.loanapp){
+            
+            const fechaDesNew = new Date();
+            const fechaPPagoNew = new Date();
+            fechaDesNew.setDate(fechaDesNew.getDate() + 14);
+            fechaPPagoNew.setDate( fechaDesNew.getDate() + 14);
+            
+            setFechaDesembolso(fechaDesNew.toISOString());
+            setFechaPrimerPago(fechaPPagoNew.toISOString());
         }
         
     },[props.loanapp])
@@ -201,6 +223,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
             const data = {
                 product: selectedProduct._id,
                 apply_amount,
+                disbursment_date: fechaDesembolso,
+                first_repay_date: fechaPrimerPago,
                 term,
                 frequency: [ttypeSel.identifier,ttypeSel.value],
                 loandests: destinations,
@@ -234,7 +258,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                 setMinAmount(selectedProduct.min_amount);
                 setMaxAmount(selectedProduct.max_amount);
                 setStepAmount(selectedProduct.step_amount);
-
+                
                 setMinTerm(selectedProduct.min_term);
                 setMaxTerm(selectedProduct.max_term);
                 setProductName(selectedProduct.product_name);
@@ -245,6 +269,57 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
         }
 
     },[productsList,currSegment]);
+
+    function onLoanAppGeneralsNext(){
+        
+    }
+
+    useEffect( ()=>{
+        if( !props.loanapp ){
+            onValidateEntries();
+        }
+    },[fechaDesembolso, fechaPrimerPago])
+
+    function onValidateEntries (){
+        setValidationsStep1(false);
+        const today = new Date();
+        const validationMessage: string[] = [];
+        const disburseDate = new Date(fechaDesembolso);
+        const firstRepayDate = new Date(fechaPrimerPago);
+
+        if( disburseDate.getTime() <= today.getTime() ) {
+            validationMessage.unshift('La fecha de desembolso no es valida el dia de hoy o pasada...\n')
+        }
+        if( firstRepayDate.getTime() <= today.getTime() ){
+            validationMessage.unshift('La fecha de primer pago no es valida el dia de hoy o pasada...\n')
+        }
+
+        if( disburseDate.getTime() >= firstRepayDate.getTime() ){
+            validationMessage.unshift('La fecha de desembolso no puede ser despues de la fecha de primero pago...\n')
+        }
+
+        if( validationMessage.length ){
+            showAlert({
+                header: 'OJO, existe un detalle',
+                subHeader: 'Verifica las siguientes entradas',
+                message: `${validationMessage.toString()}`,
+                buttons: ['OK'],
+              });
+            setValidationsStep1(false);
+        } else {
+            setValidationsStep1(true);
+        }
+
+    }
+
+    function onFechaDesembolsoChange (ev: DatetimeCustomEvent) {
+        setFechaDesembolso( ev.detail.value as string );
+        
+    }
+
+    function onFechaPrimerPagoChange( ev: DatetimeCustomEvent) {
+        setFechaPrimerPago( ev.detail.value as string);
+    }
 
     const onPhotoTitleUpdate = (e:any) =>{
         const itemPosition = pics.length - 1;
@@ -369,7 +444,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
 
             <SwiperSlide>
                 <IonList className="ion-padding">
-                    <div className="contenido-loanform">
+                    <div>
                         <IonItemDivider>Credito Solicitado: {productName}</IonItemDivider>
                         <IonItem>
                             <IonRange dualKnobs={false} min={minAmout} max={maxAmount} step={stepAmount} snaps={true} value={apply_amount} onIonChange={(e) => setApplyAmount(e.detail.value as any)}/>
@@ -382,6 +457,24 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                         <IonItem>
                             <IonLabel>Plazo: {term}</IonLabel>
                         </IonItem>
+                        <IonItem>
+                            <IonLabel>Fecha Desembolso</IonLabel>
+                            <IonDatetimeButton datetime="fecha-desembolso"></IonDatetimeButton>
+                        </IonItem>
+
+                        <IonItem>
+                            <IonLabel>Fecha Primer Pago</IonLabel>
+                            <IonDatetimeButton datetime="fecha-primer-pago"></IonDatetimeButton>
+                        </IonItem>
+
+                        <IonModal keepContentsMounted={true}>
+                            <IonDatetime id="fecha-desembolso" presentation="date" multiple={false} value={fechaDesembolso} onIonChange={onFechaDesembolsoChange} ></IonDatetime>
+                        </IonModal>
+                        <IonModal keepContentsMounted={true}>
+                            <IonDatetime id="fecha-primer-pago" presentation="date" multiple={false} value={fechaPrimerPago} onIonChange={onFechaPrimerPagoChange}></IonDatetime>
+                        </IonModal>
+
+
                         <IonRadioGroup allowEmptySelection={false} onIonChange={(e:any)=> setTermType(e.target.value!)} value={termType}>
                             <IonListHeader><IonLabel>Pagos Cada:</IonLabel></IonListHeader>
                                 {productTermTypes.map( (t:any) => (
@@ -396,7 +489,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                         </IonItem>
 
                     </div>
-                    <ButtonSlider color="primary" expand="block" label='Siguiente' onClick={() => {} } slideDirection={"F"}></ButtonSlider>
+                    <ButtonSlider color="primary" expand="block" label='Siguiente' onClick={onLoanAppGeneralsNext } disabled={!validationsStep1} slideDirection={"F"}></ButtonSlider>
                     <ButtonSlider color="medium" expand="block" label='Anterior' onClick={() => {} } slideDirection={"B"}></ButtonSlider>
                 </IonList>
 

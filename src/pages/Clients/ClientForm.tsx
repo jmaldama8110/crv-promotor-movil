@@ -1,10 +1,6 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import {
-  IonButton,
-  IonList,
-} from "@ionic/react";
-import {  ButtonSlider } from "../../components/SliderButtons";
+
 import { ClientFormPersonalData } from "../../components/ClientForm/ClientFormPersonalData";
 import { useContext, useEffect, useState } from "react";
 import { ClientFormAddress } from "../../components/ClientForm/ClientFormAddress";
@@ -13,6 +9,8 @@ import { ClientFormBusinessData } from "../../components/ClientForm/ClientFormBu
 import { ClientFormSummary } from "../../components/ClientForm/ClientFormSummary";
 import { AppContext } from "../../store/store";
 import { Geolocation } from "@capacitor/geolocation";
+import { ClientFormIdentity } from "../../components/ClientForm/ClientFormIdentiy";
+import { ClientFormComprobanteDomicilio } from "../../components/ClientForm/ClientFormComprobanteDomicilio";
 
 
 interface ClientFormProps {
@@ -45,6 +43,22 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       ...data
     })
   };
+
+  function onIdentityDocsNext( data:any) {
+    dispatchClientData({
+      type: 'SET_CLIENT',
+      ...clientData,
+      ...data
+    })
+  }
+
+  function onComprobanteDomicilioNext( data:any) {
+    dispatchClientData({
+      type: 'SET_CLIENT',
+      ...clientData,
+      ...data
+    })
+  }
 
 
   function updateAddressBasedOnType ( typeAdd: string, newAddressData:any){
@@ -119,8 +133,9 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       address: updateAddressBasedOnType('NEGOCIO',data)
     })
   }
-  function sendData() {
-    onSubmit(clientData);
+
+  function sendData( data: any) {
+    onSubmit({...clientData,...data,});
   }
 
 
@@ -130,9 +145,17 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       <SwiperSlide>
         <ClientFormPersonalData onNext={onPersonalDataNext} />
       </SwiperSlide>
+      
+      <SwiperSlide>
+        <ClientFormIdentity onNext={onIdentityDocsNext} />
+      </SwiperSlide>
 
        <SwiperSlide>
         <ClientFormAddress addressType={"DOMICILIO"} onNext={onHomeAddressNext} />
+      </SwiperSlide>
+
+      <SwiperSlide>
+        <ClientFormComprobanteDomicilio onNext={onComprobanteDomicilioNext} />
       </SwiperSlide>
      
       <SwiperSlide>
@@ -152,11 +175,8 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       </SwiperSlide>}
        
       <SwiperSlide>
-        <ClientFormSummary />
-        <IonList className="ion-padding">
-          <IonButton expand="block" onClick={sendData} color='success'>Guardar</IonButton>
-          <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />
-        </IonList>
+        <ClientFormSummary onNext={sendData}/>
+
       </SwiperSlide> 
     </Swiper>
   );

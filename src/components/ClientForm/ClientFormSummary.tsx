@@ -1,11 +1,13 @@
-import { IonCol, IonGrid, IonItemDivider, IonLabel, IonList, IonRow } from "@ionic/react";
-import { useContext, useEffect } from "react";
+import { IonButton, IonCol, IonGrid, IonItemDivider, IonLabel, IonList, IonRow, IonTextarea } from "@ionic/react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
+import { ButtonSlider } from "../SliderButtons";
 
 
-export const ClientFormSummary: React.FC<{disabledAddress?: boolean}> = ( {disabledAddress}) =>{
+export const ClientFormSummary: React.FC<{disabledAddress?: boolean, onNext:any}> = ( {disabledAddress, onNext}) =>{
+
   const { clientData } = useContext(AppContext);
-  
+  const [comment, setComment] = useState<string>('');
     const getAddresFromType = ( type: string) =>{
       let address = {
         address_line1: "",
@@ -17,12 +19,25 @@ export const ClientFormSummary: React.FC<{disabledAddress?: boolean}> = ( {disab
         province: ['', ''],
         type: ""
       }
-      
+
+
       const tmp = clientData.address.find( (i:any) => i.type === type);
       if( tmp )
         address = tmp;
       return `${address.address_line1} ${address.colony[1]} ${address.city[1]}`;
 
+    }
+    useEffect( ()=>{
+        if(clientData._id){
+            setComment(clientData.comment);
+        }
+    },[clientData])
+    
+    function onSubmit( ){
+      const data = {
+        comment,
+      }
+      onNext(data);
     }
 
     return (
@@ -68,7 +83,12 @@ export const ClientFormSummary: React.FC<{disabledAddress?: boolean}> = ( {disab
                     <IonCol size="4">Ubicado en:</IonCol><IonCol>{ getAddresFromType('NEGOCIO')}</IonCol>
                   </IonRow>              
                 }
+                <IonRow>
+                  <IonCol> <IonTextarea placeholder="Comentar aqui.." value={comment} onIonChange={(e) =>setComment(e.detail.value!)}></IonTextarea></IonCol>
+                </IonRow>
               </IonGrid>
+              <IonButton expand="block" onClick={onSubmit} color='success'>Guardar</IonButton>
+              <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />
 
         </IonList>
     );

@@ -45,7 +45,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/guarantees" />
+            <IonBackButton />
           </IonButtons>
           <IonTitle>Editar Mi Solicitud</IonTitle>
         </IonToolbar>

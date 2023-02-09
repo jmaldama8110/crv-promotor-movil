@@ -5,7 +5,7 @@ import { IonButton } from "@ionic/react";
 
 
 
-export const ButtonSlider: React.FC< { slideDirection : "F"|"B", disabled?:boolean, onClick: any, label: string, color: string, expand: 'full' |'block' }> = ( { slideDirection, onClick, label, color,expand, disabled} ) => {
+export const ButtonSlider: React.FC< { slideDirection : "F"|"B", disabled?:boolean, onClick: any, label: string, color: string, expand?: 'full' |'block' }> = ( { slideDirection, onClick, label, color,expand, disabled} ) => {
   
     const slider = useSwiper();
   

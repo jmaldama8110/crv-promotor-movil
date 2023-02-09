@@ -1,4 +1,6 @@
 import {
+  IonBackButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonPage,
@@ -40,9 +42,11 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
         
     }
 
-      
-  }, []);
+    return () =>{
+      dispatchClientData({ type:"RESET_CLIENT" })
+    }
 
+  }, []);
   const onUpdate = (data:any) => {
     // Update selected Client
     const itemId = match.url.replace("/clients/edit/", "");
@@ -63,6 +67,9 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
     <IonPage>
       <IonHeader>
         <IonToolbar>
+        <IonButtons slot="start">
+            <IonBackButton />
+          </IonButtons>        
           <IonTitle>Editar Cliente</IonTitle>
         </IonToolbar>
       </IonHeader>

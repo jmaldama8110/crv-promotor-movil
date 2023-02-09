@@ -30,9 +30,9 @@ export type ActionsClientData = {
   id_cliente: number;
   id_persona: number;
   ife_details: [any];
-  ine_clave: string;
-  ine_doc_number: string;
-  ine_duplicates: string;
+  clave_ine: string;
+  numero_vertical: string;
+  numero_emisiones: string;
   loan_cycle: number;
   marital_status: [number, string];
   nationality: [number, string];
@@ -41,6 +41,9 @@ export type ActionsClientData = {
   rfc: string;
   status: [number, string];
   tributary_regime: [string, string];
+  comment: string;
+  identity_pics: any[];
+  comprobante_domicilio_pics: any[];
   _id?: string;
   _rev?: string;
 } |
@@ -79,9 +82,9 @@ export interface ClientData {
     id_cliente: number;
     id_persona: number;
     ife_details: [any];
-    ine_clave: string;
-    ine_doc_number: string;
-    ine_duplicates: string;
+    clave_ine: string;
+    numero_vertical: string;
+    numero_emisiones: string;
     loan_cycle: number;
     marital_status: [number, string];
     nationality: [number, string];
@@ -90,6 +93,9 @@ export interface ClientData {
     rfc: string;
     status: [number, string];
     tributary_regime: [string, string];
+    comment: string;
+    identity_pics: any[];
+    comprobante_domicilio_pics: any[];  
     _id?: string;
     _rev?: string;
 }
@@ -116,9 +122,9 @@ export const clientDataDef: ClientData = {
   id_cliente: 0,
   id_persona: 0,
   ife_details: [{}],
-  ine_clave: "",
-  ine_doc_number: "",
-  ine_duplicates: "",
+  clave_ine: "",
+  numero_vertical: "",
+  numero_emisiones: "",
   email: '',
   lastname: "",
   loan_cycle: 0,
@@ -135,6 +141,9 @@ export const clientDataDef: ClientData = {
   sex: [0, ''],
   status: [0, ''],
   tributary_regime: ['', ''],
+  comment: '',
+  identity_pics: [],
+  comprobante_domicilio_pics: [],
   _id: "",
   _rev: ""
 }
@@ -176,9 +185,9 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         id_cliente: action.id_cliente,
         id_persona: action.id_persona,
         ife_details: action.ife_details,
-        ine_clave: action.ine_clave,
-        ine_doc_number: action.ine_doc_number,
-        ine_duplicates: action.ine_duplicates,
+        clave_ine: action.clave_ine,
+        numero_vertical: action.numero_vertical,
+        numero_emisiones: action.numero_emisiones,
         loan_cycle: action.loan_cycle,
         marital_status: action.marital_status,
         nationality: action.nationality,
@@ -187,6 +196,9 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         rfc: action.rfc,
         status: action.status,
         tributary_regime: action.tributary_regime,
+        comment: action.comment,
+        identity_pics: action.identity_pics,
+        comprobante_domicilio_pics: action.comprobante_domicilio_pics,
         _id: action._id,
         _rev: action._rev
       };

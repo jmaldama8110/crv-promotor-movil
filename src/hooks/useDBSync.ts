@@ -16,7 +16,7 @@ export function useDBSync () {
 
     const { dispatchSession, session } = useContext(AppContext)
     const [showToast] = useIonToast();
-
+    
     async function couchDBSyncUpload () {
     try{
         dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Subiendo datos..."});
@@ -46,17 +46,8 @@ export function useDBSync () {
         console.log('Remote => Local, Ok!');
       }).on('error', (err)=>{
         dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-        alert('No fue posible conectarse a la BD remota! verifique su conexion')
+        showToast('Estas en modo sin conexion...', 1500)
       })
-    }
-
-
-    async function prepareIndex( couchdb_type:string, fields:string[] ){
-
-      dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: `Optimizando busqueda...`});
-      await db.createIndex( { index: { fields } });
-      dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-
     }
 
 
@@ -109,5 +100,5 @@ export function useDBSync () {
     }
     }
     
-    return { couchDBSyncUpload, couchDBSyncDownload , evaluateTokenExpiration, prepareIndex }
+    return { couchDBSyncUpload, couchDBSyncDownload , evaluateTokenExpiration }
 }

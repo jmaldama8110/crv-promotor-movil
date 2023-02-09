@@ -21,58 +21,53 @@ interface UserInfo {
   lastname: string;
   second_lastname: string;
   email: string;
-  current_token: string;
   branch: [number, string];
+  token: string;
 }
-
-interface UserSession {
-  user: UserInfo,
-  token:string;
-}
-
 
 
 export const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const { dispatchSession } = useContext(AppContext);
 
-  const [user,setUser] = useState<string>('promotor@grupoconserva.mx');
-  const [pass,setPass] = useState<string>('123456');
+  const [user,setUser] = useState<string>('LlenyMijangos');
+  const [pass,setPass] = useState<string>('12345678');
 
   const [present, dismiss] = useIonLoading();
 
   async function onLogin() {
 
     try {
-     const apiResponse =  await api.post("/users/login",{
-        email: user,
+     const apiResponse =  await api.post("/users/hf/login",{
+        user,
         password: pass
       });
       
-      let usrInfo: UserSession = apiResponse.data;
+      let usrInfo: UserInfo = apiResponse.data;
       
       dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Iniciando sesion",});
       const decoded:any = jwt_decode(usrInfo.token);
       const localDate = new Date(decoded.sync_info.sync_expiration);
 
+      
   
       setTimeout( async () => {
         await Preferences.set({
           key: LOGIN_KEY_PREFERENCES,
           value: JSON.stringify(usrInfo),
         });
-        
+
         dispatchSession({
           type: "LOGIN",
-          name: usrInfo.user.name,
-          lastname: usrInfo.user.lastname,
-          user: usrInfo.user.email,
-          branch: apiResponse.data.user.employee_id.branch,
+          name: usrInfo.name,
+          lastname: usrInfo.lastname,
+          user: usrInfo.email,
+          branch: usrInfo.branch,
           current_token: usrInfo.token,
           token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
         });
   
         dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "",});
-      }, 3000);
+      }, 1500);
     }
     catch(e){
       alert("No fue posible iniciar la sesion!, verifica tus credenciales");
@@ -92,14 +87,14 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
           
           dispatchSession({
             type: "LOGIN",
-            name: userLocalStorage.user.name,
-            lastname: userLocalStorage.user.lastname,
-            user: userLocalStorage.user.email,
-            branch: userLocalStorage.user.employee_id.branch,
+            name: userLocalStorage.name,
+            lastname: userLocalStorage.lastname,
+            user: userLocalStorage.email,
+            branch: userLocalStorage.branch,
             current_token: userLocalStorage.token,
             token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
           });
-      }
+      } 
     }
 
     loadDataFromLocalStorage();

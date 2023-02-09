@@ -11,7 +11,7 @@ import { ClientForm } from "./ClientForm";
 
 export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match }) => {
     
-    const [curp, setCurp ] = useState<string>('');
+    const [fullname, setFullName ] = useState<string>('');
     const [externalId, setExternalId ] = useState<string>('');
     const [presentAlert] = useIonAlert();
     const [ present, dismiss] = useIonLoading();
@@ -23,20 +23,24 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
     async function onSearchByCurpOrIdCliente () {
     
         try {
-          present({message: 'Buscando en el <HF></HF>...'})
+          present({message: 'Buscando en el HF...'})
           // converts Id into number
           let IdCliente = externalId !== '0' ? parseInt(externalId): 0;
             if( !IdCliente) {
               /// Id Cliente is not provided, try to obtain
               api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
-              const apiRes = await api.get(`/clients/exits?identityNumber=${curp}`);
-              if( apiRes.data.id_cliente){
-                IdCliente = parseInt(apiRes.data.id_cliente);
-              } else {
-                throw new Error('Not found');
-              }
+              const apiRes = await api.get(`/clients/hf/search?branchId=${session.branch[0]}&clientName=${fullname}`);
+              if( apiRes.data.length){
+                //// tries to retrive the last record with sub_estatus = PRESTAMO ACTIVO
+                
+                const clientInfoApi = apiRes.data.find( (i:any) => i.sub_estatus ==='PRESTAMO ACTIVO' ||'PRESTAMO FINALIZADO' );
+                if( clientInfoApi ){
+                  IdCliente = parseInt(clientInfoApi.idCliente);
+                } else {
+                  throw new Error('Not found');
+                }
             }
-              
+            }
             const apiRes2 = await api.get(`/clients/hf?externalId=${IdCliente}`);
             const newData = apiRes2.data as ClientData                
             if( !(newData.branch[0] == session.branch[0]) ){
@@ -62,8 +66,7 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
     }
 
     async function onSave( data:any) {
-      /// Save new record
-
+      //// Save new record
         db.put({
           ...data,
           couchdb_type: 'CLIENT',
@@ -107,9 +110,9 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
               <div>
               { externalId === '0' &&
               <IonItem>
-                <IonItemDivider><IonLabel>CURP:</IonLabel></IonItemDivider>
-                  <IonLabel position="floating">Ingresa el CURP del Cliente</IonLabel>
-                  <IonInput type='text' value={curp}  onIonChange={ (e) => setCurp(e.detail.value!)} onIonBlur={(e:any)=>setCurp(e.target.value.toUpperCase())}></IonInput>
+                <IonItemDivider><IonLabel>Nombre del cliente:</IonLabel></IonItemDivider>
+                  <IonLabel position="floating">Ingresa nombre completo</IonLabel>
+                  <IonInput type='text' value={fullname}  onIonChange={ (e) => setFullName(e.detail.value!)} ></IonInput>
               </IonItem>}
               { externalId !== '0' &&
                 <IonItem>
@@ -117,7 +120,7 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
                   <IonLabel position="floating">Ingresa el ID Cliente HF</IonLabel>
                   <IonInput type='text' value={externalId}  onIonChange={ (e) => setExternalId(e.detail.value!)}></IonInput>
               </IonItem>}
-              <IonButton onClick={onSearchByCurpOrIdCliente} disabled={(!curp && !externalId)}>Buscar</IonButton>
+              <IonButton onClick={onSearchByCurpOrIdCliente} disabled={(!fullname && !externalId)}>Buscar</IonButton>
             </div>
             }
             {hide && <ClientForm onSubmit={onSave} />}

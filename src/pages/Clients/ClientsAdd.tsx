@@ -1,5 +1,5 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonToast } from "@ionic/react";
-import { useContext } from "react";
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonToast } from "@ionic/react";
+import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
@@ -8,7 +8,7 @@ import { ClientForm } from "./ClientForm";
 
 export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
   
-  const {  session } = useContext(AppContext);
+  const {  session,dispatchClientData } = useContext(AppContext);
   const [showToast] = useIonToast();
   const { couchDBSyncUpload }  = useDBSync();
   function onClientAdd (data: any){
@@ -31,12 +31,21 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
 
     
   }
+  useEffect( ()=>{
+    return () =>{
+      dispatchClientData({ type:"RESET_CLIENT" })
+    }
+  },[])
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton />
+          </IonButtons>        
           <IonTitle>Alta de Clientes</IonTitle>
+
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>

@@ -9,7 +9,7 @@ import productProfile from '../../assets/producto-req03.svg';
 
 export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) => {
 
-  const [currSegment, setSegment] = useState<number>(1);
+  const [currSegment, setSegment] = useState<string>("1");
   const [productList, setProductList] = useState<any[]>([]);
 
     
@@ -50,7 +50,7 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
 
   useEffect( ()=>{
     if( loanAppGroup._id ){
-      setSegment(loanAppGroup.product.external_id);
+      setSegment(`${loanAppGroup.product.external_id}`);
     }
 
   },[loanAppGroup])
@@ -107,8 +107,8 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
   return (
     <IonList className="ion-padding">
       <IonSegment
-        value={currSegment.toString()}
-        onIonChange={(e) => setSegment(parseInt(e.detail.value!))}
+        value={currSegment}
+        onIonChange={(e) => setSegment(e.detail.value!)}
       >
         {productList.map((i: any) => (
           <IonSegmentButton key={i._id} value={i.external_id}>

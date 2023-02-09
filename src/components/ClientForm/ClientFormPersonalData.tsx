@@ -13,6 +13,10 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     const [name, setName] = useState<string>("");
     const [lastname, setLastname] = useState<string>("");
     const [second_lastname, setSecondLastName] = useState<string>("");
+    const [clave_ine, setClaveIne] = useState<string>("");
+    const [numero_emisiones, setNumeroEmisiones] = useState<string>("");
+    const [numero_vertical, setNumeroVertical] = useState<string>("");
+
 
     const [sex,setSex] = useState<[number, string]>([3,'Mujer']);
     const [sexCatalog, setSexCatalog] = useState<any[]>([]);
@@ -79,6 +83,9 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                         setPhone(phoneMobile.phone);
                     }
                     setCurp(clientData.curp);
+                    setClaveIne(clientData.clave_ine);
+                    setNumeroEmisiones(clientData.numero_emisiones);
+                    setNumeroVertical(clientData.numero_vertical);
                     setNationality(clientData.nationality[0])
                     setCountryOfBirth( clientData.country_of_birth[0]);
                   }                  
@@ -138,6 +145,14 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           company: 'Desconocida',
           validated: false }],
         dob,
+        clave_ine,
+        numero_vertical,
+        numero_emisiones,
+        ife_details: [{
+          id_identificacion_oficial: clave_ine,
+          numero_emision: numero_emisiones,
+          numero_vertical_ocr: numero_vertical
+        }],
         province_of_birth: provinceOfBirth ,
         country_of_birth: countryOfBirth ? [countryOfBirth, countries.find( (i:SearchData)=> ({id: i.id, etiqueta: i.etiqueta}) ).etiqueta] : ['',''],
         nationality: nationality ? [ nationality, nationCatalog.find( (i:any) =>(i.id == nationality)).etiqueta] : [0,'']
@@ -225,6 +240,22 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           ))}
         </IonSelect>
       </IonItem>
+
+        <IonItemDivider><IonLabel>Datos del INE</IonLabel></IonItemDivider>
+        <IonItem>
+                  <IonLabel position="stacked">Clave INE</IonLabel>
+                  <IonInput type="text" value={clave_ine} onIonChange={(e=>setClaveIne(e.detail.value!))} onIonBlur={(e:any)=>setClaveIne(e.target.value.toUpperCase())}></IonInput>
+        </IonItem>
+        <IonItem>
+                  <IonLabel position="stacked">Numero Emisiones</IonLabel>
+                  <IonInput type="text" value={numero_emisiones} onIonChange={(e=>setNumeroEmisiones(e.detail.value!))} onIonBlur={(e:any)=>setNumeroEmisiones(e.target.value.toUpperCase())}></IonInput>
+        </IonItem>
+        <IonItem>
+                  <IonLabel position="stacked">Numero Vertical</IonLabel>
+                  <IonInput type="text" value={numero_vertical} onIonChange={(e=>setNumeroVertical(e.detail.value!))} onIonBlur={(e:any)=>setNumeroVertical(e.target.value.toUpperCase())}></IonInput>
+        </IonItem>
+        
+
         <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' />
       </IonList>
     

@@ -10,7 +10,6 @@ import {
 } from "../../components/SelectDropSearch";
 import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
-import { useDBSync } from '../../hooks/useDBSync';
 
 
 
@@ -20,8 +19,8 @@ const ClientsHome: React.FC = () => {
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
   
-  const { dispatchClientData } = useContext(AppContext);
-  const { prepareIndex } = useDBSync();
+  const { dispatchClientData, dispatchSession } = useContext(AppContext);
+
   let history = useHistory();
   
   const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
@@ -33,12 +32,22 @@ const ClientsHome: React.FC = () => {
 
 
 
-  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+  async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(async () => {
-      await prepareIndex("CLIENT", ["couchdb_type"])
+      const data:any = await db.find({ selector: { couchdb_type:"CLIENT" }});
+      const newData: SearchData[] = data.docs.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
+      setClientSearchData(newData);
       event.detail.complete();
-    }, 2000);
+    },2000);
+    
   }
+
+  useEffect( ()=>{
+
+    db.find( { selector: {
+      couchdb_type: "CLIENT",
+    }})
+  },[]) 
 
   function onShowActions(){
     const buttons = clientSelected.id ? 

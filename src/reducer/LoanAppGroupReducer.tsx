@@ -15,8 +15,8 @@ export type ActionsLoanAppGroup =
       approved_total: number;
       term: number;
       frequency: [string, string];
-      first_repay_at: string;
-      disbursed_at: string
+      first_repay_date: string;
+      disbursment_date: string
       disbursment_mean: number;
       liquid_guarantee: number;
       loan_cycle: string;
@@ -63,8 +63,8 @@ export interface LoanAppGroup{
     approved_total: number;
     term: number;
     frequency: [string, string];
-    first_repay_at: string;
-    disbursed_at: string;
+    first_repay_date: string;
+    disbursment_date: string;
     disbursment_mean: number;
     liquid_guarantee: number;
     loan_cycle: string;
@@ -101,8 +101,8 @@ export const loanAppGroupDef: LoanAppGroup = {
   approved_total: 0,
   term: 0,
   frequency: ["", ""],
-  first_repay_at: "",
-  disbursed_at: '',
+  first_repay_date: "",
+  disbursment_date: '',
   disbursment_mean: 0,
   liquid_guarantee: 0,
   loan_cycle: "",
@@ -145,8 +145,8 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
        approved_total: action.approved_total,
        term: action.term,
        frequency: action.frequency,
-       first_repay_at: action.first_repay_at,
-       disbursed_at: action.disbursed_at,
+       first_repay_date: action.first_repay_date,
+       disbursment_date: action.disbursment_date,
        disbursment_mean: action.disbursment_mean,
        liquid_guarantee: action.liquid_guarantee,
        loan_cycle: action.loan_cycle,

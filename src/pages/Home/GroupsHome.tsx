@@ -5,7 +5,6 @@ import { RouteComponentProps } from 'react-router';
 
 import { SearchData, SelectDropSearch } from '../../components/SelectDropSearch';
 import { db } from '../../db';
-import { useDBSync } from '../../hooks/useDBSync';
 import { AppContext } from '../../store/store';
 import './GroupsHome.css';
 
@@ -13,9 +12,9 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
-  const { prepareIndex } = useDBSync();
+
   const { dispatchGroupData } = useContext(AppContext);
-  const [clientSearchData ] = useState<SearchData[]>([]);
+  const [clientSearchData, setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
     rev: "",
@@ -24,7 +23,9 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
 
   function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(async () => {
-      await prepareIndex("GROUP", ["couchdb_type"])
+      const data:any = await db.find({ selector: { couchdb_type:"GROUP" }});
+      const newData: SearchData[] = data.docs.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.group_name}` }))
+      setClientSearchData( newData)
       event.detail.complete();
     }, 2000);
   }

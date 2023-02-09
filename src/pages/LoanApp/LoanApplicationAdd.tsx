@@ -40,7 +40,7 @@ export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
         <IonHeader>
             <IonToolbar>
             <IonButtons slot="start">
-                <IonBackButton defaultHref="/guarantees" />
+                <IonBackButton />
             </IonButtons>
             <IonTitle>Nueva Solicitud</IonTitle>
             </IonToolbar>

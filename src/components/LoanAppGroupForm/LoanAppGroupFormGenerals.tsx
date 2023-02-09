@@ -1,5 +1,5 @@
 
-import { IonAvatar, IonItem, IonItemDivider, IonLabel, IonList, IonListHeader, IonRadio, IonRadioGroup, IonRange } from "@ionic/react";
+import { DatetimeChangeEventDetail, IonAvatar, IonDatetime, IonDatetimeButton, IonItem, IonItemDivider, IonLabel, IonList, IonListHeader, IonModal, IonRadio, IonRadioGroup, IonRange, useIonAlert } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
 import { getRound } from "../../utils/math";
@@ -12,6 +12,10 @@ interface TermType {
     value: string;
     year_periods: string;
 }
+interface DatetimeCustomEvent extends CustomEvent {
+    detail: DatetimeChangeEventDetail;
+    target: HTMLIonDatetimeElement;
+  }
 
 export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit}) => {
 
@@ -26,7 +30,13 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
 
     /// Pago igual resultante
     const [paymentAmount, setPaymentAmount] = useState<string | undefined | null>("");
-    
+
+    const [validationsStep1, setValidationsStep1] = useState<boolean>(true);
+
+    const [fechaPrimerPago, setFechaPrimerPago] = useState<string>('');
+    const [fechaDesembolso, setFechaDesembolso] = useState<string>('');
+    const [showAlert] = useIonAlert();
+
 
     function onSend(){
         const freqItem:TermType = loanAppGroup.product.term_types.find( (i:TermType) => i.identifier === termType )
@@ -34,6 +44,8 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
         const data ={   
             apply_amount,
             term,
+            disbursment_date: fechaDesembolso,
+            first_repay_date: fechaPrimerPago,
             frequency: [freqItem.identifier, freqItem.value ],
             coordinates: [lat,lng],
         }
@@ -44,6 +56,19 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
         if( loanAppGroup._id){ // runs when the _id not empty, thus in edit mode                
                 setTerm( loanAppGroup.term);
                 setTermType( loanAppGroup.frequency[0]);
+                setFechaDesembolso( loanAppGroup.disbursment_date);
+                setFechaPrimerPago( loanAppGroup.first_repay_date);
+        }
+        if( !loanAppGroup._id){
+            //// calcualate defautl dates for Disbursment date and first repay date 14 days ahead today
+                const fechaDesNew = new Date();
+                const fechaPPagoNew = new Date();
+                fechaDesNew.setDate(fechaDesNew.getDate() + 14);
+                fechaPPagoNew.setDate( fechaDesNew.getDate() + 14);
+                
+                setFechaDesembolso(fechaDesNew.toISOString());
+                setFechaPrimerPago(fechaPPagoNew.toISOString());
+            
         }
 
     },[loanAppGroup]) 
@@ -113,6 +138,56 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
         loadCoordinates();
       }, []);
 
+
+
+      useEffect( ()=>{
+        if( !loanAppGroup._id ){
+            onValidateEntries();
+        }
+    },[fechaDesembolso, fechaPrimerPago])
+
+    function onValidateEntries (){
+        setValidationsStep1(false);
+        const today = new Date();
+        const validationMessage: string[] = [];
+        const disburseDate = new Date(fechaDesembolso);
+        const firstRepayDate = new Date(fechaPrimerPago);
+
+        if( disburseDate.getTime() <= today.getTime() ) {
+            validationMessage.unshift('La fecha de desembolso no es valida el dia de hoy o pasada...\n')
+        }
+        if( firstRepayDate.getTime() <= today.getTime() ){
+            validationMessage.unshift('La fecha de primer pago no es valida el dia de hoy o pasada...\n')
+        }
+
+        if( disburseDate.getTime() >= firstRepayDate.getTime() ){
+            validationMessage.unshift('La fecha de desembolso no puede ser despues de la fecha de primero pago...\n')
+        }
+
+        if( validationMessage.length ){
+            showAlert({
+                header: 'OJO, existe un detalle',
+                subHeader: 'Verifica las siguientes entradas',
+                message: `${validationMessage.toString()}`,
+                buttons: ['OK'],
+              });
+            setValidationsStep1(false);
+        } else {
+            setValidationsStep1(true);
+        }
+
+    }
+
+    function onFechaDesembolsoChange (ev: DatetimeCustomEvent) {
+        setFechaDesembolso( ev.detail.value as string );
+        
+    }
+
+    function onFechaPrimerPagoChange( ev: DatetimeCustomEvent) {
+        setFechaPrimerPago( ev.detail.value as string);
+    }
+    
+
     return (
         <IonList className="ion-padding">
         
@@ -128,6 +203,24 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
             <IonItem>
                 <IonLabel>Plazo: {term}</IonLabel>
             </IonItem>
+            <IonItem>
+                <IonLabel>Fecha Desembolso</IonLabel>
+                <IonDatetimeButton datetime="fecha-desembolso"></IonDatetimeButton>
+            </IonItem>
+            <IonItem>
+                <IonLabel>Fecha Primer Pago</IonLabel>
+            <IonDatetimeButton datetime="fecha-primer-pago"></IonDatetimeButton>
+            </IonItem>
+            <IonModal keepContentsMounted={true}>
+                <IonDatetime id="fecha-desembolso" presentation="date" multiple={false} value={fechaDesembolso} onIonChange={onFechaDesembolsoChange} ></IonDatetime>
+            </IonModal>
+            <IonModal keepContentsMounted={true}>
+                <IonDatetime id="fecha-primer-pago" presentation="date" multiple={false} value={fechaPrimerPago} onIonChange={onFechaPrimerPagoChange}></IonDatetime>
+            </IonModal>
+
+
+
+
             <IonRadioGroup allowEmptySelection={false} onIonChange={(e:any)=> setTermType(e.target.value!)} value={termType}>
                 <IonListHeader><IonLabel>Pagos Cada:</IonLabel></IonListHeader>
                     {loanAppGroup.product.term_types.map( (t:TermType) => (
