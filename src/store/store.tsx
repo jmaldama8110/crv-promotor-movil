@@ -7,6 +7,7 @@ import { ActionsGroupData, GroupData, groupDataDef, GroupDataReducer } from "../
 import { ActionsLoanAppGroup, LoanAppGroup, loanAppGroupDef, LoanAppGroupReducer } from "../reducer/LoanAppGroupReducer";
 import { ActionsGroupMember, GroupMember, GroupMembersReducer } from "../reducer/GroupMembersReducer";
 import { ActionsMember, MemberReducer,groupMemberDef } from "../reducer/GroupMemberReducer";
+import { ActionsDropout, DropoutReducer, DroupOutType } from "../reducer/DropoutReducer";
 
 type AppContextProviderProps = {
   children: React.ReactNode
@@ -32,6 +33,9 @@ interface SharedContext {
   groupMember: GroupMember;
   dispatchMember: React.Dispatch<ActionsMember>;
 
+  dropoutMembers: DroupOutType[];
+  dispatchDropoutMembers: React.Dispatch<ActionsDropout>;
+
 }
 
 export const AppContext = createContext<SharedContext >({} as SharedContext);
@@ -56,7 +60,9 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
   const [ groupData, dispatchGroupData] = useReducer( GroupDataReducer, groupDataDef);
   const [ loanAppGroup, dispatchLoanAppGroup] = useReducer( LoanAppGroupReducer, loanAppGroupDef);
   const [ groupMemberList, dispatchGroupMember] = useReducer( GroupMembersReducer, []);
-  const [ groupMember, dispatchMember] = useReducer(MemberReducer, groupMemberDef)
+  const [ groupMember, dispatchMember] = useReducer(MemberReducer, groupMemberDef);
+  const [ dropoutMembers, dispatchDropoutMembers] = useReducer( DropoutReducer, []);
+
   const sharedCtx: SharedContext = {
     session,
     dispatchSession,
@@ -73,7 +79,9 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
     groupMemberList,
     dispatchGroupMember,
     groupMember,
-    dispatchMember
+    dispatchMember,
+    dropoutMembers,
+    dispatchDropoutMembers
   }
   
 

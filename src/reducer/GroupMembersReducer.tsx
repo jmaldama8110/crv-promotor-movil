@@ -27,6 +27,7 @@ export interface GroupMember {
   _id: string; // member id
   id_cliente: number;
   id_persona: number;
+  id_member: number;
   client_id: string; // CLIENT (couchdb_type) link to member record
   fullname: string;
   curp: string;
@@ -40,7 +41,7 @@ export interface GroupMember {
     beneficiary: string,
     relationship: string,
     percentage: number
-  },
+  }
 }
 
 
@@ -53,7 +54,7 @@ export const GroupMembersReducer = (state: State, action: ActionsGroupMember) =>
     case "ADD_GROUP_MEMBER":
       return [ ...state, action.item]
     case "REMOVE_GROUP_MEMBER":
-        return state.filter( (i:GroupMember)=> (i._id === action.idx))
+        return state.filter( (i:GroupMember)=> (i._id !== action.idx))
     case "UPDATE_GROUP_MEMBER": 
         return state.map( (i:GroupMember) => 
         ( i._id === action.idx 

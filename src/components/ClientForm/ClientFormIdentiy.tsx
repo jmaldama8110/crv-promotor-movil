@@ -19,8 +19,9 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
 
     useEffect( ()=>{
         if(clientData._id){
-            if( clientData.identity_pics )
+            if( clientData.identity_pics ){
                 setPics(clientData.identity_pics);
+            }
         }
     },[clientData])
 
@@ -34,7 +35,7 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
 
     return (
         <IonList className="ion-padding">
-        <div className="contenido-loanform">
+        <div>
             <IonItem><IonLabel>Identificación (INE frontal y trasera)</IonLabel></IonItem>            
             <IonGrid>
                 <IonRow>

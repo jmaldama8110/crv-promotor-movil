@@ -46,13 +46,25 @@ export const GroupForm: React.FC<GroupFormProps> = (props) => {
   const [hourDay, setHourDay] = useState("");
   const [hourDays, setHourDays] = useState([
     "08",
+    "08.30",
     "09",
+    "09.30",
     "10",
+    "10.30",
     "11",
+    "11.30",
     "12",
+    "12.30",
     "13",
+    "13.30",
     "14",
+    "14.30",
     "15",
+    "15.30",
+    "16",
+    "16.30",
+    "17",
+    "17.30",
   ]);
 
   const [lat, setLat] = useState(0);
@@ -116,7 +128,6 @@ export const GroupForm: React.FC<GroupFormProps> = (props) => {
     }
   },[groupData])
 
-  
 
   function onSubmit() {
     const data: any = {
@@ -134,6 +145,7 @@ export const GroupForm: React.FC<GroupFormProps> = (props) => {
         city: [cityId, cityName],
         colony: [colonyId, colonyName]
       },
+      coordinates: [lat,lng],
     };
     props.onSubmit(data);
   }

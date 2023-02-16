@@ -2,6 +2,7 @@ import {
   IonAvatar,
   IonBadge,
   IonButton,
+  IonCheckbox,
   IonCol,
   IonGrid,
   IonInput,
@@ -68,6 +69,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
   const [group_data, setGroupData] = useState<GroupData>(groupDataDef);
   const [loan_app, setLoanApp] = useState<LoanAppGroup>(loanAppGroupDef);
   const [contract, setContract] = useState<any>({});
+  const [createNewLoanApp, setCreateNewLoanApp] = useState<boolean>(false);
 
   async function onGroupSearchNext  (){
     setProgress(0.66);
@@ -274,7 +276,8 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
             groupExistId,
             group_data,
             loan_app,
-            contract
+            contract,
+            createNewLoanApp
         }
 
         onSubmit(data);
@@ -360,6 +363,13 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
               </IonItem>
               <IonItem>
                 <IonLabel>Saldo: {formatLocalCurrency(contract.saldoActual)}</IonLabel>
+              </IonItem>
+              <IonItemDivider><IonLabel>¿Generer una Nueva Solicitud?</IonLabel></IonItemDivider>
+              <IonItem>
+                <IonLabel>Si, crear una nueva solicitud</IonLabel>
+                <IonCheckbox
+                checked={createNewLoanApp}
+                onIonChange={async (e) =>setCreateNewLoanApp(e.detail.checked)} />
               </IonItem>
 
             <ButtonSlider label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={()=>{}} />

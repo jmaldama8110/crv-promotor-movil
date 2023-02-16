@@ -4,20 +4,23 @@ import {
   IonCardHeader,
   IonCardSubtitle,
 } from "@ionic/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { db } from "../../db";
 import { LoanAppGroup } from "../../reducer/LoanAppGroupReducer";
+import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 
 
 
 export const LoanAppGroupCard: React.FC<RouteComponentProps> = ({ match }) => {
   const [loans, setLoans] = useState<LoanAppGroup[]>([]);
+  const { dispatchSession } = useContext(AppContext)
   let render = true;
   useEffect(() => {
     if (render) {
       render = false;
+      dispatchSession({ type:"SET_LOADING", loading_msg: "Cargando...", loading: true });
       db.createIndex({
         index: { fields: ["couchdb_type"] },
       }).then(function () {
@@ -34,7 +37,8 @@ export const LoanAppGroupCard: React.FC<RouteComponentProps> = ({ match }) => {
           const newData = clientLoans.map( (i:LoanAppGroup) =>({
               ...i
           }))
-          setLoans(newData)
+          setLoans(newData);
+          dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false });
 
           
         });

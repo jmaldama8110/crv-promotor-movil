@@ -9,7 +9,7 @@ import { ButtonSlider } from "../SliderButtons";
 export const ClientFormComprobanteDomicilio: React.FC<{ onNext:any}> = ({ onNext })=>{
 
     const { takePhoto, pics, setPics } = useCameraTaker();
-    const { clientData} = useContext(AppContext);
+    const { clientData } = useContext(AppContext);
 
     const onPhotoTitleUpdate = (e:any) =>{
         const itemPosition = pics.length - 1;
@@ -34,7 +34,7 @@ export const ClientFormComprobanteDomicilio: React.FC<{ onNext:any}> = ({ onNext
     },[clientData])
     return (
         <IonList className="ion-padding">
-        <div className="contenido-loanform">
+        <div>
             <IonItem><IonLabel>Comprobante Domicilio</IonLabel></IonItem>            
             <IonGrid>
                 <IonRow>

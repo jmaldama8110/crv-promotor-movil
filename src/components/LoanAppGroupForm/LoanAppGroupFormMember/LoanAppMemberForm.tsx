@@ -52,12 +52,11 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
                 couchdb_type: "CLIENT"
               }
             }).then( data =>{
-              /// remove clients listed in group List
+              /// remove clients listed within same group List
               const newSearchList = data.docs.filter( (curr:any) =>{
                 const found = groupMemberList.find( (x:GroupMember) => x.client_id === curr._id )
                 return !found
               })
-              
               const newData = newSearchList.map( (i:any)=>(
                   {   id: i._id,
                             rev: i._rev,
@@ -174,14 +173,8 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
         
     }
 
-    function onRemoveMember() {
-      alert('Deseas quitar a esta persona del grupo?');
-    }
-
-
-
     return (
-        <IonList className="ion-padding">
+        <IonList>
             { !groupMember._id &&<SelectDropSearch
                   dataList={clientSearchData}
                   setSelectedItemFx={setClientSelected}
@@ -257,8 +250,8 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
             </IonItem>
             <p></p>
             <IonButton onClick={onSend} color='medium' disabled={!entryAmtValid} expand='block'>Guardar</IonButton>
-            { groupMember._id && <IonButton color='warning' onClick={onRemoveMember} >Quitar Integrante</IonButton>}
         </IonList>
+        
     );
 
 

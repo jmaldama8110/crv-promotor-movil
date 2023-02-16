@@ -34,6 +34,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
 
   async function loanAppNewExist(IdClienteGroup: number){
      try{
+      
         await db.createIndex( {index: { fields: ["couchdb_type"]}});
         const data = await db.find({selector: {
           couchdb_type: 'LOANAPP_GROUP'
@@ -66,7 +67,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
     try{
       present( { message: 'Guardando...'})
       const colony:any = await getColonyIfExist(data.group_data.address.colony[0]);
-      
+
       /// crea el grupo, solo si no existe
       const newGroupId = !data.groupExistId ? Date.now().toString() : data.groupExistId;
       if (!data.groupExistId) {
@@ -88,10 +89,12 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
                 //// crear la solicitud? solamente si 
         // selecciona PRESTAMO ACTIVO (se omite NUEVO TRAMITE)
         const loanExist = await loanAppNewExist( data.group_data.id_cliente);
-        if( !loanExist ){
+        if( !loanExist && data.createNewLoanApp ){
+          
           const newLoaApp: LoanAppGroup = {
             ...data.loan_app,
             _id: Date.now().toString(),
+            dropout: [],
             apply_by: newGroupId,
             apply_at: new Date().toISOString(),
             created_by: session.user,
@@ -109,6 +112,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
             {
               ...data.contract,
               _id: Date.now().toString(),
+              client_id: newGroupId,
               created_by: session.user,
               created_at: new Date().toISOString(),
               branch: session.branch,

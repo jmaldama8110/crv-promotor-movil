@@ -10,8 +10,10 @@ import {
   RefresherEventDetail,
   IonRefresher,
   IonRefresherContent,
+  IonItem,
+  IonLabel,
 } from "@ionic/react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
@@ -20,6 +22,7 @@ import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
 export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
   const { session,dispatchSession } = useContext(AppContext);
+  const [info,setInfo] = useState({});
   
   const { couchDBSyncDownload } = useDBSync();
 
@@ -58,7 +61,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       event.detail.complete();
    }
 
-  
+
   return (
     <IonPage>
       <IonHeader>

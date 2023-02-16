@@ -40,11 +40,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
           if( homeAddress ){
             setMyCp(homeAddress.post_code);
 
-            dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Optimizando busqueda codigos postales..."});
+            
             populateColoniesByPostCode( homeAddress.post_code, setColonyCat);
             setAddressL1( homeAddress.address_line1);
-            
-            dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "" });
           }
 
       }
@@ -66,6 +64,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   function populateColoniesByPostCode( cpData: string, updateFx: (value: React.SetStateAction<ColonyType[]>) => void ) {
     if (!cpData) return;
 
+    dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
     db.createIndex({
       index: { fields: ['couchdb_type','codigo_postal']}
     }).then( function() {
@@ -80,7 +79,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
               etiqueta: i.etiqueta,
               ciudad_localidad: i.ciudad_localidad,
             })));
-
+            dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
         })
         .catch((err) => {
           console.log(err);

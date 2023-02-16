@@ -63,8 +63,9 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
             //// calcualate defautl dates for Disbursment date and first repay date 14 days ahead today
                 const fechaDesNew = new Date();
                 const fechaPPagoNew = new Date();
-                fechaDesNew.setDate(fechaDesNew.getDate() + 14);
-                fechaPPagoNew.setDate( fechaDesNew.getDate() + 14);
+
+                fechaDesNew.setDate(fechaDesNew.getDate() + 7);
+                fechaPPagoNew.setDate( fechaPPagoNew.getDate() + 14);
                 
                 setFechaDesembolso(fechaDesNew.toISOString());
                 setFechaPrimerPago(fechaPPagoNew.toISOString());
@@ -138,11 +139,9 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
         loadCoordinates();
       }, []);
 
-
-
       useEffect( ()=>{
         if( !loanAppGroup._id ){
-            onValidateEntries();
+            // onValidateEntries();
         }
     },[fechaDesembolso, fechaPrimerPago])
 

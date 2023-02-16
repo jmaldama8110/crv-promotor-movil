@@ -19,10 +19,11 @@ export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
     const [ educationLevelCatalog, setEducationLevelCatalog] = useState<SearchData[]>([]);
     const [maritalStatus, setMaritalStatus] = useState<number>(0);
     const [ maritalStatusCatalog, setMaritalStatusCatalog] = useState<SearchData[]>([]);
-    const { clientData } = useContext(AppContext);
+    const { clientData, dispatchSession } = useContext(AppContext);
 
 useEffect( ()=>{
   
+  dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
   db.createIndex( { index: { fields: ["couchdb_type", "name"]}} )
   .then( function (){
     db.find({
@@ -68,7 +69,7 @@ useEffect( ()=>{
                   setProfession( { id: clientData.business_data.profession[0], etiqueta: clientData.business_data.profession[1]});
                   setEconomicActivity( { id: clientData.business_data.economic_activity[0], etiqueta:clientData.business_data.economic_activity[1]})
                 }
-                
+                dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
               })
             })
         })

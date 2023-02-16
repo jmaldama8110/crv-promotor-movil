@@ -29,8 +29,8 @@ interface UserInfo {
 export const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const { dispatchSession } = useContext(AppContext);
 
-  const [user,setUser] = useState<string>('LlenyMijangos');
-  const [pass,setPass] = useState<string>('12345678');
+  const [user,setUser] = useState<string>('');
+  const [pass,setPass] = useState<string>('');
 
   const [present, dismiss] = useIonLoading();
 
@@ -105,11 +105,11 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
         <IonList className="ion-padding">
           <IonItem>
             <IonLabel position="floating">Usuario</IonLabel>
-            <IonInput type="text" value={user}></IonInput>
+            <IonInput type="text" value={user} onIonChange={(e:any) => setUser(e.detail.value)}></IonInput>
           </IonItem>
           <IonItem>
             <IonLabel position="floating">Contraseña</IonLabel>
-            <IonInput type="password" value={pass}></IonInput>
+            <IonInput type="password" value={pass} onIonChange={(e:any)=> setPass(e.detail.value)}></IonInput>
           </IonItem>
 
           <IonButton expand="block" onClick={onLogin}>Login</IonButton>

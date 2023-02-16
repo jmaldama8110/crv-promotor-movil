@@ -22,12 +22,14 @@ export function useDBSync () {
         dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Subiendo datos..."});
         db.replicate.to(remoteDB).on('complete', function () {
           console.log('Local => RemoteDB, Ok!')
-          showToast("Ok, se guardo el registro!",1500);
+          showToast("Sincronizacion OK! (local -> Remoto)",1500);
     
         }).on('error', function (err) {
-          showToast("Ok, se guardo el registro!, pero no estas conectado!",1500);
+          console.log(err);
+          showToast("Ok, se guardo el registro!, pero sin conexion!",1500);
         });
       }
+    
       catch(error){
         console.log(error);
       }           
@@ -44,9 +46,10 @@ export function useDBSync () {
         
         dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
         console.log('Remote => Local, Ok!');
-      }).on('error', (err)=>{
+      }).on('error', (err:any)=>{
+        
         dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-        showToast('Estas en modo sin conexion...', 1500)
+        showToast('Estas en modo sin conexion...'+err.message, 1500)
       })
     }
 

@@ -7,13 +7,12 @@ import { ButtonSlider } from "../../components/SliderButtons";
 import { LoanAppGroupFormSummary } from "../../components/LoanAppGroupForm/LoanAppGroupFormSummary";
 import { LoanAppGroupFormGenerals } from "../../components/LoanAppGroupForm/LoanAppGroupFormGenerals";
 import { AppContext } from "../../store/store";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 
 export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
  
-  const { dispatchLoanAppGroup, loanAppGroup, dispatchGroupMember, groupMemberList } = useContext( AppContext );
-  
+  const { dispatchLoanAppGroup, loanAppGroup, dispatchGroupMember,dropoutMembers, groupMemberList, dispatchDropoutMembers } = useContext( AppContext );
 
   /** Product selection */
   function onProductNext (data:any) {
@@ -33,18 +32,23 @@ export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
       type: "SET_LOAN_APP_GROUP",
       ...loanAppGroup,
       ...data,
-      members: groupMemberList
+      members: groupMemberList,
+      dropout: dropoutMembers
     })
   }
+
 
   function onMembersNext (){ 
     /// nothing to do, since members are manages by another state (GroupMembers)
   }
 
+
   function onSend() {
-    onSubmit( loanAppGroup );
     dispatchLoanAppGroup( { type: 'RESET_LOAN_APP_GROUP'})
     dispatchGroupMember( { type:"POPULATE_GROUP_MEMBERS", data: []})
+    dispatchDropoutMembers( { type: "POPULATE_DROPOUTS", data: []});
+
+    onSubmit( loanAppGroup );
   }
   
   return (

@@ -7,6 +7,7 @@ import { useContext } from "react";
 import { LoanAppGroupForm } from "./LoanAppGroupForm";
 import { LoanAppGroup } from "../../reducer/LoanAppGroupReducer";
 import { useDBSync } from "../../hooks/useDBSync";
+import { createAction } from "../../model/Actions";
 
 export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
 
@@ -15,10 +16,11 @@ export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
     
     const onAdd = async (data:any) =>{
         const clientId = props.match.url.split("/")[2];
+        const loanAppId = Date.now().toString();
         const newLoanAppGroup: LoanAppGroup = {
             ...data,
             members: groupMemberList,
-            _id: Date.now().toString(),
+            _id: loanAppId,
             apply_by: clientId,
             apply_at: (new Date()).toISOString(),
             created_by: session.user,
@@ -29,6 +31,7 @@ export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
         db.put({
             ...newLoanAppGroup
           }).then( async (doc)=>{
+              await createAction( "CREATE_UPDATE_LOAN", { id_loan: loanAppId}, session.user )
               await couchDBSyncUpload();
               props.history.goBack();
           }).catch( e =>{

@@ -8,13 +8,14 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useContext } from "react";
+import { DroupOutType } from "../../reducer/DropoutReducer";
 import { GroupMember } from "../../reducer/GroupMembersReducer";
 import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 
 
 export const LoanAppGroupFormSummary: React.FC = () => {
-  const { groupMemberList, loanAppGroup } = useContext(AppContext);
+  const { groupMemberList, loanAppGroup, dropoutMembers } = useContext(AppContext);
 
 
   return (
@@ -56,6 +57,14 @@ export const LoanAppGroupFormSummary: React.FC = () => {
                               }
 
                         </IonGrid>
+      <IonItem><IonLabel>Bajas:</IonLabel></IonItem>
+                        <IonGrid>
+                            { dropoutMembers.map((i:DroupOutType)=> (
+                                <IonRow key={i.member_id}><IonLabel className="xs"></IonLabel>- {i.fullname.slice(0,20)} ({i.reasonType}) <IonLabel className="xs">({i.dropoutReason[1]}) </IonLabel></IonRow>) )
+                              }
+
+                        </IonGrid>
+
     </IonList>
   );
 };

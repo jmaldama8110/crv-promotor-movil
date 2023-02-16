@@ -78,6 +78,7 @@ import { LoanAppMemberEdit } from "./components/LoanAppGroupForm/LoanAppGroupFor
 import { GroupFromHF } from "./pages/Groups/GroupFromHF";
 import { GroupImport } from "./pages/Groups/GroupImport/GroupImport";
 import { useDBSync } from "./hooks/useDBSync";
+import { ContractDetail } from "./pages/Contracts/ContractDetail";
 
 setupIonicReact();
 
@@ -102,6 +103,7 @@ const App: React.FC = () => {
       if (render) {
         ///// what needs to be rendered once goes here!
         await couchDBSyncDownload();
+        
         render = false;      
       }
     };
@@ -159,7 +161,7 @@ const App: React.FC = () => {
             <Route exact path="/groups/:id/loanapps/edit/:id/members/edit/:id" component={LoanAppMemberEdit}></Route>
 
             <Route exact path="/groups/import" component={GroupImport}></Route>
-
+            <Route exact path="/contracts/:contractId" component={ContractDetail}></Route>
 
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>

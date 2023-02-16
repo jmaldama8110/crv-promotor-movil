@@ -10,7 +10,7 @@ import {
 } from "@ionic/react";
 import { useContext, useState } from "react";
 import { RouteComponentProps } from "react-router";
-import { db, remoteDB } from "../../db";
+import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 
 import { AppContext } from "../../store/store";
@@ -18,13 +18,14 @@ import { GroupForm } from "./GroupForm";
 
 export const GroupAdd: React.FC<RouteComponentProps> = (props) => {
   
-  const { session } = useContext(AppContext);
+  const { session, dispatchSession } = useContext(AppContext);
   const { couchDBSyncUpload } = useDBSync();
   const [progress, setProgress] = useState(0.1);
 
   const onAdd = async (data: any) => {
 
     // Save new record
+  dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true});
     db.put({
       couchdb_type: "GROUP",
       _id: Date.now().toString(),
@@ -36,6 +37,7 @@ export const GroupAdd: React.FC<RouteComponentProps> = (props) => {
     })
       .then(async (doc) => {
         await couchDBSyncUpload();
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false});
         props.history.goBack();
       })
       .catch((e) => {

@@ -10,6 +10,7 @@ export const groupMemberDef: GroupMember = {
     _id: '', // member id
     id_cliente: 0,
     id_persona: 0,
+    id_member: 0,
     client_id: '', // CLIENT (couchdb_type) link to member record
     fullname: '',
     curp: '',

@@ -37,13 +37,16 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     const [phoneStatus, setPhoneStatus] = useState<boolean>(false);
     const [curp, setCurp] = useState<string>("");
     const [curpStatus, setCurpStatus] = useState<boolean>(false);
-    const { clientData,dispatchClientData } = useContext(AppContext);
+    const { clientData,dispatchSession } = useContext(AppContext);
 
     let render = true;
 
     useEffect( ()=> {
+
       if( render ){
-        
+        render = false;
+
+      dispatchSession({type: 'SET_LOADING', loading_msg: 'Cargando...', loading: true })
       db.createIndex( { index: { fields: ['couchdb_type','name']}})
         .then( function () {
           db.find( { 
@@ -90,6 +93,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                     setCountryOfBirth( clientData.country_of_birth[0]);
                   }                  
                 })
+                dispatchSession( {type: 'SET_LOADING', loading_msg: '', loading:false });
               })
 
             })
@@ -125,6 +129,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
             }
             if( provinces.length ){
               const provSel = provinces.find( (i:any) => i.abreviatura === curpData.prov)
+              if(provSel)
               setProvinceOfBirth( [provSel._id, provSel.etiqueta] );
             }
           }

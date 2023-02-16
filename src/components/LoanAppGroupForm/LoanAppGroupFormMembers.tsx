@@ -6,14 +6,16 @@ import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import avatar from '../../../src/assets/avatar.svg';
+import { DroupOutType } from "../../reducer/DropoutReducer";
 
 export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit }) => {
 
-    const { groupMemberList, loanAppGroup, dispatchLoanAppGroup, dispatchGroupMember, dispatchMember } = useContext( AppContext);
+    const { groupMemberList, loanAppGroup, dropoutMembers, dispatchLoanAppGroup, dispatchGroupMember, dispatchMember , dispatchDropoutMembers} = useContext( AppContext);
     const [sumTotal, setSumTotal] = useState<number>(0)
     const [remaining, setRemaining] = useState<number>(loanAppGroup.apply_amount)
 
     function onSend() {
+
       onSubmit();
     }
     function onAutoFixLoanAmount() {
@@ -22,6 +24,7 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
         type:"SET_LOAN_APP_GROUP",
         ...loanAppGroup,
         members: groupMemberList,
+        dropout: dropoutMembers,
         apply_amount: sumTotal
       })
     }
@@ -43,9 +46,11 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
     useEffect( ()=>{
       
       if( loanAppGroup._id) {
-        dispatchGroupMember({type:'POPULATE_GROUP_MEMBERS', data: loanAppGroup.members})
+        dispatchGroupMember({type:'POPULATE_GROUP_MEMBERS', data: loanAppGroup.members});
+        dispatchDropoutMembers({type: "POPULATE_DROPOUTS", data: loanAppGroup.dropout});
       }
     },[loanAppGroup])
+    
 
     return (
         <IonList className="ion-padding">
@@ -77,7 +82,27 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
             <IonLabel color={ remaining > 0 ? 'warning' : 'danger'}><h3>{ remaining > 0 ?"Faltante" :"Excedente"} {formatLocalCurrency(remaining)}</h3></IonLabel>
             <IonButton onClick={onAutoFixLoanAmount}>Corregir</IonButton>
             </IonItem>
-            }
+        }
+          {!!dropoutMembers.length &&
+          <IonItem>
+            <IonLabel>
+              <h1>Bajas del Grupo</h1>
+            </IonLabel>
+          </IonItem>}
+        {
+          dropoutMembers.map((i:DroupOutType) =>(
+            <IonItem key={i.member_id}>
+              <IonAvatar slot="start">
+                <img
+                  alt="Perfil de usuario sin foto"
+                  src={avatar}
+                />
+              </IonAvatar>
+              <IonLabel>{ i.fullname } {i.reasonType} {i.dropoutReason[1]}</IonLabel>            
+            </IonItem>            
+          ))
+       }
+
         <IonButton 
         color='success' 
         routerLink={  loanAppGroup._id ? `${loanAppGroup._id}/members/add` : 'add/members/add'} 

@@ -5,7 +5,6 @@ import { TermType } from "../../reducer/LoanAppGroupReducer";
 import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
-import productProfile from '../../assets/producto-req03.svg';
 
 export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) => {
 

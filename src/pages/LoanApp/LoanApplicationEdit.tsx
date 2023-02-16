@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db, remoteDB } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
+import { createAction } from "../../model/Actions";
 import { AppContext } from "../../store/store";
 
 import { LoanApplicationForm } from "./LoanApplicationForm";
@@ -11,7 +12,7 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
 
     const [loan,setLoan] = useState({})
     const [showToast] = useIonToast();
-    const { dispatchSession } = useContext(AppContext);
+    const { dispatchSession, session } = useContext(AppContext);
     const { couchDBSyncUpload } = useDBSync();
 
     useEffect( ()=>{
@@ -34,14 +35,16 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
     
     const onSave = async (data:any) => {
       const itemId = props.match.url.split("/")[5];
-
+      dispatchSession({ type: "SET_LOADING", loading_msg: "Guardando...", loading: true})
       db.get(itemId).then( (loanInfo:any) => {
         return db.put({
           ...loanInfo,
           ...data,
           updated_at: Date.now()
         }).then(async ()=> {
+          await createAction( "CREATE_UPDATE_LOAN", { id_loan: itemId}, session.user )
           await couchDBSyncUpload();
+          dispatchSession({ type: "SET_LOADING", loading_msg: "", loading: false})
           props.history.goBack();
         })
       })

@@ -11,7 +11,7 @@ import {
   } from "@ionic/react";
   import { useContext, useEffect, useState } from "react";
   import { RouteComponentProps } from "react-router";
-  import { db, remoteDB } from "../../db";
+  import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
   
   import { AppContext } from "../../store/store";
@@ -20,7 +20,6 @@ import { useDBSync } from "../../hooks/useDBSync";
   export const GroupEdit: React.FC<RouteComponentProps> = (props) => {
     
     const { dispatchGroupData, dispatchSession } = useContext(AppContext);
-    const [showToast] = useIonToast();
     const [progress, setProgress] = useState(0.1);
     const { couchDBSyncUpload } = useDBSync();
   
@@ -29,8 +28,10 @@ import { useDBSync } from "../../hooks/useDBSync";
         if( render ){
             render = false;
             const itemId = props.match.url.replace("/groups/edit/", "");
+            dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...',loading: true});
             db.get(itemId)
                 .then( (data:any) => {
+                  dispatchSession( { type: "SET_LOADING", loading_msg: "", loading: false})
                     dispatchGroupData( {
                         type: 'SET_GROUP_DATA',
                         ...data
@@ -47,7 +48,7 @@ import { useDBSync } from "../../hooks/useDBSync";
     const onUpdate = (data:any) => {
         // Update selected Client
         const itemId = props.match.url.replace("/groups/edit/", "");
-        
+        dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true});
         db.get(itemId).then( async (clientDbData:any) => {
           return db.put({
             ...clientDbData,
@@ -55,6 +56,7 @@ import { useDBSync } from "../../hooks/useDBSync";
             
           }).then( async ()=>{
             await couchDBSyncUpload();
+            dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false});
             props.history.goBack();
           })
         })

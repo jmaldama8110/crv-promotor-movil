@@ -15,7 +15,7 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
     const [externalId, setExternalId ] = useState<string>('');
     const [presentAlert] = useIonAlert();
     const [ present, dismiss] = useIonLoading();
-    const { session, dispatchClientData } = useContext(AppContext);
+    const { session, dispatchClientData, dispatchSession } = useContext(AppContext);
     const [hide, setHide] = useState<boolean>(false)
     
     const { couchDBSyncUpload }  = useDBSync();
@@ -32,17 +32,28 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
               const apiRes = await api.get(`/clients/hf/search?branchId=${session.branch[0]}&clientName=${fullname}`);
               if( apiRes.data.length){
                 //// tries to retrive the last record with sub_estatus = PRESTAMO ACTIVO
-                
                 const clientInfoApi = apiRes.data.find( (i:any) => i.sub_estatus ==='PRESTAMO ACTIVO' ||'PRESTAMO FINALIZADO' );
                 if( clientInfoApi ){
                   IdCliente = parseInt(clientInfoApi.idCliente);
                 } else {
                   throw new Error('Not found');
                 }
-            }
+               
+              }
             }
             const apiRes2 = await api.get(`/clients/hf?externalId=${IdCliente}`);
-            const newData = apiRes2.data as ClientData                
+            const newData = apiRes2.data as ClientData
+
+            /// validates whether the client exist locally or not
+            const searchData = await db.find( { selector: { couchdb_type: "CLIENT"}});
+            const checkCoincidences = searchData.docs.find( (i:any) =>( 
+              (i.curp === newData.curp )  ||
+              (`${i.name}${i.lastname}${i.second_lastname}` === `${newData.name}${newData.lastname}${newData.second_lastname}` ) ||
+              (i.id_cliente == IdCliente) ));
+            if( checkCoincidences ){
+              throw new Error('Found already locally!')
+            }            
+            
             if( !(newData.branch[0] == session.branch[0]) ){
                   throw new Error('No puedes modificar datos fuera de tu sucursal');
             }
@@ -66,25 +77,25 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
     }
 
     async function onSave( data:any) {
-      //// Save new record
-        db.put({
-          ...data,
-          couchdb_type: 'CLIENT',
-          _id: Date.now().toString(),
-          status: [2,'Aprovado'],
-        }).then(async (doc)=>{
-
-          await couchDBSyncUpload();      
-          history.goBack();
-
-        }).catch( e =>{
-          presentAlert({
-            header: 'No fue posible guardar',
-            subHeader: 'Ooops algo paso',
-            message: 'No fue posible guardar!',
-            buttons: ['OK'],
-          })
-        })
+      dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true});
+            // Save new record
+            db.put({
+              ...data,
+              couchdb_type: 'CLIENT',
+              _id: Date.now().toString(),
+              status: [2,'Aprovado'],
+            }).then(async (doc)=>{
+              await couchDBSyncUpload();
+              dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
+              history.goBack();
+            }).catch( e =>{
+              presentAlert({
+                header: 'No fue posible guardar',
+                subHeader: 'Ooops algo paso',
+                message: 'No fue posible guardar!',
+                buttons: ['OK'],
+              })
+            })
 
     }
 

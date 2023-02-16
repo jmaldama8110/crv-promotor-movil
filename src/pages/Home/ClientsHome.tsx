@@ -1,7 +1,8 @@
-import { IonButton, IonContent, IonHeader, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet, useIonToast } from '@ionic/react';
 import { useContext, useEffect, useState } from 'react';
 import { db } from '../../db';
 import type { OverlayEventDetail } from '@ionic/core';
+import { Browser } from '@capacitor/browser';
 
 import './ClientsHome.css';
 import {
@@ -10,16 +11,20 @@ import {
 } from "../../components/SelectDropSearch";
 import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
+import { useDBSync } from '../../hooks/useDBSync';
+import { locationOutline } from 'ionicons/icons';
 
 
 
 const ClientsHome: React.FC = () => {
 
-
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
-  
-  const { dispatchClientData, dispatchSession } = useContext(AppContext);
+  const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
+
+  const [showToast] = useIonToast();
+  const { dispatchClientData, session } = useContext(AppContext);
+  const { couchDBSyncUpload } = useDBSync();
 
   let history = useHistory();
   
@@ -30,10 +35,16 @@ const ClientsHome: React.FC = () => {
     etiqueta: "",
   });
 
+  const [ clientDetail, setClientDetail] = useState<{
+    id_cliente: number;
+    location: string;
+    coords: [number, number]
+  }>({id_cliente: 0, location: '', coords:[0,0]})
 
 
   async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(async () => {
+      await couchDBSyncUpload();
       const data:any = await db.find({ selector: { couchdb_type:"CLIENT" }});
       const newData: SearchData[] = data.docs.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
       setClientSearchData(newData);
@@ -42,12 +53,6 @@ const ClientsHome: React.FC = () => {
     
   }
 
-  useEffect( ()=>{
-
-    db.find( { selector: {
-      couchdb_type: "CLIENT",
-    }})
-  },[]) 
 
   function onShowActions(){
     const buttons = clientSelected.id ? 
@@ -93,11 +98,59 @@ const ClientsHome: React.FC = () => {
             history.push(actions.data.routerLink);
         if( actions.data.action === 'related-people')
             history.push(actions.data.routerLink);
-
-        
       }
     }
   },[actions])
+
+
+  useEffect( ()=>{
+
+    async function loadOptions (){
+      if( geoActions) {
+        if( geoActions.data ){
+            if( geoActions.data.action === 'directions'){
+              await Browser.open({ url: `https://www.google.com/maps/dir/?api=1&destination=${clientDetail.coords[0]}%2C${clientDetail.coords[1]}` });
+            }
+            if( geoActions.data.action === 'map-view'){
+              await Browser.open({ url: `https://www.google.com/maps/@?api=1&map_action=map&zoom=18&center=${clientDetail.coords[0]}%2C${clientDetail.coords[1]}` });            
+            }
+        }
+      }
+        
+    }
+    loadOptions();
+  },[geoActions])
+
+  useEffect( ()=>{
+    async function loadClientData(){
+      const data = await db.find( { selector: { couchdb_type: "CLIENT"}});
+      const foundClient:any = data.docs.find( (i:any) => i._id === clientSelected.id )
+      if( foundClient) {
+        const addrs = foundClient.address.find((i:any) => i.type ==="DOMICILIO")
+        setClientDetail( {
+          id_cliente: foundClient.id_cliente,
+          location: !!addrs ? `${addrs.colony[1]}, ${addrs.city[1]}`: '',
+          coords: foundClient.coordinates
+        } );
+      }
+    }
+
+    loadClientData();
+
+  },[clientSelected])
+
+  function onShowGeoActions () {
+    const buttons = [ 
+                      { text: 'Indicaciones', role:"destructive",data: { action: 'directions'}},
+                      { text: 'Ver Mapa', data: { action: "map-view" } }
+                    ]
+                    present(
+                      { header: 'Ubicacion',
+                        subHeader: 'Indique modo del mapa:',
+                        buttons,
+                          onDidDismiss: ({ detail }) => setGeoActions(detail),
+                        })
+  }
 
   return (
     <IonPage>
@@ -129,8 +182,18 @@ const ClientsHome: React.FC = () => {
                 />
         </IonItemGroup>
 
-        <IonButton onClick={onShowActions} color='medium'>Acciones</IonButton>
-
+        {!!clientSelected.id &&
+        <div>
+          <IonItem>
+            <IonLabel>Id Cliente: {clientDetail.id_cliente ? clientDetail.id_cliente: 'Sin Registro HF'} </IonLabel>
+          </IonItem>
+          <IonItem button onClick={onShowGeoActions}>
+            <IonIcon icon={locationOutline}></IonIcon> 
+            <IonLabel>{clientDetail.location} </IonLabel>
+          </IonItem>
+        </div>
+        }
+        <IonButton onClick={onShowActions} color='success'>Acciones</IonButton>
 
         </IonList>
 

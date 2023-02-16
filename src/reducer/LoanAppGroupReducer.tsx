@@ -1,3 +1,4 @@
+import { DroupOutType } from "./DropoutReducer";
 import { GroupMember } from "./GroupMembersReducer";
 
 export type ActionsLoanAppGroup =
@@ -24,6 +25,7 @@ export type ActionsLoanAppGroup =
       created_at: string;
       status: [number, string];
       members: GroupMember [];
+      dropout: DroupOutType[];
       product: {
         external_id: number;
         min_amount: number;
@@ -48,7 +50,6 @@ export interface TermType {
       year_periods: string;
   }
 
-
 export interface LoanAppGroup{
     _id: string;
     couchdb_type: 'LOANAPP_GROUP',
@@ -72,6 +73,7 @@ export interface LoanAppGroup{
     created_at: string;
     status: [number, string];
     members: GroupMember [];
+    dropout: DroupOutType[],
     product: {
       external_id: number;
       min_amount: number;
@@ -110,6 +112,7 @@ export const loanAppGroupDef: LoanAppGroup = {
   created_at: "",
   status: [0, ""],
   members: [],
+  dropout: [],
   product: {
     external_id: 0,
     min_amount: 1000,
@@ -154,6 +157,7 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
        created_at: action.created_at,
        status: action.status,
        members: action.members,
+       dropout: action.dropout,
        product: {
           external_id: action.product.external_id,
           min_amount: action.product.min_amount,
