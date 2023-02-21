@@ -30,7 +30,7 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
       dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
         db.get(itemId)
           .then( async (data) => {
-            await createAction("CREATE_UPDATE_CLIENT", { _id: itemId }, session.user);
+            
             const newData = data as ClientData;
             dispatchClientData({
               type: "SET_CLIENT",
@@ -58,6 +58,7 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
         ...clientDbData,
         ...data
       }).then( async ()=>{
+        await createAction("CREATE_UPDATE_CLIENT", { _id: itemId }, session.user);
         await couchDBSyncUpload();
         dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
         history.goBack();

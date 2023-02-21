@@ -12,6 +12,7 @@ import { useContext, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
 import { useDBSync } from "../../../hooks/useDBSync";
+import { createAction } from "../../../model/Actions";
 import { LoanAppGroup } from "../../../reducer/LoanAppGroupReducer";
 import { AppContext } from "../../../store/store";
 import { GroupImportImportForm } from "./GroupImportForm";
@@ -90,20 +91,27 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
         // selecciona PRESTAMO ACTIVO (se omite NUEVO TRAMITE)
         const loanExist = await loanAppNewExist( data.group_data.id_cliente);
         if( !loanExist && data.createNewLoanApp ){
-          
+          const newLoanAppIdGrp = Date.now().toString()
           const newLoaApp: LoanAppGroup = {
             ...data.loan_app,
-            _id: Date.now().toString(),
+            _id: newLoanAppIdGrp,
             dropout: [],
             apply_by: newGroupId,
+            GL_financeable: false,
+            liquid_guarantee: 10,
+            renovation: true,
             apply_at: new Date().toISOString(),
             created_by: session.user,
             created_at: new Date().toISOString(),
             branch: session.branch,
             status: [1, "NUEVO TRAMITE"],
+            estatus: "TRAMITE",
+            sub_estatus: "NUEVO TRAMITE",
             couchdb_type: "LOANAPP_GROUP",
           };
           await db.put(newLoaApp);
+          await createAction( "CREATE_UPDATE_LOAN" , { id_loan: newLoanAppIdGrp },session.user )
+
         }
       //// traer el prestamo ACTIVO para consultar saldo si es que no ha sido sincronizado
       const contractExist = await contractNewExist( data.contract.idContrato);
@@ -131,7 +139,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
       dismiss();
       alert('Hubo un problema...')
     }
-    ///// this parts is only because the Post Code in groups is not assigned
+    ///// this parts is only because POST CODE for groups address is not assigned
     
         // const newGroupId = !groupExistId ? Date.now().toString() : groupExistId;
         // if (!groupExistId) {

@@ -39,8 +39,6 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
           const homeAddress = clientData.address.find( (i:any) => ( i.type === addressType))
           if( homeAddress ){
             setMyCp(homeAddress.post_code);
-
-            
             populateColoniesByPostCode( homeAddress.post_code, setColonyCat);
             setAddressL1( homeAddress.address_line1);
           }
@@ -55,38 +53,30 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   //// 1. Search Post Code when click button
   const onPopulateHomeColonies = async ()=>{
     dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Optimizando busqueda codigos postales..."});
-    populateColoniesByPostCode(myCP,setColonyCat);
+    await populateColoniesByPostCode(myCP,setColonyCat);
     myColonySelectList.current.open();
     dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "" });
 
   }
 
-  function populateColoniesByPostCode( cpData: string, updateFx: (value: React.SetStateAction<ColonyType[]>) => void ) {
+  async function populateColoniesByPostCode( cpData: string, updateFx: (value: React.SetStateAction<ColonyType[]>) => void ) {
     if (!cpData) return;
-
-    dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
+    await 
     db.createIndex({
       index: { fields: ['couchdb_type','codigo_postal']}
-    }).then( function() {
-      db.find({
+    });
+    const colonies = await  db.find({
         selector: {
           couchdb_type: "NEIGHBORHOOD",
           codigo_postal: cpData,
         },
-      }).then((colonies) => {
-          updateFx( colonies.docs.map((i: any) => ({
-              _id: i._id,
-              etiqueta: i.etiqueta,
-              ciudad_localidad: i.ciudad_localidad,
-            })));
-            dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      });
+    updateFx( colonies.docs.map((i: any) => ({
+        _id: i._id,
+        etiqueta: i.etiqueta,
+        ciudad_localidad: i.ciudad_localidad,
+    })));
     
-
-    })
   }
 
   // 2. When Colonies finished being populated, then attempts to open the Select Drop List
@@ -236,6 +226,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             onIonBlur={(e: any) => setAddressL1(e.target.value.toUpperCase())}
           ></IonInput>
         </IonItem>
+        <p></p>
           <ButtonSlider onClick={onSubmit} slideDirection={'F'} color='medium' expand="block" label="Siguiente" />
           <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />
     </IonList>

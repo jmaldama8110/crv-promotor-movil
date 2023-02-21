@@ -35,6 +35,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
           ...loanInfo,
           ...data,
           members: groupMemberList,
+          renovation: false,
           // dropout: dropoutMembers,
           updated_at: Date.now()
         }).then( async function(){

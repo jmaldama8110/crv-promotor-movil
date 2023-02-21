@@ -1,5 +1,5 @@
 import { IonList, IonItem, IonLabel, IonIcon, IonGrid, IonRow, IonCol, IonImg, IonInput, IonButton } from "@ionic/react";
-import { camera } from "ionicons/icons";
+import { camera, trashOutline } from "ionicons/icons";
 import { useContext, useEffect } from "react";
 import { useCameraTaker } from "../../hooks/useCameraTaker";
 import { AppContext } from "../../store/store";
@@ -57,6 +57,9 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
             <IonButton onClick={() => takePhoto(20)}>
                 <IonIcon icon={camera}></IonIcon>
             </IonButton>
+            { !!pics.length &&<IonButton color='warning' onClick={ ()=>{
+                setPics([]);
+            }}><IonIcon icon={trashOutline}></IonIcon></IonButton>}
         </div>
         <ButtonSlider color="primary" label='Siguiente' expand="block" onClick={onSubmit} slideDirection={"F"}></ButtonSlider>
         <ButtonSlider color="medium" label='Anterior'  expand="block" onClick={() => {} } slideDirection={"B"}></ButtonSlider>

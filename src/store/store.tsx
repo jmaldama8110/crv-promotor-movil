@@ -8,11 +8,13 @@ import { ActionsLoanAppGroup, LoanAppGroup, loanAppGroupDef, LoanAppGroupReducer
 import { ActionsGroupMember, GroupMember, GroupMembersReducer } from "../reducer/GroupMembersReducer";
 import { ActionsMember, MemberReducer,groupMemberDef } from "../reducer/GroupMemberReducer";
 import { ActionsDropout, DropoutReducer, DroupOutType } from "../reducer/DropoutReducer";
+import { ActionsClientVerification, ClientVerification, clientVerificationDefault, ClientVerificationReducer } from "../reducer/ClientVerificationReducer";
 
 type AppContextProviderProps = {
   children: React.ReactNode
 }
 interface SharedContext {
+
   session: Session;
   dispatchSession: React.Dispatch<ActionsSession>;
   guaranteesList: Guarantee[];
@@ -35,6 +37,9 @@ interface SharedContext {
 
   dropoutMembers: DroupOutType[];
   dispatchDropoutMembers: React.Dispatch<ActionsDropout>;
+
+  clientVerification: ClientVerification;
+  dispatchClientVerification: React.Dispatch<ActionsClientVerification>;
 
 }
 
@@ -62,7 +67,7 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
   const [ groupMemberList, dispatchGroupMember] = useReducer( GroupMembersReducer, []);
   const [ groupMember, dispatchMember] = useReducer(MemberReducer, groupMemberDef);
   const [ dropoutMembers, dispatchDropoutMembers] = useReducer( DropoutReducer, []);
-
+  const [clientVerification, dispatchClientVerification] = useReducer(ClientVerificationReducer, clientVerificationDefault);
   const sharedCtx: SharedContext = {
     session,
     dispatchSession,
@@ -81,7 +86,9 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
     groupMember,
     dispatchMember,
     dropoutMembers,
-    dispatchDropoutMembers
+    dispatchDropoutMembers,
+    clientVerification,
+    dispatchClientVerification
   }
   
 

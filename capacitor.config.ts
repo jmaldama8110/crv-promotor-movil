@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'promotor-movil',
+  appId: 'com.movil.conserva',
+  appName: 'Conserva Movil',
   webDir: 'build',
   bundledWebRuntime: false
 };

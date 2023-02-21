@@ -22,6 +22,7 @@ export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
             members: groupMemberList,
             _id: loanAppId,
             apply_by: clientId,
+            renovation: false,
             apply_at: (new Date()).toISOString(),
             created_by: session.user,
             created_at: (new Date()).toISOString(),

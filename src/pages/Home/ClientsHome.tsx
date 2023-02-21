@@ -14,8 +14,6 @@ import { AppContext } from '../../store/store';
 import { useDBSync } from '../../hooks/useDBSync';
 import { locationOutline } from 'ionicons/icons';
 
-
-
 const ClientsHome: React.FC = () => {
 
   const [present] = useIonActionSheet();
@@ -64,7 +62,7 @@ const ClientsHome: React.FC = () => {
       { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
       { text: 'Referencias & Personas', data: { action: 'related-people', routerLink:  `/clients/${clientSelected.id}/related-people` } },
       { text: 'Datos Bancarios', data: { action: '' } },
-      { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },
+      { text: 'Verificacion Ocular', data: { action: 'client-verification', routerLink: `/clients/${clientSelected.id}/verifications` }  },
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
@@ -98,6 +96,9 @@ const ClientsHome: React.FC = () => {
             history.push(actions.data.routerLink);
         if( actions.data.action === 'related-people')
             history.push(actions.data.routerLink);
+        if( actions.data.action === 'client-verification')
+            history.push(actions.data.routerLink);
+
       }
     }
   },[actions])

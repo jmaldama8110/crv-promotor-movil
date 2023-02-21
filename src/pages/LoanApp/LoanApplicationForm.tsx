@@ -91,7 +91,8 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
             }).then( function (){
                 db.find({
                     selector: {
-                    couchdb_type: "LOANDEST"
+                    couchdb_type: "CATALOG",
+                    name: "CATA_destinoCredito"
                     }
                 }).then( (data:any) =>{
                     /// converts from loanDestinatios Catalog to locally have an array of selected destinations and its status TRUE or FALSE

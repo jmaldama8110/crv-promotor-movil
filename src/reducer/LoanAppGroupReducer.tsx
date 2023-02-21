@@ -54,6 +54,8 @@ export interface LoanAppGroup{
     _id: string;
     couchdb_type: 'LOANAPP_GROUP',
     apply_by: string;
+    renovation: boolean;
+    GL_financeable: boolean;
     id_cliente: string;
     id_solicitud: string;
     loan_officer: string;
@@ -92,6 +94,8 @@ export interface LoanAppGroup{
 export const loanAppGroupDef: LoanAppGroup = {
   _id: "",
   couchdb_type: 'LOANAPP_GROUP',
+  renovation: true,
+  GL_financeable: false,
   apply_by: "",
   id_cliente: "",
   id_solicitud: "",
@@ -106,7 +110,7 @@ export const loanAppGroupDef: LoanAppGroup = {
   first_repay_date: "",
   disbursment_date: '',
   disbursment_mean: 0,
-  liquid_guarantee: 0,
+  liquid_guarantee: 10,
   loan_cycle: "",
   created_by: "", 
   created_at: "",

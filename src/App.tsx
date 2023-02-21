@@ -1,4 +1,4 @@
-import { Route } from "react-router-dom";
+import { Route, RouteComponentProps } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
@@ -79,9 +79,11 @@ import { GroupFromHF } from "./pages/Groups/GroupFromHF";
 import { GroupImport } from "./pages/Groups/GroupImport/GroupImport";
 import { useDBSync } from "./hooks/useDBSync";
 import { ContractDetail } from "./pages/Contracts/ContractDetail";
+import { ClientVerificationAdd } from "./pages/ClientVerification/ClientVerificationAdd";
+import { ClientVerificationHome } from "./pages/ClientVerification/ClientVerificationHome";
+import { ClientVerificationEdit } from "./pages/ClientVerification/ClientVerificationEdit";
 
 setupIonicReact();
-
 
 
 const App: React.FC = () => {
@@ -120,7 +122,16 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonTabs>
           <IonRouterOutlet>
-            <Route exact path="/clients" component={ClientsHome}></Route>
+            
+            <Route
+              exact
+              path="/clients"
+              render={(props) => {
+                return !!session.current_token ? <ClientsHome /> : <MyProfile {...props} />;
+              }}
+            />
+
+
             <Route exact path="/clients/edit/:id" component={ClientsEdit}></Route>
             <Route exact path="/clients/socioeconomics/edit/:id" component={SocioEconomicsForm}></Route>
             <Route exact path="/clients/add" component={ClientsAdd}></Route>
@@ -128,6 +139,10 @@ const App: React.FC = () => {
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
             <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>
             <Route exact path="/clients/:id/loanapps/edit/:id" component={LoanApplicationEdit}></Route>
+
+            <Route exact path="/clients/:id/verifications" component={ClientVerificationHome}></Route>
+            <Route exact path="/clients/:id/verfications/add" component={ClientVerificationAdd}></Route>
+            <Route exact path="/clients/:id/verfications/edit/:id" component={ClientVerificationEdit}></Route>
 
             <Route exact path="/clients/:id/guarantees" component={GuaranteesHome}></Route>
             <Route exact path="/clients/:id/guarantees/equipment/add" component={GuaranteeAddEq}></Route>
@@ -145,7 +160,15 @@ const App: React.FC = () => {
             <Route exact path="/clients/:id/related-people/beneficiaries/add" component={BeneficiariesAdd}></Route>
             <Route exact path="/clients/:id/related-people/beneficiaries/edit/:id" component={BeneficiariesEdit}></Route>
 
-            <Route exact path="/groups" component={GroupsHome}></Route>   
+            <Route
+              exact
+              path="/groups"
+              render={(props) => {
+                return !!session.current_token ? <GroupsHome {...props} /> : <MyProfile {...props}/>;
+              }}
+            />
+
+
             <Route exact path="/groups/add" component={GroupAdd}></Route>
             <Route exact path="/groups/add-from-hf" component={GroupFromHF}></Route>
             <Route exact path="/groups/edit/:id" component={GroupEdit}></Route>
@@ -174,11 +197,12 @@ const App: React.FC = () => {
               <IonIcon icon={personCircleOutline} />
               <IonLabel>Mi Perfil</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab1" href="/clients" >
+            
+            <IonTabButton tab="tab1" href="/clients" disabled={!session.current_token} >
               <IonIcon icon={personAddOutline} />
               <IonLabel>Clientes</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab2" href="/groups">
+            <IonTabButton tab="tab2" href="/groups" disabled={!session.current_token}>
               <IonIcon icon={peopleOutline} />
               <IonLabel>Grupos</IonLabel>
             </IonTabButton>
@@ -190,10 +214,12 @@ const App: React.FC = () => {
               <IonIcon icon={notificationsCircleOutline} />
               <IonLabel>Mensajes</IonLabel>
             </IonTabButton>
+            
           </IonTabBar>
         </IonTabs>
       </IonReactRouter>
     </IonApp>
   );
 };
+
 export default App;

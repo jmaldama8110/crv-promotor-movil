@@ -111,7 +111,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
             <IonLabel position="floating">Contraseña</IonLabel>
             <IonInput type="password" value={pass} onIonChange={(e:any)=> setPass(e.detail.value)}></IonInput>
           </IonItem>
-
+          <p></p>
           <IonButton expand="block" onClick={onLogin}>Login</IonButton>
         </IonList>
   );

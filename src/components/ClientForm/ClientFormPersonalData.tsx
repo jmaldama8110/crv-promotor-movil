@@ -46,7 +46,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
       if( render ){
         render = false;
 
-      dispatchSession({type: 'SET_LOADING', loading_msg: 'Cargando...', loading: true })
+      dispatchSession({type: 'SET_LOADING', loading_msg: 'Datos personales...', loading: true })
       db.createIndex( { index: { fields: ['couchdb_type','name']}})
         .then( function () {
           db.find( { 

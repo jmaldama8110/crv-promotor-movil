@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { AppContextProvider } from './store/store';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
+
 const container = document.getElementById('root');
 const root = createRoot(container!);
 

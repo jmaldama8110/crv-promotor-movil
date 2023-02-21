@@ -23,13 +23,13 @@ export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
 
 useEffect( ()=>{
   
-  dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
+  dispatchSession({ type: "SET_LOADING", loading_msg: 'Datos socioeconomicos...', loading: true});
   db.createIndex( { index: { fields: ["couchdb_type", "name"]}} )
   .then( function (){
     db.find({
       selector: {
         couchdb_type: 'CATALOG',
-        name: 'CATA_ocupacion'
+        name: 'CATA_ocupacionPLD'
       }
     }).then( (data:any) =>{
       setOcupationCatalog(data.docs.map( (i:SearchData)=>({id: i.id, etiqueta: i.etiqueta}) ));

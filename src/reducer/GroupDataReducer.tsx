@@ -17,7 +17,8 @@ export type ActionsGroupData =
         municipality: [string, string];
         city:[ string, string];
         colony: [string, string];
-        address_line2?: string;       
+        address_line2?: string;
+        street_reference: string;  
       },
       
       status: [number, ""];
@@ -43,7 +44,8 @@ export interface GroupData{
       municipality: [string, string];
       city:[ string, string];
       colony: [string, string];
-      address_line2?: string;       
+      address_line2?: string;
+      street_reference: string;
     },
     status: [number, string];
 }
@@ -65,7 +67,8 @@ export const groupDataDef: GroupData = {
       municipality: ["", ""],
       city:[ "", ""],
       colony: ["", ""],
-      address_line2: ""       
+      address_line2: "",
+      street_reference: ""     
     },
     
     status: [0,""],
@@ -95,7 +98,8 @@ export const GroupDataReducer = (state: State, action: ActionsGroupData) => {
             colony: action.address.colony,
             province: action.address.province,
             municipality: action.address.municipality,
-            city: action.address.city
+            city: action.address.city,
+            street_reference: action.address.street_reference
         },
         status: action.status,
       };

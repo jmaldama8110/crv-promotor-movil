@@ -350,7 +350,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
                 <IonLabel>Ciclo: {contract.Ciclo}</IonLabel>
               </IonItem>
               <IonItem>
-                <IonLabel>Ultimo Pago: {formatDate(contract.fechaUltimoReembolso)}</IonLabel>
+                <IonLabel>Ult Pago Realizado: {formatDate(contract.fechaUltimoReembolso)}</IonLabel>
               </IonItem>
               <IonItem>
                 <IonLabel>periodicidad: {contract.periodicidad}</IonLabel>

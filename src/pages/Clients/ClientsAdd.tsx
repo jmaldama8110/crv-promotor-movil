@@ -70,7 +70,7 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
             <IonBackButton />
           </IonButtons>        
           <IonTitle>Alta de Clientes</IonTitle>
-
+          
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
