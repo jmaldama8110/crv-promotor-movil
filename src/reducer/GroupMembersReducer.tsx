@@ -37,6 +37,8 @@ export interface GroupMember {
   approved_amount: string,
   loan_cycle: number,
   disbursment_mean: 1 | 2,
+  estatus: string;
+  sub_estatus: string;
   insurance: {
     beneficiary: string,
     relationship: string,

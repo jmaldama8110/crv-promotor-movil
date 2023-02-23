@@ -61,8 +61,7 @@ const ClientsHome: React.FC = () => {
       { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
       { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
       { text: 'Referencias & Personas', data: { action: 'related-people', routerLink:  `/clients/${clientSelected.id}/related-people` } },
-      { text: 'Datos Bancarios', data: { action: '' } },
-      { text: 'Verificacion Ocular', data: { action: 'client-verification', routerLink: `/clients/${clientSelected.id}/verifications` }  },
+      // { text: 'Datos Bancarios', data: { action: '' } },
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
@@ -95,8 +94,6 @@ const ClientsHome: React.FC = () => {
         if( actions.data.action === 'guarantees')
             history.push(actions.data.routerLink);
         if( actions.data.action === 'related-people')
-            history.push(actions.data.routerLink);
-        if( actions.data.action === 'client-verification')
             history.push(actions.data.routerLink);
 
       }
@@ -194,6 +191,7 @@ const ClientsHome: React.FC = () => {
           </IonItem>
         </div>
         }
+        
         <IonButton onClick={onShowActions} color='success'>Acciones</IonButton>
 
         </IonList>

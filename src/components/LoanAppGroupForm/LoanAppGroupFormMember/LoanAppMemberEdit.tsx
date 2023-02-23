@@ -13,7 +13,7 @@ import { LoanAppMemberForm } from "./LoanAppMemberForm";
 
 export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
 
-    const { dispatchMember, groupMemberList, dispatchDropoutMembers,dispatchGroupMember  } = useContext(AppContext);
+    const { dispatchMember,groupMember, groupMemberList, dispatchDropoutMembers,dispatchGroupMember  } = useContext(AppContext);
 
     let render = true;
     const [reasonTypes] = useState(["CANCELACION","RECHAZO","CASTIGO"])
@@ -120,6 +120,12 @@ export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
       
     }
 
+
+    function onClientVerifications (){
+      // routerLink: `/clients/${clientId}/verifications` 
+      const urlData = props.match.url.split("/");
+      props.history.push(`/clients/${groupMember.client_id}/verifications`)
+    }
     
   return (
     <IonPage>
@@ -136,6 +142,8 @@ export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
 
       
        <IonButton id="open-modal" expand="block" color='warning'>Baja Integrante</IonButton>
+       <p></p>
+       <IonButton expand="block" color='secondary' onClick={onClientVerifications}>Verificacion Ocular</IonButton>
       
         
        <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>

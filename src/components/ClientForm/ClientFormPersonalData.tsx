@@ -45,8 +45,6 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
 
       if( render ){
         render = false;
-
-      dispatchSession({type: 'SET_LOADING', loading_msg: 'Datos personales...', loading: true })
       db.createIndex( { index: { fields: ['couchdb_type','name']}})
         .then( function () {
           db.find( { 
@@ -93,7 +91,6 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                     setCountryOfBirth( clientData.country_of_birth[0]);
                   }                  
                 })
-                dispatchSession( {type: 'SET_LOADING', loading_msg: '', loading:false });
               })
 
             })

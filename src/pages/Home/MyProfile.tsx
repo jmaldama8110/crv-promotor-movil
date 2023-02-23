@@ -10,19 +10,19 @@ import {
   RefresherEventDetail,
   IonRefresher,
   IonRefresherContent,
-  IonItem,
-  IonLabel,
+  IonFooter,
 } from "@ionic/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
 import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
+import { App, AppInfo } from '@capacitor/app';
 
 export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
   const { session,dispatchSession } = useContext(AppContext);
-  const [info,setInfo] = useState({});
+  const [info,setInfo] = useState<AppInfo>();
   
   const { couchDBSyncDownload } = useDBSync();
 
@@ -61,6 +61,13 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       event.detail.complete();
    }
 
+   useEffect(()=>{
+    async function LoadAppInfo(){
+      const data: AppInfo = await App.getInfo();
+      setInfo(data); 
+    }
+    LoadAppInfo();
+   },[])
 
   return (
     <IonPage>
@@ -93,6 +100,11 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
         </IonList>}
       </IonContent>
+      <IonFooter>
+        <IonToolbar>
+            <p className="margin-auto text-center xs">{ info ? `${info?.name} (${info?.version}) - build ${info?.build}`: 'Web version'}  </p>
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };

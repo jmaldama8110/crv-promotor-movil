@@ -52,7 +52,7 @@ export const ClientVerificationHome: React.FC<RouteComponentProps> = ({match, hi
             }
 
           </IonList>
-            <IonButton onClick={onAddNew}>Nueva Verificacion</IonButton>
+            <IonButton onClick={onAddNew} color='tertiary'>Realizar Verificacion</IonButton>
         </IonContent>
       </IonPage>
     );

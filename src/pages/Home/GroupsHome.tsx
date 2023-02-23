@@ -184,6 +184,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
           </IonItem>
         </div>
         }
+        
         <IonButton onClick={onShowActions} color='medium'>Acciones</IonButton>
         </IonList>
 

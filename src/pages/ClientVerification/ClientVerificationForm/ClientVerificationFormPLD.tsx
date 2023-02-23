@@ -154,7 +154,7 @@ export const ClientVerificationFormPLD: React.FC<{ onNext:any, onSetProgress:any
               <IonTextarea placeholder="ingrese aqui una descripción de sus responsabilidades" value={detectCommets} onIonChange={(e)=> setDetectCommets(e.detail.value!)}></IonTextarea>
           </IonItem>
           <p></p>
-            <IonButton color="primary" expand="block" onClick={onSend} >Guardar</IonButton>
+            <IonButton color="primary" expand="block" onClick={onSend} disabled={!!clientVerification._id}>Guardar</IonButton>
             <ButtonSlider color="medium" expand="block" label='Anterior' onClick={() => { onSetProgress(0.5)} } slideDirection={"B"}></ButtonSlider>
 
         </IonList>

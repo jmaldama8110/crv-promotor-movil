@@ -27,6 +27,8 @@ import avatar from '../../../../src/assets/avatar.svg';
 import { GroupData, groupDataDef } from "../../../reducer/GroupDataReducer";
 import { LoanAppGroup, loanAppGroupDef } from "../../../reducer/LoanAppGroupReducer";
 import { formatDate, formatLocalCurrency, formatLocalCurrencyV2 } from "../../../utils/numberFormatter";
+import { GroupMember } from "../../../reducer/GroupMembersReducer";
+
 
 interface GroupLoanApplicationHF {
   idCliente: number;
@@ -38,12 +40,9 @@ interface GroupLoanApplicationHF {
   TipoCliente: string;
 }
 
-interface MemberHf {
-  id_member: number;
-  id_cliente: number;
-  fullname: string;
-  approved_amount: number;
+interface MemberHf extends GroupMember{
   isActive: boolean;
+  
 }
 
 export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.SetStateAction<number>>, onSubmit: any}> = ({ setProgress, onSubmit }) => {
@@ -100,18 +99,33 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       if( apiRes2.data[0]){
         setContract( apiRes2.data[0])
       }
-      
 
       setGroupData( apiRes.data.group_data);
       setLoanApp( apiRes.data.loan_app);
       const newMemberData: MemberHf[] = apiRes
                                         .data.
                                         loan_app.members.map( (mem:MemberHf)=>(
-                                      { id_member: mem.id_member,
+                                      { _id: '',
+                                        id_member: mem.id_member,
                                         id_cliente: mem.id_cliente,
+                                        id_persona: mem.id_persona,
+                                        client_id: '',
                                         fullname: mem.fullname,
+                                        curp: mem.curp,
+                                        position: mem.position,
+                                        apply_amount: mem.apply_amount,
+                                        previous_amount: mem.previous_amount,
                                         approved_amount: mem.approved_amount,
-                                        isActive: false 
+                                        loan_cycle: mem.loan_cycle,
+                                        disbursment_mean: mem.disbursment_mean,
+                                        estatus: mem.estatus,
+                                        sub_estatus: mem.sub_estatus,
+                                        insurance: {
+                                          beneficiary: mem.insurance.beneficiary,
+                                          relationship: mem.insurance. relationship,
+                                          percentage: mem.insurance.percentage,
+                                        },
+                                        isActive: false,
                                       }));
       
       await onVerifyMembersExist(newMemberData);
@@ -223,16 +237,33 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
     await db.createIndex( { index: { fields: ["couchdb_type"]}});
     const clientsData = await db.find( { selector: { couchdb_type: "CLIENT"}});
     
-    const newMemberData = data.map( (mem:MemberHf)=>{
+    const newMemberData: MemberHf[] = data.map( (mem:MemberHf, itemNumber:number)=>{
       const isFound = clientsData.docs.find( (i:any) => ( mem.id_cliente === i.id_cliente  ))      
         return {
+          _id: itemNumber.toString(),
           id_member: mem.id_member,
           id_cliente: mem.id_cliente,
+          id_persona: mem.id_persona,
           fullname: mem.fullname,
+          curp: mem.curp,
+          position: mem.position,
+          previous_amount: mem.previous_amount,
+          apply_amount: mem.apply_amount,
           approved_amount: mem.approved_amount,
-          isActive: !!isFound 
+          loan_cycle: mem.loan_cycle,
+          disbursment_mean: mem.disbursment_mean,
+          estatus: mem.estatus,
+          sub_estatus: mem.sub_estatus,
+          insurance: {
+            beneficiary: mem.insurance.beneficiary,
+            relationship: mem.insurance. relationship,
+              percentage: mem.insurance.percentage,
+          },
+          isActive: !!isFound,
+          client_id: !!isFound ? isFound._id : '',
         }
     })
+    // setLoanApp({ ...loan_app,members: newMemberData });
     setMembersHf( newMemberData);
   }
 
@@ -276,6 +307,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
             groupExistId,
             group_data,
             loan_app,
+            membersHf,
             contract,
             createNewLoanApp
         }
@@ -371,7 +403,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
                 checked={createNewLoanApp}
                 onIonChange={async (e) =>setCreateNewLoanApp(e.detail.checked)} />
               </IonItem>
-
+              <p></p>
             <ButtonSlider label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={()=>{}} />
             <ButtonSlider label="Anterior" color="light" slideDirection="B" expand="block" onClick={() => {}} />
           </IonList>
@@ -427,7 +459,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
                                     <IonLabel className="xs">{i.fullname}</IonLabel>
                                   </IonCol>
                                   <IonCol>
-                                    <IonLabel> {formatLocalCurrencyV2(i.approved_amount,"","","")}</IonLabel>
+                                    <IonLabel> {formatLocalCurrencyV2(parseFloat(i.approved_amount),"","","")}</IonLabel>
                                   </IonCol>
 
                                 </IonRow>) )

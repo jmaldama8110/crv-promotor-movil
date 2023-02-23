@@ -1,9 +1,9 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from "@ionic/react";
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonItemDivider, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from "@ionic/react";
 import { RouteComponentProps } from "react-router";
 import { LoanAppCard } from "../../components/LoanAppCard";
+import { ContractsHome } from "../Contracts/ContractsHome";
 
 export const LoanApplicationHome: React.FC<RouteComponentProps> = (props) => {
-
 
   const onAddNew =  () =>{
     const clientId = props.match.url.split("/")[2];
@@ -22,8 +22,13 @@ export const LoanApplicationHome: React.FC<RouteComponentProps> = (props) => {
       </IonHeader>
       <IonContent>
         <IonList className="ion-padding">
-                <LoanAppCard {...props} />
-                <IonButton onClick={onAddNew}>Nueva Solicitud</IonButton>
+          <IonItemDivider><IonLabel>Solicitudes del cliente</IonLabel></IonItemDivider>
+            <LoanAppCard {...props} />
+            
+            <IonButton onClick={onAddNew} disabled>Nueva Solicitud</IonButton>
+                
+            <IonItemDivider><IonLabel>Contratos Activos</IonLabel></IonItemDivider>
+                  <ContractsHome {...props} />
         </IonList>
       </IonContent>
     </IonPage>

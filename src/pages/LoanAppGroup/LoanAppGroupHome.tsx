@@ -28,10 +28,10 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
           <IonList className="ion-padding">
             <IonItemDivider><IonLabel>Solicitudes</IonLabel></IonItemDivider>
                   <LoanAppGroupCard {...props} />
-
-                  <IonButton onClick={onAddNew}>Nueva Solicitud</IonButton>
+                  <IonButton onClick={onAddNew}>Crear</IonButton>
             <IonItemDivider><IonLabel>Contratos Activos</IonLabel></IonItemDivider>
                   <ContractsHome {...props} />
+                  <IonButton color='secondary'>Visitas Regulares</IonButton>
           </IonList>
         </IonContent>
       </IonPage>

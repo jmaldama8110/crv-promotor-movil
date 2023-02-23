@@ -20,11 +20,14 @@ export const groupMemberDef: GroupMember = {
     approved_amount: '',
     loan_cycle: 0,
     disbursment_mean: 2,
+    estatus: '',
+    sub_estatus: '',
     insurance: {
         beneficiary: "",
         relationship: "",
         percentage: 100
     }
+
   }
 export const MemberReducer = (state: GroupMember, action:ActionsMember ) => {
 

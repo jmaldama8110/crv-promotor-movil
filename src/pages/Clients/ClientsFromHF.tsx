@@ -1,9 +1,10 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonAlert, useIonLoading, useIonToast } from "@ionic/react";
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonPage, IonTitle, IonToolbar, useIonAlert, useIonLoading, useIonToast } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import api from "../../api/api";
 import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
+import { createAction } from "../../model/Actions";
 import { ClientData } from "../../reducer/ClientDataReducer";
 import { AppContext } from "../../store/store";
 import { ClientForm } from "./ClientForm";
@@ -12,16 +13,37 @@ import { ClientForm } from "./ClientForm";
 export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match }) => {
     
     const [fullname, setFullName ] = useState<string>('');
+    const [clientName, setClientName ] = useState<string>('');
+    const [loanAppStatus, setLoanAppStatus ] = useState<string>('');
+    const [createNewLoanApp, setCreateNewLoanApp] = useState<boolean>(false);
+    const [createContract, setCreateContract] = useState<boolean>(false);
+    const [idLoanApplication, setIdLoanApplication] = useState<number>(0);
+    const [idClient, setIdClient] = useState<number>(0);
+    const [ClientIdLocal, setClientIdLocal] = useState<string>('');
+    const [clientExistLocal, setClientExistLocal ] = useState<boolean>(false);
+
+    /// externalId manages form Mode when searching clients for groups or individuals
     const [externalId, setExternalId ] = useState<string>('');
     const [presentAlert] = useIonAlert();
     const [ present, dismiss] = useIonLoading();
     const { session, dispatchClientData, dispatchSession } = useContext(AppContext);
     const [hide, setHide] = useState<boolean>(false)
-    
     const { couchDBSyncUpload }  = useDBSync();
     
+
+    function clearAll(){
+      setFullName('');
+      setClientName('');
+      setLoanAppStatus('');
+      setCreateContract(false);
+      setCreateNewLoanApp(false);
+      setIdLoanApplication(0);
+      setIdClient(0);
+      setClientIdLocal('');
+      setClientExistLocal(false);
+    }
     async function onSearchByCurpOrIdCliente () {
-    
+      clearAll();
         try {
           present({message: 'Buscando en el HF...'})
           // converts Id into number
@@ -32,9 +54,16 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
               const apiRes = await api.get(`/clients/hf/search?branchId=${session.branch[0]}&clientName=${fullname}`);
               if( apiRes.data.length){
                 //// tries to retrive the last record with sub_estatus = PRESTAMO ACTIVO
-                const clientInfoApi = apiRes.data.find( (i:any) => i.sub_estatus ==='PRESTAMO ACTIVO' ||'PRESTAMO FINALIZADO' );
+                let clientInfoApi = apiRes.data.find( (i:any) => i.sub_estatus ==='PRESTAMO ACTIVO' );
+                if( !clientInfoApi) {
+                  clientInfoApi = apiRes.data.find( (i:any)=> i.sub_estatus === 'PRESTAMO FINALIZADO');
+                }
                 if( clientInfoApi ){
                   IdCliente = parseInt(clientInfoApi.idCliente);
+                  setIdClient(clientInfoApi.idCliente);
+                  setIdLoanApplication(clientInfoApi.idSolicitud);
+                  setClientName(clientInfoApi.nombreCliente);
+                  setLoanAppStatus(clientInfoApi.sub_estatus)
                 } else {
                   throw new Error('Not found');
                 }
@@ -51,16 +80,16 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
               (`${i.name}${i.lastname}${i.second_lastname}` === `${newData.name}${newData.lastname}${newData.second_lastname}` ) ||
               (i.id_cliente == IdCliente) ));
             if( checkCoincidences ){
-              throw new Error('Found already locally!')
-            }            
-            
-            if( !(newData.branch[0] == session.branch[0]) ){
-                  throw new Error('No puedes modificar datos fuera de tu sucursal');
+              setClientExistLocal(true);
+              setClientIdLocal(checkCoincidences._id);
+              
             }
+            setClientName(`${newData.name} ${newData.lastname} ${newData.second_lastname}`);
+
             dispatchClientData({ type: 'SET_CLIENT',
                     ...newData,
                     _id:'0' });
-            setHide(true);  
+            
             dismiss();
 
         }
@@ -76,26 +105,103 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
         }
     }
 
-    async function onSave( data:any) {
-      dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true});
-            // Save new record
-            db.put({
-              ...data,
-              couchdb_type: 'CLIENT',
-              _id: Date.now().toString(),
-              status: [2,'Aprovado'],
-            }).then(async (doc)=>{
-              await couchDBSyncUpload();
-              dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
-              history.goBack();
-            }).catch( e =>{
-              presentAlert({
-                header: 'No fue posible guardar',
-                subHeader: 'Ooops algo paso',
-                message: 'No fue posible guardar!',
-                buttons: ['OK'],
-              })
-            })
+    async function onSaveOnlyClient (data:any){
+      try{
+        dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true}); 
+        // saves de Client info, this is already checked if locally exists by SearchByCurpOrId
+        const clientNewId = Date.now().toString()
+        await db.put({
+          ...data,
+          couchdb_type: 'CLIENT',
+          _id: clientNewId,
+          status: [2,'Aprovado'],
+        });
+
+        ////// Finally, puts ans Syncs
+        await couchDBSyncUpload();
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
+        history.goBack();
+
+      }
+      catch(error){
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
+        console.log(error);
+        alert('No fue posible guardar!')
+      }
+    }
+    async function onSaveWithRenovation( data:any) {
+      
+      try{
+        dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true}); 
+        // saves de Client info, this is already checked if locally exists by SearchByCurpOrId
+        const newClientId = Date.now().toString()
+        if( !clientExistLocal ){
+          await db.put({
+            ...data,
+            couchdb_type: 'CLIENT',
+            _id: newClientId,
+            status: [2,'Aprovado'],
+          });
+        } 
+
+        const loanExist = await loanAppNewExist( idClient );
+
+        if( !loanExist && createNewLoanApp ){
+          const apiRes = await api.get(`/clients/hf/loanapps?branchId=${session.branch[0]}&applicationId=${idLoanApplication}`);
+          const newLoanAppId= Date.now().toString()
+          const newLoaApp: any = {
+            ...apiRes.data,
+            _id: newLoanAppId,
+            dropout: [],
+            apply_by: clientExistLocal ? ClientIdLocal : newClientId,
+            GL_financeable: false,
+            liquid_guarantee: 10,
+            renovation: true,
+            apply_at: new Date().toISOString(),
+            created_by: session.user,
+            created_at: new Date().toISOString(),
+            branch: session.branch,
+            couchdb_type: "LOANAPP",
+          };
+          await db.put(newLoaApp);
+          await createAction( "CREATE_UPDATE_LOAN" , { id_loan: newLoanAppId },session.user )
+        }
+
+        //// active contract List
+        if( createContract ){
+          const apiRes2 = await api.get(`/clients/hf/getBalance?idCliente=${idClient}`);
+          const contractList = apiRes2.data;
+          for( let x = 0; x < contractList.length; x++){
+            /// iterates through the contract list
+            const contractExist = await contractNewExist( contractList[x]);
+            if( !contractExist ){
+              /// if the contract does not exists, create it
+              const newContract = 
+                  {
+                    ...apiRes2.data[0],
+                    _id: Date.now().toString(),
+                    client_id: clientExistLocal ? ClientIdLocal : newClientId,
+                    created_by: session.user,
+                    created_at: new Date().toISOString(),
+                    branch: session.branch,
+                    couchdb_type: "CONTRACT",
+                }
+                await db.put(newContract);
+            }
+          }
+        }
+        ////// Finally, puts ans Syncs
+        await couchDBSyncUpload();
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
+        history.goBack();
+
+      }
+      catch(error){
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
+        console.log(error);
+        alert('No fue posible guardar!')
+      }
+      
 
     }
 
@@ -103,6 +209,30 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
       setExternalId( match.url.split("/")[3] ) ;
 
     },[])
+
+
+  
+    async function loanAppNewExist(IdCliente: number){
+        await db.createIndex( {index: { fields: ["couchdb_type"]}});
+        const data = await db.find({selector: { couchdb_type: 'LOANAPP' }})
+        const loan = data.docs.find((i:any) => i.id_cliente == IdCliente  )
+        return !!loan;
+
+   }
+   async function contractNewExist(IdContract: number){
+     try{
+        await db.createIndex( {index: { fields: ["couchdb_type"]}});
+        const data = await db.find({selector: {
+          couchdb_type: 'CONTRACT'
+        }})
+         const contract = data.docs.find((i:any) => i.idContrato == IdContract  )
+        return !!contract;
+     }
+     catch(e){
+      console.log(e);
+      return false;
+     }
+  }
 
   return (
     <IonPage>
@@ -119,22 +249,50 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
         <IonList className='ion-padding'>
             { !hide &&
               <div>
-              { externalId === '0' &&
+              { externalId === '0' && /// search by Client Name
               <IonItem>
                 <IonItemDivider><IonLabel>Nombre del cliente:</IonLabel></IonItemDivider>
                   <IonLabel position="floating">Ingresa nombre completo</IonLabel>
                   <IonInput type='text' value={fullname}  onIonChange={ (e) => setFullName(e.detail.value!)} ></IonInput>
               </IonItem>}
-              { externalId !== '0' &&
+              { externalId !== '0' && /// search by Id Cliente HF
                 <IonItem>
                 <IonItemDivider><IonLabel>ID Cliente HF:</IonLabel></IonItemDivider>
                   <IonLabel position="floating">Ingresa el ID Cliente HF</IonLabel>
                   <IonInput type='text' value={externalId}  onIonChange={ (e) => setExternalId(e.detail.value!)}></IonInput>
               </IonItem>}
+              <p></p>
               <IonButton onClick={onSearchByCurpOrIdCliente} disabled={(!fullname && !externalId)}>Buscar</IonButton>
+              <p></p>
+                        <IonButton color='success' onClick={ ()=>setHide(true)}>Ver</IonButton>
             </div>
             }
-            {hide && <ClientForm onSubmit={onSave} />}
+            {!hide && 
+                        <>
+                        <IonItem><p>{clientName}</p></IonItem>
+                        {clientExistLocal ? <IonItem><p>Id Local: {ClientIdLocal}</p></IonItem> : ''}
+                        <IonItem><p>Solicitud: {idLoanApplication}</p></IonItem>
+                        <IonItem><p>Estatus: {loanAppStatus}</p></IonItem>
+                        <IonItem>
+                          <IonLabel>Renovar del credito</IonLabel>
+                          <IonCheckbox
+                          checked={createNewLoanApp}
+                          onIonChange={async (e) =>setCreateNewLoanApp(e.detail.checked)} />
+                        </IonItem>
+                        <IonItem>
+                          <IonLabel>Registrar Contracto activo</IonLabel>
+                            <IonCheckbox
+                            checked={createContract}
+                            onIonChange={async (e) =>setCreateContract(e.detail.checked)} />
+                        </IonItem>
+                        
+                        </>
+
+
+            }
+
+            { hide && <ClientForm onSubmit={ externalId === '0' ? onSaveWithRenovation : onSaveOnlyClient} /> }
+            
         </IonList>
       </IonContent>
     </IonPage>

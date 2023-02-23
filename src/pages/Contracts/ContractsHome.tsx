@@ -68,6 +68,7 @@ import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
             dispatchSession({ type: "SET_LOADING", loading_msg: "Cargando contratos...", loading: true});
             const prods = await db.find( { selector: { couchdb_type: "PRODUCT" }})
             const data:any = await db.find({ selector: { couchdb_type: "CONTRACT"}})
+            
             const newData = data.docs.filter( (i:any) => i.client_id === clientId)
             
             const contractsData = newData.map( (i:any) =>{

@@ -59,7 +59,7 @@ export const ClientVerificationImages:React.FC< { onNext:any }> = ( { onNext }) 
             <IonButton onClick={() => takePhoto(20)}>
                 <IonIcon icon={camera}></IonIcon>
             </IonButton>
-            { !!pics.length &&<IonButton color='warning' onClick={ ()=>{
+            { !!pics.length && !clientVerification._id &&<IonButton color='warning' onClick={ ()=>{
                 setPics([]);
             }}><IonIcon icon={trashOutline}></IonIcon></IonButton>}
         </div>

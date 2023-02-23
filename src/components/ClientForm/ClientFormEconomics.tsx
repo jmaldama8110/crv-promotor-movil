@@ -23,7 +23,7 @@ export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
 
 useEffect( ()=>{
   
-  dispatchSession({ type: "SET_LOADING", loading_msg: 'Datos socioeconomicos...', loading: true});
+  
   db.createIndex( { index: { fields: ["couchdb_type", "name"]}} )
   .then( function (){
     db.find({
@@ -69,7 +69,6 @@ useEffect( ()=>{
                   setProfession( { id: clientData.business_data.profession[0], etiqueta: clientData.business_data.profession[1]});
                   setEconomicActivity( { id: clientData.business_data.economic_activity[0], etiqueta:clientData.business_data.economic_activity[1]})
                 }
-                dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
               })
             })
         })

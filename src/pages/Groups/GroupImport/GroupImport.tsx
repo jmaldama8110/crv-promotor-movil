@@ -94,6 +94,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
           const newLoanAppIdGrp = Date.now().toString()
           const newLoaApp: LoanAppGroup = {
             ...data.loan_app,
+            members: data.membersHf,
             _id: newLoanAppIdGrp,
             dropout: [],
             apply_by: newGroupId,
@@ -139,42 +140,6 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
       dismiss();
       alert('Hubo un problema...')
     }
-    ///// this parts is only because POST CODE for groups address is not assigned
-    
-        // const newGroupId = !groupExistId ? Date.now().toString() : groupExistId;
-        // if (!groupExistId) {
-        //   db.put({
-        //     ...apiRes.data.group_data,
-        //     address: {
-        //       ...apiRes.data.group_data.address,
-        //       post_code: colony ? colony.codigo_postal : "",
-        //     },
-        //     couchdb_type: "GROUP",
-        //     _id: newGroupId,
-        //     created_by: session.user,
-        //     branch: session.branch,
-        //     created_at: new Date(),
-        //     status: [2, "Activo"],
-        //   });
-        // }
-        
-
-        // const newLoaApp: LoanAppGroup = {
-        //   ...apiRes.data.loan_app,
-        //   _id: Date.now().toString(),
-        //   apply_by: newGroupId,
-        //   apply_at: new Date().toISOString(),
-        //   created_by: session.user,
-        //   created_at: new Date().toISOString(),
-        //   branch: session.branch,
-        //   status: [1, "NUEVO TRAMITE"],
-        //   couchdb_type: "LOANAPP_GROUP",
-        // };
-
-        // db.put(newLoaApp).then(async () => {
-        //   await couchDBSync();
-        //   dismiss();
-        // });
 
   }
 

@@ -33,8 +33,8 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
     });
     let render = true;
 
-    const [position, setPosition ] = useState<string>('No');
-    const [positions ] = useState<string[]>(['No','Presidenta(e)','Secretaria(o)', 'Tesorera(o)']);
+    const [position, setPosition ] = useState<string>('');
+    const [positions ] = useState<string[]>(['','Presidenta(e)','Secretaria(o)', 'Tesorera(o)']);
 
     const [disbursment_mean, setDisbursmentMean ] = useState<number>(2);
     const [disbursmeans ] = useState([{ id: 1, mean:'Cheque'}, {id:2, mean:'OPR'}]);
