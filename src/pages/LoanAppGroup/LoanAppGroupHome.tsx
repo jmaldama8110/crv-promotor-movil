@@ -31,7 +31,6 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
                   <IonButton onClick={onAddNew}>Crear</IonButton>
             <IonItemDivider><IonLabel>Contratos Activos</IonLabel></IonItemDivider>
                   <ContractsHome {...props} />
-                  <IonButton color='secondary'>Visitas Regulares</IonButton>
           </IonList>
         </IonContent>
       </IonPage>

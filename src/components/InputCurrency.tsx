@@ -4,7 +4,9 @@ export const InputCurrency: React.FC< { InputString: string,
   fxUpdateInput: React.Dispatch<React.SetStateAction<string>>,
   BadgeFlag: boolean, 
   fxUpdateBadge: React.Dispatch<React.SetStateAction<boolean>>,
-  placeholder?: string
+  placeholder?: string,
+
+
 } > = ( { InputString, fxUpdateInput,  BadgeFlag,fxUpdateBadge, placeholder}) => {
     
     function onApplyAmountChange (e:any){
@@ -20,7 +22,7 @@ export const InputCurrency: React.FC< { InputString: string,
         }
     }
   return (
-    <IonItem>
+    <>
       <IonInput
         type="text"
         value={InputString}
@@ -30,6 +32,6 @@ export const InputCurrency: React.FC< { InputString: string,
       <IonBadge color={BadgeFlag ? "success" : "warning"}>
         {BadgeFlag ? "Ok" : "!"}
       </IonBadge>
-    </IonItem>
+    </>
   );
 };

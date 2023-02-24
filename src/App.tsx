@@ -82,6 +82,8 @@ import { ContractDetail } from "./pages/Contracts/ContractDetail";
 import { ClientVerificationAdd } from "./pages/ClientVerification/ClientVerificationAdd";
 import { ClientVerificationHome } from "./pages/ClientVerification/ClientVerificationHome";
 import { ClientVerificationEdit } from "./pages/ClientVerification/ClientVerificationEdit";
+import { VisitsHome } from "./pages/Visits/VisitsHome";
+import { VisitsAdd } from "./pages/Visits/VisitsAdd";
 
 setupIonicReact();
 
@@ -185,6 +187,8 @@ const App: React.FC = () => {
 
             <Route exact path="/groups/import" component={GroupImport}></Route>
             <Route exact path="/contracts/:contractId" component={ContractDetail}></Route>
+            <Route exact path="/contracts/:contractId/visits" component={VisitsHome}></Route>
+            <Route exact path="/contracts/:contractId/visits/add" component={VisitsAdd}></Route>
 
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>

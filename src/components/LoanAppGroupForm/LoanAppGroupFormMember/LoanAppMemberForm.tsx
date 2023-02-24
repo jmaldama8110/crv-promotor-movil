@@ -233,7 +233,9 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
             <IonItem>
                 <IonLabel>Importe Solicitado:</IonLabel>
             </IonItem>
-            <InputCurrency InputString={apply_amount} fxUpdateInput={setApplyAmount} BadgeFlag={entryAmtValid} fxUpdateBadge={setEntryAmtValid} />
+            <IonItem>
+              <InputCurrency InputString={apply_amount} fxUpdateInput={setApplyAmount} BadgeFlag={entryAmtValid} fxUpdateBadge={setEntryAmtValid} />
+            </IonItem>
             <IonItem>
                 <IonSelect
                 value={disbursment_mean}

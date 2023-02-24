@@ -14,12 +14,15 @@ export const ClientVerificationHome: React.FC<RouteComponentProps> = ({match, hi
   useEffect( ()=>{
     async function loadData(){
       try{
+        dispatchSession({ type:"SET_LOADING", loading_msg: "Cargando visitas...", loading: true});
         const clientId = match.url.split("/")[2];
         const data = await db.find({ selector: { couchdb_type: "CLIENT_VERIFICATION"}});
         const verifs = data.docs.filter( (i:any) => i.client_id === clientId );
         setVerificationsList(verifs); 
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false});
       }
       catch(e){
+        dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false});
         alert('Error al leer verificaciones...')
       }
       
@@ -36,7 +39,7 @@ export const ClientVerificationHome: React.FC<RouteComponentProps> = ({match, hi
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonBackButton defaultHref="/clients" />
+              <IonBackButton />
             </IonButtons>
             <IonTitle>Verificaciones Oculares</IonTitle>
           </IonToolbar>

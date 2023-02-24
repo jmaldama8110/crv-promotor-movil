@@ -78,6 +78,3 @@ export const ClientVerificationAdd: React.FC<RouteComponentProps> = ({match,hist
     );
 }
 
-function couchDBSyncUpload() {
-  throw new Error("Function not implemented.");
-}

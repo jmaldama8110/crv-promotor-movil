@@ -137,7 +137,8 @@ export const ClientVerificationFormSocioeconomics: React.FC<{ onNext:any, onSetP
                 <IonLabel position="floating">¿En dónde trabaja?</IonLabel>
                 <IonInput type="text" value={placeOfWork} onIonChange={(e)=>setPlaceOfWork(e.detail.value!) } onIonBlur={(e:any)=>setPartnerName(e.target.value.toUpperCase())}></IonInput>
             </IonItem>
-            <InputCurrency InputString={weeklyIncome} fxUpdateInput={setWeeklyIncome} BadgeFlag={weeklyIncomeValid} fxUpdateBadge={setWeeklyIncomeValid} placeholder="Ingresos de la pareja" />
+            <IonItem>
+            <InputCurrency InputString={weeklyIncome} fxUpdateInput={setWeeklyIncome} BadgeFlag={weeklyIncomeValid} fxUpdateBadge={setWeeklyIncomeValid} placeholder="Ingresos de la pareja" /></IonItem>
             <IonItem>
             <IonLabel>¿Tienes Hijos?</IonLabel>
             <IonSelect
@@ -222,7 +223,8 @@ export const ClientVerificationFormSocioeconomics: React.FC<{ onNext:any, onSetP
                 <IonLabel position="floating">¿Cuántas personas viven en su casa?</IonLabel>
                 <IonInput type="text" placeholder="" value={peopleLiving} onIonChange={(e)=>setPeopleLiving(e.detail.value!)}></IonInput>
           </IonItem>
-          <InputCurrency InputString={rentAmount} fxUpdateInput={setRentAmount} BadgeFlag={rentAmountValid} fxUpdateBadge={setRentAmountValid} placeholder="Cuanto paga de Renta" />
+          <IonItem>
+          <InputCurrency InputString={rentAmount} fxUpdateInput={setRentAmount} BadgeFlag={rentAmountValid} fxUpdateBadge={setRentAmountValid} placeholder="Cuanto paga de Renta" /></IonItem>
 
           <IonItem><IonLabel>¿Su familia sabe que tiene crédito con CONSERVA?</IonLabel>
             <IonCheckbox checked={familyIsAwareOfLoan} onIonChange={async (e) =>setFamilyAwareOfLoan(e.detail.checked)} />

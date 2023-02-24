@@ -1,4 +1,5 @@
 import {
+  IonButton,
     IonCard,
     IonCardContent,
     IonCardHeader,
@@ -75,6 +76,7 @@ import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
               const prod:any = prods.docs.find( (x:any) => x.external_id == i.id_producto_maestro );
 
               return {
+                _id: i._id,
                 contractId: i.idContrato,
                 productName: prod.product_name,
                 clientName: i.nombreCliente,
@@ -128,10 +130,10 @@ import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
           contracts.length ?
         contracts.map((i: any, n) => (
           <IonCard
-            button={true}
+            button={false}
             color={getStatus(i.status)}
             key={n}
-            routerLink={`/contracts/${i.contractId}`}
+            
           >
             <IonCardHeader>
               <h1>{i.clientName}</h1>
@@ -143,6 +145,9 @@ import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
               <p>
                 {formatLocalCurrency(i.originalAmount)} / {i.term} {i.frequency}
               </p>
+              
+              <IonButton color='success' routerLink={`/contracts/${i._id}/visits`}>Visitas</IonButton>
+              <IonButton color='warning' routerLink={`/contracts/${i.contractId}`}>Ver Edo cta</IonButton>
             </IonCardContent>
           </IonCard>
         )) : <div><p>No tienes créditos activos...</p></div>
