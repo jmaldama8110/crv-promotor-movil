@@ -140,6 +140,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
   };
 
   function onSearch() {
+    
     setLoansList([]);
     const groupNameSearch = groupName.toUpperCase();
     present({ message: "Buscando..." });
@@ -154,6 +155,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
         const groupSearch = data.docs.find(
           (i: any) => i.group_name === groupNameSearch
         );
+        
         if (groupSearch) {
           setGroupExistId(groupSearch._id);
         }
@@ -164,7 +166,9 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
           ] = `Bearer ${session.current_token}`;
           const apiRes = await api.get(`/clients/hf/search?branchId=${session.branch[0]}&clientName=${groupNameSearch}`);
           dismiss();
-          if (!apiRes.data.length) {
+          
+          const resultData = apiRes.data.filter( (i:any)=>  (i.sub_estatus === "PRESTAMO ACTIVO" && i.nombreCliente ===groupNameSearch ))
+          if (!resultData) {
             presentAlert({
               header: "Busqueda sin resultados",
               subHeader: "Favor de verificar el nombre correcto del grupo",
@@ -174,11 +178,11 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
               buttons: ["OK"],
             });
             clearDataForm();
-          } else {
-            const resultData = apiRes.data.filter( (i:any)=>  (i.sub_estatus === "PRESTAMO ACTIVO"))
+          } else{
             const reversedData = resultData.reverse() as GroupLoanApplicationHF[];
             setLoansList(reversedData);
           }
+          
         } catch (err) {
           console.log(err);
           dismiss();

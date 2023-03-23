@@ -1,4 +1,4 @@
-import { IonButton, IonCheckbox, IonCol, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonRow } from "@ionic/react";
+import { IonButton, IonCheckbox, IonCol, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonRow, useIonActionSheet } from "@ionic/react";
 import { camera, trashOutline } from "ionicons/icons";
 import { useContext, useEffect, useState } from "react";
 
@@ -7,9 +7,11 @@ import { useCameraTaker } from "../../hooks/useCameraTaker";
 import { Geolocation } from "@capacitor/geolocation";
 import { AppContext } from "../../store/store";
 import { MemberInArrears } from "../../reducer/MembersInArrears";
+import { locationOutline } from 'ionicons/icons';
+import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
+import { Browser } from "@capacitor/browser";
 
-
-export const VisitsForm: React.FC<{onSubmit:any}> = ({onSubmit})=>{
+export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, visitData})=>{
 
     const { takePhoto, pics, setPics } = useCameraTaker();
     const onPhotoTitleUpdate = (e:any) =>{
@@ -18,6 +20,7 @@ export const VisitsForm: React.FC<{onSubmit:any}> = ({onSubmit})=>{
         setPics([...newData]);
         
     }
+
 
     const [ asisstStars, setAssistStars ]=  useState<boolean[]>([false, false, false,false, false])
     const [ harmonyStars, setHarmonyStars ]=  useState<boolean[]>([false, false, false,false, false])
@@ -28,6 +31,8 @@ export const VisitsForm: React.FC<{onSubmit:any}> = ({onSubmit})=>{
     
     const [lat, setLat] = useState(0);
     const [lng, setLng] = useState(0);
+    const [present] = useIonActionSheet();
+    const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
     
     const { membersInArrears, dispatchMembersInArrears } = useContext(AppContext)
 
@@ -71,8 +76,56 @@ export const VisitsForm: React.FC<{onSubmit:any}> = ({onSubmit})=>{
         }
         loadCoordinates();
         
+
       }, []);
 
+      
+
+      useEffect( ()=>{
+
+        /// If we are in edit mode
+        if( !!visitData ){
+            setHarmonyStars(visitData.harmonyStars);
+            setPuntualStars(visitData.punctualtStars);
+            setAssistStars( visitData.asisstStars);
+            setPics( visitData.visits_pics);
+            setCompletePayment(visitData.completePayment);
+            setInternalArreas(visitData.internalArrears);
+            if(visitData.internalArrears){
+                dispatchMembersInArrears( { type: "POPULATE_MEMBERS_INARREARS",data: visitData.membersInArrears});
+            }
+        }
+      },[visitData])
+
+      function onViewLocations () {
+        const buttons = [ 
+                          { text: 'Indicaciones', role:"destructive",data: { action: 'directions'}},
+                          { text: 'Ver Mapa', data: { action: "map-view" } }
+                        ]
+                        present(
+                          { header: 'Ubicacion',
+                            subHeader: 'Indique modo del mapa:',
+                            buttons,
+                              onDidDismiss: ({ detail }) => setGeoActions(detail),
+                            })
+      }
+      useEffect( ()=>{
+
+        async function loadOptions (){
+          if( geoActions) {
+            if( geoActions.data ){
+                if( geoActions.data.action === 'directions'){
+                  await Browser.open({ url: `https://www.google.com/maps/dir/?api=1&destination=${visitData.coordinates[0]}%2C${visitData.coordinates[1]}` });
+                }
+                if( geoActions.data.action === 'map-view'){
+                  await Browser.open({ url: `https://www.google.com/maps/@?api=1&map_action=map&zoom=18&center=${visitData.coordinates[0]}%2C${visitData.coordinates[1]}` });            
+                }
+            }
+          }
+            
+        }
+        loadOptions();
+      },[geoActions])
     return (
         <IonList>
             <IonItemDivider><IonLabel>Ranking General</IonLabel></IonItemDivider>
@@ -138,7 +191,8 @@ export const VisitsForm: React.FC<{onSubmit:any}> = ({onSubmit})=>{
             </>}
 
             <p></p>
-            <IonButton color='success' disabled={!pics.length} onClick={onSend}>Guardar Visita</IonButton>
+            { !visitData && <IonButton color='success' disabled={!pics.length} onClick={onSend}>Guardar Visita</IonButton>}
+            { !!visitData && <IonButton color="success" onClick={onViewLocations}> <IonIcon icon={locationOutline}></IonIcon>Ubicación</IonButton>}
         </IonList>
     );
 }

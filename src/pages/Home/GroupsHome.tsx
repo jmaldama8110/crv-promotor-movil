@@ -51,7 +51,8 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
       { text: 'Nuevo Grupo', role:"destructive",data: { action: 'add', routerLink:'/groups/add' } },
       { text: 'Editar', data: { action:"edit", routerLink: `/groups/edit/${clientSelected.id}` } },
       { text: 'Solicitudes & Creditos', data: { action: 'loanapps', routerLink: `/groups/${clientSelected.id}/loanapps`} },
-      { text: 'Garantia Liquida', data: { action: 'guarantees', routerLink:  `/groups/${clientSelected.id}/guarantees` } },
+      { text: 'Tarjeton Digital', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
+      { text: 'Ver Documentos', data: { action: 'docs', routerLink:  `/docs` } },
       { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },
     ] :
       [
@@ -97,9 +98,11 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
           history.push(actions.data.routerLink);
         if( actions.data.action === 'loanapps')
             history.push(actions.data.routerLink);
-        if( actions.data.action === 'guarantees')
+        if( actions.data.action === 'tarjeton')
             history.push(actions.data.routerLink);
         if( actions.data.action === 'related-people')
+            history.push(actions.data.routerLink);
+        if( actions.data.action === 'docs')
             history.push(actions.data.routerLink);
 
         

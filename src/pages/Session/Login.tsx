@@ -6,12 +6,13 @@ import {
   IonItem,
   useIonLoading,
 } from "@ionic/react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { Preferences } from "@capacitor/preferences";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
 import jwt_decode from "jwt-decode";
+import PdfUrlViewer from "../../components/PdfViewer/PdfUrlViewer";
 export const LOGIN_KEY_PREFERENCES = 'promotor-movil-preferences';
 
 
@@ -20,19 +21,16 @@ interface UserInfo {
   name: string;
   lastname: string;
   second_lastname: string;
-  email: string;
+  email: string;  
   branch: [number, string];
   token: string;
 }
-
 
 export const Login: React.FC<RouteComponentProps> = ({ history }) => {
   const { dispatchSession } = useContext(AppContext);
 
   const [user,setUser] = useState<string>('');
   const [pass,setPass] = useState<string>('');
-
-  const [present, dismiss] = useIonLoading();
 
   async function onLogin() {
 
@@ -100,6 +98,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
     loadDataFromLocalStorage();
 
   }, []);
+  
 
   return (
         <IonList className="ion-padding">
@@ -113,6 +112,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
           </IonItem>
           <p></p>
           <IonButton expand="block" onClick={onLogin}>Login</IonButton>
+
         </IonList>
   );
 };

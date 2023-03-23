@@ -7,7 +7,7 @@ import { ButtonSlider } from "../../components/SliderButtons";
 import { LoanAppGroupFormSummary } from "../../components/LoanAppGroupForm/LoanAppGroupFormSummary";
 import { LoanAppGroupFormGenerals } from "../../components/LoanAppGroupForm/LoanAppGroupFormGenerals";
 import { AppContext } from "../../store/store";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 
 
 export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {

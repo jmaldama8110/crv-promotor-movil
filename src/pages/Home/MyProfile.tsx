@@ -23,7 +23,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
   const { session,dispatchSession } = useContext(AppContext);
   const [info,setInfo] = useState<AppInfo>();
-  
+  const [envs, setEnvs] = useState<[string,string]>(['',''])
   const { couchDBSyncDownload } = useDBSync();
 
   function onCloseSession (){
@@ -65,7 +65,10 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
     async function LoadAppInfo(){
       const data: AppInfo = await App.getInfo();
       setInfo(data); 
+      
     }
+    setEnvs([`Host: ${process.env.REACT_APP_COUCHDB_HOST}`, `DB: ${process.env.REACT_APP_COUCHDB_NAME}`])
+    
     LoadAppInfo();
    },[])
 
@@ -78,8 +81,8 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       </IonHeader>
       <IonContent >
       <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
+        <IonRefresherContent></IonRefresherContent>
+      </IonRefresher>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Mi Perfil</IonTitle>
@@ -102,6 +105,8 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       </IonContent>
       <IonFooter>
         <IonToolbar>
+            <p className="margin-auto text-center xs">{envs[0]}</p>
+            <p className="margin-auto text-center xs">{envs[1]}</p>
             <p className="margin-auto text-center xs">{ info ? `${info?.name} (${info?.version}) - build ${info?.build}`: 'Web version'}  </p>
         </IonToolbar>
       </IonFooter>

@@ -1,0 +1,22 @@
+.barcode-header {
+    line-height: 0.5rem;
+    font-size: 12px;
+}
+.barcode-container {
+    text-align: center;   
+}
+.barcode-container p {
+    line-height: 0.5rem;
+}
+
+.barcode-element {
+    width: 100%;
+}
+.barcode-associates {
+    display: flex;
+    flex-wrap: wrap;
+}
+.barcode-associates img {
+    width: 150px;
+    padding: 5px;
+}

@@ -8,14 +8,17 @@ import {
   IonLabel,
   IonList,
   IonPage,
+  IonRefresher,
+  IonRefresherContent,
   IonTitle,
   IonToolbar,
+  RefresherEventDetail,
 } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
-import { formatDate } from "../../utils/numberFormatter";
+import { formatLocalDateShort } from "../../utils/numberFormatter";
 
 export const VisitsHome: React.FC<RouteComponentProps> = ({
   history,
@@ -28,22 +31,25 @@ export const VisitsHome: React.FC<RouteComponentProps> = ({
     const contractId = match.url.split("/")[2];
     history.push(`/contracts/${contractId}/visits/add`);
   };
-  useEffect(() => {
-    async function loadData() {
-      try {
-        dispatchSession({ type: "SET_LOADING", loading_msg: "Cargando visitas...", loading: true });
-        const contractId = match.url.split("/")[2];
-        console.log(contractId);
-        const data = await db.find({ selector: { couchdb_type: "VISIT" } });
-        const verifs = data.docs.filter((i: any) => i.contract_id === contractId);
-        setVerificationsList(verifs);
-        dispatchSession({ type: "SET_LOADING", loading_msg: "", loading: false });
-      } catch (e) {
-        dispatchSession({
-          type: "SET_LOADING", loading_msg: "", loading: false });
-          alert("Error al leer visitas...");
-      }
+  async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+      await loadData();
+      event.detail.complete();
+   }
+   async function loadData() {
+    try {
+      const contractId = match.url.split("/")[2];
+      
+      const data = await db.find({ selector: { couchdb_type: "VISIT" } });
+      const verifs = data.docs.filter((i: any) => i.contract_id === contractId);
+      
+      //// sets the list from most recent to oldest
+      setVerificationsList(verifs.reverse());
+    } catch (e) {
+        alert("Error al leer visitas...");
     }
+  }
+  useEffect(() => {
+
     loadData();
   }, []);
   return (
@@ -57,6 +63,10 @@ export const VisitsHome: React.FC<RouteComponentProps> = ({
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+        <IonRefresherContent></IonRefresherContent>
+      </IonRefresher>
+
         <IonList className="ion-padding">
           {verificationsList.map((i: any) => (
             <IonItem
@@ -65,7 +75,7 @@ export const VisitsHome: React.FC<RouteComponentProps> = ({
               routerLink={`visits/edit/${i._id}`}
             >
               <IonLabel>
-                {formatDate(i.created_at)} | {i.loanAmount}
+                {i.created_by}, {formatLocalDateShort(i.created_at)}
               </IonLabel>
             </IonItem>
           ))}

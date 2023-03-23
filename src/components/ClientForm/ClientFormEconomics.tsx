@@ -32,6 +32,7 @@ useEffect( ()=>{
         name: 'CATA_ocupacionPLD'
       }
     }).then( (data:any) =>{
+      
       setOcupationCatalog(data.docs.map( (i:SearchData)=>({id: i.id, etiqueta: i.etiqueta}) ));
       db.find({ 
         selector: {
@@ -46,6 +47,7 @@ useEffect( ()=>{
             name: "CATA_ActividadEconomica"
           }
         }).then( (data:any) =>{
+          
             setEconomicActivityCatalog( data.docs.map( (i:SearchData)=>({id: i.id, etiqueta: i.etiqueta})));
             db.find( {
               selector: {

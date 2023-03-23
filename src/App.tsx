@@ -1,4 +1,4 @@
-import { Route, RouteComponentProps } from "react-router-dom";
+import { Route } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
@@ -43,6 +43,7 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import "./globalstyles.css";
+import './pages/WhereToPay/WhereToPay.css';
 import { MyProfile } from "./pages/Home/MyProfile";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./store/store";
@@ -84,6 +85,9 @@ import { ClientVerificationHome } from "./pages/ClientVerification/ClientVerific
 import { ClientVerificationEdit } from "./pages/ClientVerification/ClientVerificationEdit";
 import { VisitsHome } from "./pages/Visits/VisitsHome";
 import { VisitsAdd } from "./pages/Visits/VisitsAdd";
+import { VisitsEdit } from "./pages/Visits/VisitsEdit";
+import { WhereToPayHome } from "./pages/WhereToPay/WhereoToPayHome";
+
 
 setupIonicReact();
 
@@ -95,6 +99,7 @@ const App: React.FC = () => {
   const { couchDBSyncDownload, evaluateTokenExpiration} = useDBSync();
 
   useEffect(() => {
+    
     if (session.loading) {
       present({ message: session.loading_msg });
     } else {
@@ -113,6 +118,7 @@ const App: React.FC = () => {
     };
     loadRender();
 
+    
   }, []);
 
   async function onTabChange  (){
@@ -170,7 +176,6 @@ const App: React.FC = () => {
               }}
             />
 
-
             <Route exact path="/groups/add" component={GroupAdd}></Route>
             <Route exact path="/groups/add-from-hf" component={GroupFromHF}></Route>
             <Route exact path="/groups/edit/:id" component={GroupEdit}></Route>
@@ -189,6 +194,8 @@ const App: React.FC = () => {
             <Route exact path="/contracts/:contractId" component={ContractDetail}></Route>
             <Route exact path="/contracts/:contractId/visits" component={VisitsHome}></Route>
             <Route exact path="/contracts/:contractId/visits/add" component={VisitsAdd}></Route>
+            <Route exact path="/contracts/:contractId/visits/edit/:id" component={VisitsEdit}></Route>
+            <Route exact path="/wheretopay/:id" component={WhereToPayHome}></Route>
 
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>

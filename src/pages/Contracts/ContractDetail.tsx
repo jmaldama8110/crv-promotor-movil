@@ -1,15 +1,17 @@
-import {
-    IonContent,IonHeader,IonPage,IonToolbar,IonButtons,IonMenuButton,IonItem,IonCard,useIonLoading,IonSegment,IonSegmentButton,IonLabel,IonCardContent,IonCardHeader,IonCardSubtitle,IonCardTitle,IonButton, IonBackButton, IonTitle, } from "@ionic/react";
-  import { useContext, useEffect, useState } from "react";
-  import { RouteComponentProps } from "react-router";
-  import api from "../../api/api";
-//   import { PDFViewer } from "../../components/PDFViewer";
-  import { AppContext } from "../../store/store";
-//   import { base64toBlob } from "../../utils/base64toBlob";
-  import { formatLocalDate,formatLocalDateShort } from "../../utils/numberFormatter";
-  import { formatLocalCurrency } from "../../utils/numberFormatter";
-  
-  export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
+import { IonContent,IonHeader,IonPage,IonToolbar,IonButtons,IonItem,IonCard,useIonLoading,IonSegment,IonSegmentButton,IonLabel,IonCardContent,IonCardHeader,IonCardSubtitle,IonCardTitle,IonButton, IonBackButton, IonTitle, IonInput, } from "@ionic/react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { RouteComponentProps } from "react-router";
+import api from "../../api/api";
+import PdfUrlViewer from "../../components/PdfViewer/PdfUrlViewer";
+import { Browser } from '@capacitor/browser';
+
+import { AppContext } from "../../store/store";
+
+import { formatLocalDate,formatLocalDateShort } from "../../utils/numberFormatter";
+import { formatLocalCurrency } from "../../utils/numberFormatter";
+
+export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
+
     const { session } = useContext(AppContext);
     const [present, dismiss] = useIonLoading();
     const [cuotasInfo, setCuotasInfo] = useState([]);
@@ -25,7 +27,11 @@ import {
     const [fechaUltPago, setFechaUltPago ] = useState('');
     const [currSegment, setSegment] = useState<string>("resumen");
 
-    // const [pdfDoc, setPdfDoc] = useState<string>('');
+    const url = useRef<string>('');
+    const [showPdf, setShowPdf] = useState(false);
+    const [scale, setScale] = useState<number>(1);
+    const [page, setPage] = useState<number>(1);
+    const windowRef = useRef<any>();
     
     let render = true;
   
@@ -98,27 +104,42 @@ import {
     }, []);
 
 
+    async function onOpenLinkPdf() {
+      try{
+        const contractIdUrl = match.url.split("/")[2];
+        present({message: "Descargando pdf..."});
+        const apiRes = await api.get(`/docs/pdf/account-statement?contractId=${contractIdUrl}`);
+        const url = `${process.env.REACT_APP_BASE_URL_API}/${apiRes.data.downloadPath}`;
+        await Browser.open({ url } );
+        dismiss();
+      }
+      catch(error){
+        console.log(error);
+        dismiss();
+        alert('Se presento un problema al intentar crear el archivo')
+      }
 
-    async function onViewAccountStatement(){
+    }
 
-    //   const contractId = match.url.replace("/contracts/", "");
-    //   const now = new Date();
+
+  async function onViewAccountStatement(){
+
+    const contractId = match.url.split("/")[2];
+    const now = new Date();
       
-    // try{
-    //     present( {message: 'Cargando Estado de Cuenta...'});
-    //     const apiRes = await api.get(`/contract?contractId=${contractId}&dateFrom=2000-01-01&dateEnd=${now.toISOString()}`);
-    //     const blob = base64toBlob(apiRes.data.base64File);
-    //     const url = URL.createObjectURL(blob);    
-    //     setPdfDoc(url);
-    //     dismiss();
-    // }
-    // catch(e){
-    //     dismiss();
-    //     console.log(e);
-    //     alert('No fue posible obtener el documento PDF solicitado')
-    // }
-      
-
+    try{
+        present( {message: 'Cargando Estado de Cuenta...'});
+        // const apiRes = await api.get(`/contract?contractId=${contractId}&dateFrom=2000-01-01&dateEnd=${now.toISOString()}`);
+        const apiRes = await api.get(`/docs/pdf/account-statement`);
+        url.current = apiRes.data
+        setShowPdf(true);
+        dismiss();
+    }
+    catch(e){
+        dismiss();
+        console.log(e);
+        alert('No fue posible obtener el documento PDF solicitado')
+    }
 
     } 
   
@@ -129,6 +150,10 @@ import {
       return 0;
     }
   
+  
+    const scrollToItem = () => {
+      windowRef.current && windowRef.current.scrollToItem(page - 1, "start");
+    };
    
     return (
       <IonPage id="principal">
@@ -137,7 +162,7 @@ import {
             <IonButtons slot="start">
               <IonBackButton />
             </IonButtons>
-            <IonTitle>Detalles del contracto</IonTitle>
+            <IonTitle>Detalles del Contrato</IonTitle>
           </IonToolbar>
         </IonHeader>
 
@@ -199,9 +224,24 @@ import {
           )}
           {currSegment === "edocuenta" && (
             <div className="ion-padding">
-                <p>Ver Estado de Cuenta Aqui</p>
-              {/* { !pdfDoc && <IonButton onClick={onViewAccountStatement}>Ver Estado de Cuenta</IonButton>}
-              <PDFViewer fileURL={pdfDoc}/> */}
+              
+              {!showPdf &&
+                <>
+                  <IonButton onClick={onViewAccountStatement} color='medium' disabled>Ver PDF</IonButton>
+                  <IonButton onClick={onOpenLinkPdf} color='success'>Abir PDF</IonButton>
+                </>
+              }
+              { showPdf &&
+              <div>
+                <div>
+                  <IonInput value={page} onIonChange={(e:any) => setPage(e.detail.value)} />
+                  <IonButton onClick={scrollToItem}>goto</IonButton>
+                  <IonButton  onClick={() => setScale(v => v + 0.1)}>+</IonButton>
+                  <IonButton onClick={() => setScale(v => v - 0.1)}>-</IonButton>
+                </div>
+                <br />
+                <PdfUrlViewer url={url.current} scale={scale} windowRef={windowRef} />
+              </div>}
             </div>
           )}
         </IonContent>

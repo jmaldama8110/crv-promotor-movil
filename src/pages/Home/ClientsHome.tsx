@@ -61,7 +61,7 @@ const ClientsHome: React.FC = () => {
       { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
       { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
       { text: 'Referencias & Personas', data: { action: 'related-people', routerLink:  `/clients/${clientSelected.id}/related-people` } },
-      // { text: 'Datos Bancarios', data: { action: '' } },
+      { text: 'Tarjeton Digital', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
@@ -95,6 +95,9 @@ const ClientsHome: React.FC = () => {
             history.push(actions.data.routerLink);
         if( actions.data.action === 'related-people')
             history.push(actions.data.routerLink);
+        if( actions.data.action === 'tarjeton')
+            history.push(actions.data.routerLink);
+
 
       }
     }
