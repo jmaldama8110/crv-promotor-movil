@@ -1,10 +1,10 @@
 import {
-  IonPage, IonHeader, IonToolbar, IonButtons, IonTitle,IonContent, IonList,IonCard,IonCardContent,IonCardHeader,IonCardSubtitle,IonItem,useIonLoading,IonLabel,IonListHeader,IonRadio,IonRadioGroup,IonBackButton, IonButton,
+  IonPage, IonHeader, IonToolbar, IonButtons, IonTitle,IonContent, IonList,IonCard,IonCardContent,IonCardHeader,IonCardSubtitle,IonItem,useIonLoading,IonLabel,IonListHeader,IonRadio,IonRadioGroup,IonBackButton, IonButton, IonItemDivider,
 } from "@ionic/react";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import 'swiper/css';
-// import  JsBarcode from 'jsbarcode';
-import { useContext, useEffect, useState } from "react";
+import  JsBarcode from 'jsbarcode';
+import { useContext, useState } from "react";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
 
@@ -13,46 +13,39 @@ import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../../components/SliderButtons";
 import { db } from "../../db";
 
-interface IntermediadiesData {
+interface IntermediaryData {
     id: string;
     name: string;
-    logo: string;
-    external_id: number;
-    tipo_evento: string;
     contain_barcode: boolean;
     associates: []
 }
 
+
 interface IntermediaryDataProps {
   id: string;
   name: string;
-  logo: string;
+  logo?: string;
   onSelectIntermediary: any;
 }
 
 const IntermediaryCard: React.FC<IntermediaryDataProps> = ({id, name, logo, onSelectIntermediary}) => {
-  
-  
   const swiper = useSwiper();
-  
   function onSelect (e:any){
     
     onSelectIntermediary(e);
     swiper.slideNext();
   }
-  return(
-      <IonCard key={id} >
-                  <img
-                    src={`data:image/png;base64,${logo}`}
-                    style={{ height: "50px" }}
-                    onClick={onSelect}
-                    id={`${id}`}
-                  ></img>
-                  <IonCardHeader>
-                    <h1>{name}</h1>
-              <IonCardSubtitle>{`${name}`}</IonCardSubtitle>
-            </IonCardHeader>
-        <IonCardContent></IonCardContent>
+  return (
+      <IonCard
+        id={`ioncard-intermediary-${id}`}
+        key={id} 
+        onClick={onSelect}>
+          <IonCardHeader
+            id={`ioncard-intermediary-${id}`}
+          >
+              <h1 id={`ioncard-intermediary-${id}`}>{name}</h1>
+              <IonCardSubtitle id={`ioncard-intermediary-${id}`}>{`${name}`}</IonCardSubtitle>
+          </IonCardHeader>
       </IonCard>
   );
 }
@@ -60,87 +53,87 @@ const IntermediaryCard: React.FC<IntermediaryDataProps> = ({id, name, logo, onSe
 export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) => {
 
   const [present,dismiss] = useIonLoading();
-  const [intermediaries, setIntermediaries ] = useState<IntermediadiesData[]>([]);
-  const [associates, setAssociates] = useState<IntermediadiesData[]>([]);
+  const [intermediaries, setIntermediaries ] = useState<IntermediaryData[]>([]);
+  const [associates, setAssociates] = useState<IntermediaryData[]>([]);
   const [tipoEvento, setTipoEvento] = useState<string>('');
   const [nombreCliente, setNombreCliente] = useState<string>('');
   const [tipoIntermediario, setTipoIntermediario] = useState<string>('');
-
-  // const { loginInfo, personalData, contractsList } = useContext(AppContext);
+  const [codigoReferenciado, setCodigoReferenciado] = useState<string>('');
+  
   const [contractsList, setContractsList]  = useState<any[]>([]);
   const [selectedType, setSelectedType] = useState<string>('');
 
   const [selectedContract, setSelectedContract] = useState<string>('');
+  const { session } = useContext(AppContext);
 
-  useEffect( ()=>{
+ async function loadIntermediaries() {
+  try{
+    present( {message:'Cargando intermediarios...'})
 
-    async function loadData (){
-      // present( {message:'Cargando ...'})
-      try{
-        /**
-         * OBTENER los intermediarios
-         */
-        // api.defaults.headers.common["Authorization"] = `Bearer ${loginInfo.current_token}`;
-        // const apiRes = await api.get('/paymentIntermediare');
-        // setIntermediaries( apiRes.data );
-        setIntermediaries([{
-          id: "1",
-          name: "BODEGA AHORRERA",
-          logo: "",
-          external_id: 0,
-          tipo_evento: "",
-          contain_barcode: false,
-          associates:[]
-        }]);
+    api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
+    const apiRes = await api.get('/intermediary/hf');
+    const apiData: IntermediaryData[] = apiRes.data.map( (x:any) =>( {
+        id: `${x.id}`,
+        name: x.nombre,
+        contain_barcode: x.contiene_codigo_barras,
+        associates: []
+    }))
+    setIntermediaries(apiData);
+    
+    const clientId = match.url.split("/")[2]
+    const contractsQuery = await db.find({ selector: { couchdb_type:"CONTRACT"}});
+    const contracts = contractsQuery.docs.filter( (i:any) => i.client_id === clientId);
+    setContractsList(contracts);
+    dismiss();
 
-        /**
-         * Loads up contract info
-         */
-        const clientId = match.url.split("/")[2]
-        const contractsQuery = await db.find({ selector: { couchdb_type:"CONTRACT"}});
-        const contracts = contractsQuery.docs.filter( (i:any) => i.client_id === clientId);
-        setContractsList(contracts);
+  }
+  catch(error){
+    dismiss();
+    alert('No se encontraron medios donde realizar pago, solicite ayuda');
+    
+  }
+}
 
-        dismiss();
+async function selectIntermediary( e:any) {
+
+  const targetId = e.target.id.replace('ioncard-intermediary-','')
+
+  const selectedItem = intermediaries.find( (i:IntermediaryData)=> i.id === targetId );
+  const clientId = match.url.split("/")[2];
+  
+  if( selectedItem ){
+    try{ 
+      present('Cargando referencias...')
+
+      /** retrieves client data */
+      const clientData:any = await db.get(clientId);
+  
+      api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+      // if selectedType === '2' (Pago de Garantía) or selectedType === '6' requires contractId
+      const referenceId = selectedType === '2' ? clientData.id_cliente : selectedContract;
+      const apiRes = await api.get(`/clients/createReference?typeReference=${selectedType}&id=${referenceId}&idIntermediario=${selectedItem.id}`);
+
+      setTipoEvento(apiRes.data[0].tipo_evento);
+      setNombreCliente(apiRes.data[0].nombre_cliente);
+      setTipoIntermediario(apiRes.data[0].nombre);
+      setCodigoReferenciado(apiRes.data[0].referencia);
+      if( selectedItem.contain_barcode && apiRes.data.length){
+        JsBarcode("#code128",apiRes.data[0].referencia,{ fontSize: 14 } );
       }
-      catch(error){
-        // dismiss();
-        alert('No se encontraron medios donde realizar pago, solicite ayuda');
-        history.goBack();
-      }
+
+      dismiss();
+    } catch(error){
+      dismiss();
+      console.log(error);
+      alert('No fue posible procesar la peticion de referencias de pago')
     }
-    loadData();
-  },[]);
-
-
-  async function selectIntermediary( e:any) {
-
-    const selectedItem = intermediaries.find( (i:any)=> i._id === e.target.id );
-    if( selectedItem ){
-      try{ 
-        present('Cargando referencias...')
-        // api.defaults.headers.common["Authorization"] = `Bearer ${loginInfo.current_token}`;
-        /// if selectedType === '2' (Pago de Garantía) or selectedType === '6' requires contractId
-        // const referenceId = selectedType === '2' ? personalData.id_cliente : selectedContract;
-        // const apiRes = await api.get(`/clients/createReference?typeReference=${selectedType}&id=${referenceId}&idIntermediario=${selectedItem.external_id}`);
-        
-        // if( selectedItem.contain_barcode && apiRes.data.length){
-        //   JsBarcode("#code128",apiRes.data[0].referencia,{ fontSize: 14 } );
-        //   setTipoEvento(apiRes.data[0].tipo_evento);
-        //   setNombreCliente(apiRes.data[0].nombre_cliente);
-        //   setTipoIntermediario(apiRes.data[0].nombre);
-        // }
-
-        dismiss();
-      } catch(error){
-        dismiss();
-        console.log(error);
-        alert('No fue posible procesar la peticion de referencias de pago')
-      }
-      
-      setAssociates(selectedItem.associates);
-       
-    }
+    
+    setAssociates(selectedItem.associates);
+     
+  }
+}
+ const onSelectTypeNext = async () =>{
+      await loadIntermediaries();
  }
   
 
@@ -155,7 +148,10 @@ export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) 
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <Swiper spaceBetween={50} slidesPerView={1} >
+
+
+        <Swiper spaceBetween={50} slidesPerView={1} allowTouchMove={false} >
+          {/** Select Guarantee or Repayment */}
           <SwiperSlide>
             <IonList className="ion-margin">
               <IonRadioGroup value={selectedType} onIonChange={e => setSelectedType(e.detail.value)}>
@@ -170,11 +166,12 @@ export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) 
                   <IonLabel>Pagar Crédito</IonLabel>
                   <IonRadio slot="start" value="6" />
                 </IonItem>
-                
-                <ButtonSlider  disabled={!selectedType}  onClick={()=>{}} color='success' label="Siguiente" expand="block" slideDirection="F"/>
+                <p></p>
+                <ButtonSlider  disabled={!selectedType}  onClick={onSelectTypeNext} color='success' label="Siguiente" expand="block" slideDirection="F"/>
               </IonRadioGroup>            
             </IonList>
           </SwiperSlide>
+          {/** Only when Repayment selected, list contracts*/}
           { selectedType === '6' && // only when Credit type selected
           <SwiperSlide>
             <IonList className="ion-padding">
@@ -196,15 +193,15 @@ export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) 
                 </IonRadioGroup>              
             </IonList>
           </SwiperSlide>}
+
           <SwiperSlide>
             <IonList>
               {
-              intermediaries.map((p: any,n) => (
+              intermediaries.map((p: IntermediaryData,n) => (
                 <IntermediaryCard
                   key={n}
-                  id={p._id} 
+                  id={p.id} 
                   name={p.name} 
-                  logo={p.logo} 
                   onSelectIntermediary={selectIntermediary}/>
               ))}
               <IonList className="ion-padding">
@@ -217,16 +214,18 @@ export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) 
 
           </SwiperSlide>
 
+
+
           <SwiperSlide>
           <IonList className="ion-padding">
-            <div className="barcode-header">
-              <p>Deposito de: {tipoEvento} </p>
-              <p>Nombre: {nombreCliente}</p>
-              <p>Corresponsal: {tipoIntermediario}</p>
-            </div>
+            <IonItem>{nombreCliente}</IonItem>
+            <IonItem><IonLabel>Deposito de: {tipoEvento}</IonLabel></IonItem>
+            <IonItem><IonLabel>Donde pagar: {tipoIntermediario}</IonLabel></IonItem>
+            <IonItemDivider><IonLabel>Referencia:</IonLabel></IonItemDivider>
+            <IonItem><h3>{codigoReferenciado}</h3></IonItem>
             <div className="barcode-container">
               <svg id="code128" className="barcode-element" ></svg>
-            </div>  
+            </div>
               <div className="barcode-associate">
               {
                 associates.map( (x:any,n)=>(
@@ -236,10 +235,11 @@ export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) 
               }
               </div>
               <p></p>
-                <IonButton color='primary' expand="block">Finalizar</IonButton> <p></p>
                 <IonButton color='success' expand="block">Compartir</IonButton>
             </IonList>
           </SwiperSlide>
+
+
         </Swiper>
       </IonContent>
     </IonPage>

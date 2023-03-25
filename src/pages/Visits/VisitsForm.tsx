@@ -6,10 +6,11 @@ import { StarRank } from "../../components/StarRank";
 import { useCameraTaker } from "../../hooks/useCameraTaker";
 import { Geolocation } from "@capacitor/geolocation";
 import { AppContext } from "../../store/store";
-import { MemberInArrears } from "../../reducer/MembersInArrears";
+import { MemberInArrears } from "../../reducer/MembersInArrearsReducer";
 import { locationOutline } from 'ionicons/icons';
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import { Browser } from "@capacitor/browser";
+import { QuizElement } from "../../reducer/QuizReducer";
 
 export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, visitData})=>{
 
@@ -18,9 +19,7 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
         const itemPosition = pics.length - 1;
         const newData = pics.map( (i:any,n)=>( itemPosition == n  ? { base64str: i.base64str,title: e.target.value } : i ) );
         setPics([...newData]);
-        
     }
-
 
     const [ asisstStars, setAssistStars ]=  useState<boolean[]>([false, false, false,false, false])
     const [ harmonyStars, setHarmonyStars ]=  useState<boolean[]>([false, false, false,false, false])
@@ -28,13 +27,16 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
  
     const [completePayment, setCompletePayment] = useState<boolean>(false);
     const [internalArrears, setInternalArreas] = useState<boolean>(false);
+
+    const [visitQuiz, setVisitQuiz] = useState<boolean>(false);
+    
     
     const [lat, setLat] = useState(0);
     const [lng, setLng] = useState(0);
     const [present] = useIonActionSheet();
     const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
     
-    const { membersInArrears, dispatchMembersInArrears } = useContext(AppContext)
+    const { membersInArrears, dispatchMembersInArrears, visitQuizChecklist, dispatchVisitQuizChecklist } = useContext(AppContext)
 
     function onSend(){
         const data = {
@@ -45,10 +47,13 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
             internalArrears,
             visits_pics: pics,
             membersInArrears,
+            visitQuizChecklist,
+            visitQuiz,
             coordinates: [lat,lng]
         }
         onSubmit(data);
     }
+
 
     async function onItemArrearsChange(e:any) {
         const idx = e.target.id.split("-")[1]
@@ -68,6 +73,27 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
         dispatchMembersInArrears( { type: "UPDATE_MEMBER_INARREARS_AMT",...updateMbm   })
 
     }
+
+    async function onVisitCheckChange(e:any) {
+        const idx = parseInt(e.target.id.split("-")[1])
+        const updateCheck = {
+            idx,
+            done: e.target.checked
+        }
+        dispatchVisitQuizChecklist( { type: "UPDATE_QUIZ_CHECK",...updateCheck   })
+        
+    }
+
+    async function onInputNoteChange (e:any) {
+        const idx = parseInt(e.target.id.split('-')[1]);
+        const updateNote = {
+            idx,
+            note: e.target.value
+        }
+        dispatchVisitQuizChecklist({ type: 'UPDATE_QUIZ_NOTE',...updateNote})
+    }
+
+
     useEffect(() => {
         async function loadCoordinates() {
           const coordsData = await Geolocation.getCurrentPosition();
@@ -79,8 +105,6 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
 
       }, []);
 
-      
-
       useEffect( ()=>{
 
         /// If we are in edit mode
@@ -91,8 +115,12 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
             setPics( visitData.visits_pics);
             setCompletePayment(visitData.completePayment);
             setInternalArreas(visitData.internalArrears);
+            setVisitQuiz(visitData.visitQuiz);
             if(visitData.internalArrears){
                 dispatchMembersInArrears( { type: "POPULATE_MEMBERS_INARREARS",data: visitData.membersInArrears});
+            }
+            if( visitData.visitQuiz){
+                dispatchVisitQuizChecklist({type: "POPULATE_QUIZ", data: visitData.visitQuizChecklist })
             }
         }
       },[visitData])
@@ -178,17 +206,38 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
                 <IonLabel>Mora interna</IonLabel>
                 <IonCheckbox slot='start' checked={internalArrears} onIonChange={async (e) =>setInternalArreas(e.detail.checked)} />
             </IonItem>
+            <IonItem>
+                <IonLabel>Mi Espacio Mujer</IonLabel>
+                <IonCheckbox slot='start' checked={visitQuiz} onIonChange={async (e) =>setVisitQuiz(e.detail.checked)} />
+            </IonItem>
+
             { internalArrears &&
             <>
                 <IonItemDivider><IonLabel>Integrantes</IonLabel></IonItemDivider>
                 {membersInArrears.map( (mb:MemberInArrears)=>(
                     <IonItem key={mb._id}>
-                        <IonCheckbox slot="start" value={mb.is_in_arrears} onIonChange={onItemArrearsChange} id={`arrearsmemb-${mb._id}`}></IonCheckbox>
+                        <IonCheckbox slot="start" checked={mb.is_in_arrears} onIonChange={onItemArrearsChange} id={`arrearsmemb-${mb._id}`}></IonCheckbox>
                         <IonLabel>{mb.fullname}</IonLabel>
                         <IonInput type='text' placeholder="importe adeudo" value={mb.arrears_amount} id={`arrearsamtinput-${mb._id}`} onIonBlur={onInputAmountChange}></IonInput>
                     </IonItem>
                 ))}
             </>}
+            { visitQuiz &&
+            <>
+                <IonItemDivider><IonLabel>Acciones Realizas</IonLabel></IonItemDivider>
+                { visitQuizChecklist.map( (ac:QuizElement) =>(
+                    <IonItem key={ac.id}>
+                        <IonCheckbox slot="start" checked={ac.done} onIonChange={onVisitCheckChange} id={`certificationactioncheck-${ac.id}`}></IonCheckbox>
+                        <IonLabel>{ac.title}</IonLabel>
+                        <IonInput type='text' placeholder="...describa" value={ac.note} id={`certificationactionnote-${ac.id}`} onIonBlur={onInputNoteChange}></IonInput>
+                    </IonItem>
+                ))
+
+                }
+                
+            </>
+            }
+
 
             <p></p>
             { !visitData && <IonButton color='success' disabled={!pics.length} onClick={onSend}>Guardar Visita</IonButton>}

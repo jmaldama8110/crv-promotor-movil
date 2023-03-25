@@ -101,6 +101,7 @@ export function useDBSync () {
                 lastname: "",
                 user: "",
                 branch: [0,""],
+                officer_rank:  [0,""],
                 current_token: "",
                 token_expiration: ""
               });

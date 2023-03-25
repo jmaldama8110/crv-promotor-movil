@@ -10,7 +10,8 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../db";
-import { MemberInArrears } from "../../reducer/MembersInArrears";
+import { MemberInArrears } from "../../reducer/MembersInArrearsReducer";
+import { QuizElement } from "../../reducer/QuizReducer";
 import { AppContext } from "../../store/store";
 import { VisitsForm } from "./VisitsForm";
 
@@ -25,6 +26,7 @@ export const VisitsEdit: React.FC<RouteComponentProps> = ({ match, history }) =>
     completePayment: boolean;
     internalArrears: boolean;
     membersInArrears: MemberInArrears[];
+    visitQuizChecklist: QuizElement[];
     visits_pics: any[];
     contract_id: string;
     coordinates: [number, number];
@@ -38,6 +40,7 @@ export const VisitsEdit: React.FC<RouteComponentProps> = ({ match, history }) =>
     completePayment: false,
     internalArrears: false,
     membersInArrears: [],
+    visitQuizChecklist: [],
     visits_pics: [],
     contract_id: "",
     coordinates: [0, 0],
@@ -52,7 +55,6 @@ export const VisitsEdit: React.FC<RouteComponentProps> = ({ match, history }) =>
     try {
       const visitId = match.url.split("/")[5];
       const visitItem:any = await db.get(visitId);
-      
       setVisit(visitItem);
    } catch (e) {
       alert("No fue posible ver la visita");

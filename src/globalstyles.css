@@ -8,6 +8,11 @@
 .margin-auto {
     margin: auto;
 }
+.margin-left-md {  margin-left: 2rem; }
+.margin-right-md {  margin-right: 2rem; }
+.margin-left-lg {  margin-left: 3rem; }
+.margin-right-lg {  margin-right: 3rem; }
+
 .margin-bottom-sm {
     margin-bottom: 1rem ;
 }
@@ -31,3 +36,25 @@
     
     text-align: center;
 }
+
+/* For Loguin.tsx **/
+.image-container {
+    padding: 1rem;
+}
+.shadow {
+    box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1), 0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+}
+
+.image-container ion-img{
+    width: 40%;
+    margin: auto;
+}
+
+.image-container p {
+    color: #676767;
+    text-align: center;
+    font-size: small;
+    max-width: 300px;
+    margin:auto;
+}
+/* */

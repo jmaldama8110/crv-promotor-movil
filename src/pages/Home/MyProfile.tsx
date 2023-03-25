@@ -11,6 +11,9 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonFooter,
+  IonItem,
+  IonLabel,
+  IonImg,
 } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
@@ -18,6 +21,10 @@ import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
 import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
 import { App, AppInfo } from '@capacitor/app';
+
+import officerRankN1 from '../../assets/officer_rank_n1.png';
+import officerRankN2 from '../../assets/officer_rank_n2.png';
+import officerRankN3 from '../../assets/officer_rank_n3.png';
 
 export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
@@ -49,6 +56,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
         lastname: "",
         user: "",
         branch: [0,""],
+        officer_rank: [0,""],
         current_token: "",
         token_expiration: ""
       });
@@ -94,11 +102,22 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
         }
         {session.user &&
           <IonList className="ion-padding">
-          <p>Nombre: {session.name} {session.lastname}</p>
-          <p>Usuario: {session.user}</p>
-          <p>Expira el: {session.token_expiration}</p>
-          <p>Centro de Costo: { !!session.branch ? session.branch[1]: '<No  />'}</p>
-          
+            <IonItem> <IonLabel>Hola! {session.name} </IonLabel> </IonItem>
+            <IonItem><IonLabel>Usuario: {session.user}</IonLabel></IonItem>
+            <IonItem><IonLabel>Sesion Expira: {session.token_expiration}</IonLabel>
+            </IonItem>
+            <IonItem>
+              <IonLabel>Sucursal: { !!session.branch ? session.branch[1]: 'No'}</IonLabel>
+            </IonItem>
+          <p></p>
+          <div className="image-container">
+            { session.officer_rank[0] == 4 && <IonImg src={officerRankN1} alt='Certification social Nivel 1'></IonImg>}
+            { session.officer_rank[0] == 5 && <IonImg src={officerRankN2} alt='Certification social Nivel 2'></IonImg>}
+            { session.officer_rank[0] == 6 && <IonImg src={officerRankN3} alt='Certification social Nivel 3'></IonImg>}
+            { (session.officer_rank[0] ==4 ||
+              session.officer_rank[0] == 5 ||
+              session.officer_rank[0] == 6) && <p>Felicidades! has alcando el nivel de certificacion </p>}
+          </div>
           <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
 
         </IonList>}

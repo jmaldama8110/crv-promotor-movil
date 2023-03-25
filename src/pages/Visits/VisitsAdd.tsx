@@ -3,21 +3,21 @@ import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
-import { MemberInArrears } from "../../reducer/MembersInArrears";
+import { MemberInArrears } from "../../reducer/MembersInArrearsReducer";
 
 import { AppContext } from "../../store/store";
 import { VisitsForm } from "./VisitsForm";
 
 export const VisitsAdd: React.FC<RouteComponentProps> = ({ history, match})=>{
 
-  const { dispatchSession, dispatchMembersInArrears, session }  = useContext(AppContext);
+  const { dispatchSession, dispatchMembersInArrears, dispatchVisitQuizChecklist, session }  = useContext(AppContext);
   const { couchDBSyncUpload} = useDBSync();
 
     const onSubmit = async (data:any) =>{
       const contractId = match.url.split("/")[2];
       dispatchSession({ type: "SET_LOADING", loading_msg: "Guardando...", loading: true});
       try{
-        console.log(data);
+        
         await db.put({
           ...data,
           _id: Date.now().toString(),
@@ -57,10 +57,19 @@ export const VisitsAdd: React.FC<RouteComponentProps> = ({ history, match})=>{
                   arrears_amount: "",
                   is_in_arrears: false,
                 }))
-                dispatchMembersInArrears({type:"POPULATE_MEMBERS_INARREARS", data:membersInArrears})
+                dispatchMembersInArrears({type:"POPULATE_MEMBERS_INARREARS", data:membersInArrears});
+                
             }
-            
           }
+          
+          dispatchVisitQuizChecklist({ type: 'POPULATE_QUIZ', data: [
+            { id: 1001, title: 'Metodologico', note:'', done: false },
+            { id: 2001, title: 'Finanzas', note:'', done: false },
+            { id: 3001, title: 'Medio Ambiente', note:'', done: false },
+            { id: 4001, title: 'Salud', note:'', done: false },
+            { id: 5001, title: 'Reconocimiento / Fidelizacion', note:'', done: false },
+            { id: 6001, title: 'Otros: especificar...', note:'', done: false },
+          ]})
         }
         catch(e){
           console.log(e);
@@ -71,7 +80,8 @@ export const VisitsAdd: React.FC<RouteComponentProps> = ({ history, match})=>{
       LoadContract();
 
       return  ()=>{
-        dispatchMembersInArrears({ type: "POPULATE_MEMBERS_INARREARS", data: []})
+        dispatchMembersInArrears({ type: "POPULATE_MEMBERS_INARREARS", data: []});
+        dispatchVisitQuizChecklist({ type: "POPULATE_QUIZ",data: []});
       }
     },[])
 

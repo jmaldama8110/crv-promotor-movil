@@ -4,17 +4,17 @@ import {
   IonLabel,
   IonButton,
   IonItem,
-  useIonLoading,
+  IonImg,
 } from "@ionic/react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { Preferences } from "@capacitor/preferences";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
 import jwt_decode from "jwt-decode";
-import PdfUrlViewer from "../../components/PdfViewer/PdfUrlViewer";
-export const LOGIN_KEY_PREFERENCES = 'promotor-movil-preferences';
+import logoOfficerCertification from '../../assets/officer_certification_logo.png';
 
+export const LOGIN_KEY_PREFERENCES = 'promotor-movil-preferences';
 
 /// UserSession and UserInfo combine API format response when login
 interface UserInfo {
@@ -23,6 +23,7 @@ interface UserInfo {
   second_lastname: string;
   email: string;  
   branch: [number, string];
+  officer_rank: [number, string];
   token: string;
 }
 
@@ -46,8 +47,6 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
       const decoded:any = jwt_decode(usrInfo.token);
       const localDate = new Date(decoded.sync_info.sync_expiration);
 
-      
-  
       setTimeout( async () => {
         await Preferences.set({
           key: LOGIN_KEY_PREFERENCES,
@@ -61,6 +60,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
           user: usrInfo.email,
           branch: usrInfo.branch,
           current_token: usrInfo.token,
+          officer_rank: usrInfo.officer_rank,
           token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
         });
   
@@ -89,6 +89,7 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
             lastname: userLocalStorage.lastname,
             user: userLocalStorage.email,
             branch: userLocalStorage.branch,
+            officer_rank: userLocalStorage.officer_rank,
             current_token: userLocalStorage.token,
             token_expiration: `${localDate.toLocaleDateString() },${localDate.toLocaleTimeString()}`
           });
@@ -102,6 +103,11 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
         <IonList className="ion-padding">
+          <div className="image-container shadow margin-left-md margin-right-md">
+            <IonImg src={logoOfficerCertification} alt='Certification social'></IonImg>
+            <p>Reconocimiento a promotores por aplicar responsablemente acciones que fortalecen el microcrédito </p>
+          </div>
+          <p></p>
           <IonItem>
             <IonLabel position="floating">Usuario</IonLabel>
             <IonInput type="text" value={user} onIonChange={(e:any) => setUser(e.detail.value)}></IonInput>
