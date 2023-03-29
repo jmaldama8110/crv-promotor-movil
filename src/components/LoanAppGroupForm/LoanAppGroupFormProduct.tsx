@@ -11,9 +11,8 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
   const [currSegment, setSegment] = useState<string>("1");
   const [productList, setProductList] = useState<any[]>([]);
 
-    
   const [minAmout, setMinAmount] = useState(1000);
-  const [maxAmount, setMaxAmount] = useState(100000);
+  const [maxAmount, setMaxAmount] = useState(1000000);
   const [stepAmount, setStepAmount] = useState(10000);
 
   const [minTerm, setMinTerm] = useState<number>(1);
@@ -40,7 +39,6 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
             },
           }).then((data: any) => {
             const productForGroups = data.docs.filter((i: any) => (i.external_id === 1 || i.external_id === 3))
-            
             setProductList(productForGroups);
           });
         });
@@ -83,8 +81,10 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
   function updateParams ( ) {
     const selectedProduct:any = productList.find( (i:any) => i.external_id == currSegment )
     if( selectedProduct ){
+      const maxAmount = loanAppGroup.members.length > 0 ? loanAppGroup.members.length * selectedProduct.max_amount : selectedProduct.max_amount;
+
       setMinAmount(selectedProduct.min_amount);
-      setMaxAmount(selectedProduct.max_amount);
+      setMaxAmount(maxAmount);
       setStepAmount(selectedProduct.step_amount);
 
       setMinTerm(selectedProduct.min_term);

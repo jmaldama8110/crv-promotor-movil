@@ -39,11 +39,9 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
           // dropout: dropoutMembers,
           updated_at: Date.now()
         }).then( async function(){
-          await createAction( "CREATE_UPDATE_LOAN", { id_loan: itemId}, session.user )
+          await createAction( "CREATE_UPDATE_LOAN", { id_loan: itemId, hasDropouts: !!dropoutMembers.length }, session.user );
           await couchDBSyncUpload();
-
           //// actions for dropout members
-
 
            dispatchSession( { type: "SET_LOADING", loading_msg: '',loading: false});
           props.history.goBack();

@@ -36,7 +36,6 @@ export function useCameraTaker() {
     });
   
     const base64Data = await base64FromPath(photo.webPath!);
-    
     const itemImage:GeneralPhoto = { base64str: base64Data, title:'' }
     
     const newPhotos = [...pics, itemImage];

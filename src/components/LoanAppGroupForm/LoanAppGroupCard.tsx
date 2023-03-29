@@ -50,16 +50,12 @@ export const LoanAppGroupCard: React.FC<RouteComponentProps> = ({ match }) => {
 
   }, []);
 
-  function getStatus(status: number) {
+  function getStatus(status: string) {
     switch (status) {
-      case 1:
+      case "PRESTAMO ACTIVO":
+        return "ligth";
+      case "NUEVO TRAMITE":
         return "medium";
-      case 2:
-        return "warning";
-      case 3:
-        return "secondary";
-      case 4:
-        return "success";
       default:
         return "ligth";
     }
@@ -71,13 +67,14 @@ export const LoanAppGroupCard: React.FC<RouteComponentProps> = ({ match }) => {
       {loans.map((i: LoanAppGroup, n) => (
         <IonCard
           button={true}
-          color={getStatus(i.status[0])}
+          color={getStatus(i.sub_estatus)}
+          
           routerLink={`loanapps/edit/${i._id}`}
           key={n}
         >
           <IonCardHeader>
             <h1>{i.product.product_name}</h1>
-            <IonCardSubtitle>{i.status[1]}</IonCardSubtitle>
+            <IonCardSubtitle>{i.sub_estatus}</IonCardSubtitle>
           </IonCardHeader>
           <IonCardContent>
             {formatLocalCurrency(i.apply_amount)} / {i.term} {i.frequency[1]}

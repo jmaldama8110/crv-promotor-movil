@@ -23,7 +23,8 @@ export type ActionsLoanAppGroup =
       loan_cycle: string;
       created_by: string; 
       created_at: string;
-      status: [number, string];
+      estatus: string;
+      sub_estatus: string;
       members: GroupMember [];
       dropout: DroupOutType[];
       product: {
@@ -73,7 +74,8 @@ export interface LoanAppGroup{
     loan_cycle: string;
     created_by: string; 
     created_at: string;
-    status: [number, string];
+    estatus: string;
+    sub_estatus: string;
     members: GroupMember [];
     dropout: DroupOutType[],
     product: {
@@ -114,7 +116,8 @@ export const loanAppGroupDef: LoanAppGroup = {
   loan_cycle: "",
   created_by: "", 
   created_at: "",
-  status: [0, ""],
+  estatus: "",
+  sub_estatus: "",
   members: [],
   dropout: [],
   product: {
@@ -159,7 +162,8 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
        loan_cycle: action.loan_cycle,
        created_by: action.created_by, 
        created_at: action.created_at,
-       status: action.status,
+       estatus: action.estatus,
+       sub_estatus: action.sub_estatus,
        members: action.members,
        dropout: action.dropout,
        product: {

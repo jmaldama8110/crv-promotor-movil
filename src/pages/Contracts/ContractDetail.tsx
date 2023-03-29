@@ -26,6 +26,7 @@ export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
     const [fechaLimitePago, setFechaLimitePago ] = useState('');
     const [fechaUltPago, setFechaUltPago ] = useState('');
     const [currSegment, setSegment] = useState<string>("resumen");
+    const expiredPaymentNo = useRef<any>(0);
 
     const url = useRef<string>('');
     const [showPdf, setShowPdf] = useState(false);
@@ -54,7 +55,7 @@ export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
             const expired = new Date(i.fecha_vencimiento);
             return expired < hoy;
           }).sort(evaluarOrdenNoPago);
-  
+          
           // recorre todo el arreglo para calcular todo lo que ya se vencio para pago
           let totalVencido = 0,
               totalPagado = parseFloat(loanSummary.capital_pagado + 
@@ -70,6 +71,20 @@ export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
           const totalpending = totalVencido > totalPagado ? totalVencido - totalPagado: 0;
           setFechaUltPago(fUltimoPago);
           ////////////////////////////////////////////////////////
+
+          //// Evalua el Plan para obtener las fechas vencidas ////
+          const pPlan = apiRes.data[3];
+          const expiredDates = pPlan.filter( (x:any) => {
+            const fromDate = new Date(x.fecha_vencimiento);
+            const now = new Date();
+            return (fromDate.getTime() < now.getTime() )
+          });
+          if( expiredDates )
+            expiredPaymentNo.current = expiredDates.length
+          ///////////////////////////////////
+          
+
+
           setTotalPendiente(formatLocalCurrency(totalpending))
           setCuotasInfo(dataCuotas);
           setSaldoActual(formatLocalCurrency(parseFloat(loanSummary.saldo_capital_actual)));
@@ -129,7 +144,7 @@ export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
       
     try{
         present( {message: 'Cargando Estado de Cuenta...'});
-        // const apiRes = await api.get(`/contract?contractId=${contractId}&dateFrom=2000-01-01&dateEnd=${now.toISOString()}`);
+
         const apiRes = await api.get(`/docs/pdf/account-statement`);
         url.current = apiRes.data
         setShowPdf(true);
@@ -187,10 +202,11 @@ export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
                 <IonCardHeader>
                   <IonCardSubtitle>Pago Pendiente:</IonCardSubtitle>
                   <IonCardTitle color={statusColor}>{totalPendiente}</IonCardTitle>
-                  <IonCardSubtitle>Saldo del Credito:</IonCardSubtitle>
-                  <IonCardTitle>{saldoActual}</IonCardTitle>
+                  <IonCardSubtitle>Semana / Periodo:</IonCardSubtitle>
+                  <IonCardTitle>{expiredPaymentNo.current} de {plazo} {periodicidad}</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
+                  <p>Saldo Capital: {saldoActual}</p>
                   <p>Estatus: {status}</p>
                   <p>Fecha Limite: {fechaLimitePago}</p>
                   <p>Plazo: {plazo} {periodicidad}</p>

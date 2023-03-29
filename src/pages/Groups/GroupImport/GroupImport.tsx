@@ -33,14 +33,14 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
     return colony;
   }
 
-  async function loanAppNewExist(IdClienteGroup: number){
+  async function loanAppExist(IdLoanApp: number){
      try{
       
         await db.createIndex( {index: { fields: ["couchdb_type"]}});
         const data = await db.find({selector: {
           couchdb_type: 'LOANAPP_GROUP'
         }})
-         const loan = data.docs.find((i:any) => i.id_cliente == IdClienteGroup  )
+         const loan = data.docs.find((i:any) => i.id_solicitud == IdLoanApp  )
         return !!loan;
      }
      catch(e){
@@ -87,10 +87,28 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
             status: [2, "Activo"],
           })
         }
-                //// crear la solicitud? solamente si 
-        // selecciona PRESTAMO ACTIVO (se omite NUEVO TRAMITE)
-        const loanExist = await loanAppNewExist( data.group_data.id_cliente);
-        if( !loanExist && data.createNewLoanApp ){
+        /// valida si esta solicitud, ya existe localmente
+        const loanExist = await loanAppExist( data.loan_app.id_solicitud);
+        if( !loanExist){
+          const newLoanAppIdGrp = Date.now().toString()
+          const newLoaApp: LoanAppGroup = {
+            ...data.loan_app,
+            members: data.membersHf,
+            _id: newLoanAppIdGrp,
+            dropout: [],
+            apply_by: newGroupId,
+            renovation: false,
+            apply_at: new Date().toISOString(),
+            created_by: session.user,
+            created_at: new Date().toISOString(),
+            branch: session.branch,
+            couchdb_type: "LOANAPP_GROUP",
+          };
+          await db.put(newLoaApp);
+          // await createAction( "CREATE_UPDATE_LOAN" , { id_loan: newLoanAppIdGrp },session.user )
+        }
+        ////
+        if( data.createNewLoanApp ){
           const newLoanAppIdGrp = Date.now().toString()
           const newLoaApp: LoanAppGroup = {
             ...data.loan_app,
