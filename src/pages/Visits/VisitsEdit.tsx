@@ -55,6 +55,7 @@ export const VisitsEdit: React.FC<RouteComponentProps> = ({ match, history }) =>
     try {
       const visitId = match.url.split("/")[5];
       const visitItem:any = await db.get(visitId);
+      
       setVisit(visitItem);
    } catch (e) {
       alert("No fue posible ver la visita");

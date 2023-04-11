@@ -1,7 +1,8 @@
 import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonContent, IonTitle } from "@ionic/react";
 import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
-import { db } from "../../db";
+import { db, dbX } from "../../db";
+import { GeneralPhoto } from "../../hooks/useCameraTaker";
 import { useDBSync } from "../../hooks/useDBSync";
 import { MemberInArrears } from "../../reducer/MembersInArrearsReducer";
 
@@ -21,11 +22,16 @@ export const VisitsAdd: React.FC<RouteComponentProps> = ({ history, match})=>{
         await db.put({
           ...data,
           _id: Date.now().toString(),
+          visits_pics: data.visits_pics.
+                        map( (i:GeneralPhoto) => ({ _id: i._id , title: i.title })), /// saves skiping  base64str
           couchdb_type: "VISIT",
           contract_id: contractId,
           created_by: session.user,
           created_at: (new Date().toISOString()),
-        })
+        });
+        /// saves photos in a separeted DB
+        // saves full array of pics
+        await dbX.bulkDocs(data.visits_pics); 
 
         await couchDBSyncUpload();
         dispatchSession({ type: "SET_LOADING", loading_msg: "", loading: false});

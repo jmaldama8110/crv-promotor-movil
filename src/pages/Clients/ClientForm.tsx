@@ -9,7 +9,7 @@ import { ClientFormBusinessData } from "../../components/ClientForm/ClientFormBu
 import { ClientFormSummary } from "../../components/ClientForm/ClientFormSummary";
 import { AppContext } from "../../store/store";
 import { Geolocation } from "@capacitor/geolocation";
-import { ClientFormIdentity } from "../../components/ClientForm/ClientFormIdentiy";
+import { ClientFormIdentity } from "../../components/ClientForm/ClientFormIdentity";
 import { ClientFormComprobanteDomicilio } from "../../components/ClientForm/ClientFormComprobanteDomicilio";
 
 

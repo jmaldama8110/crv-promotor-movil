@@ -1,7 +1,8 @@
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonLoading } from "@ionic/react";
 import { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
-import { db } from "../../../db";
+import { db, dbX } from "../../../db";
+import { GeneralPhoto } from "../../../hooks/useCameraTaker";
 import { useDBSync } from "../../../hooks/useDBSync";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { GuaranteesFormProp } from "./GuaranteesFormProp";
@@ -27,8 +28,13 @@ export const GuaranteesEditProp:React.FC<RouteComponentProps> = ( props )=>{
             return db.put({
               ...guarantee,
               ...data,
+              property: {
+                ...data.property,
+                photos: data.property.photos.map( (i:GeneralPhoto) => ({ _id: i._id , title: i.title })), /// saves skiping  base64str
+              },
               updated_at: Date.now()
             }).then( async ()=>{
+                await dbX.bulkDocs(data.property.photos);
                 await couchDBSyncUpload();
                 props.history.goBack();
 

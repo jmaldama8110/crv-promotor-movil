@@ -9,7 +9,8 @@ import {
   } from "@ionic/react";
 import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
-import { db } from "../../db";
+import { db, dbX } from "../../db";
+import { GeneralPhoto } from "../../hooks/useCameraTaker";
 import { useDBSync } from "../../hooks/useDBSync";
 import { createAction } from "../../model/Actions";
 import { ClientData } from "../../reducer/ClientDataReducer";
@@ -56,8 +57,12 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
     db.get(itemId).then( async (clientDbData:any) => {
       return db.put({
         ...clientDbData,
-        ...data
+        ...data,
+        comprobante_domicilio_pics: data.comprobante_domicilio_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
+        identity_pics: data.identity_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
       }).then( async ()=>{
+        await dbX.bulkDocs(data.identity_pics);
+        await dbX.bulkDocs(data.comprobante_domicilio_pics);
         await createAction("CREATE_UPDATE_CLIENT", { _id: itemId }, session.user);
         await couchDBSyncUpload();
         dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});

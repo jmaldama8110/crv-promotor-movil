@@ -1,6 +1,6 @@
 import { useIonToast } from "@ionic/react";
 import { useContext } from "react";
-import { db, remoteDB } from "../db";
+import { db, dbX, remoteDB, remoteDbX } from "../db";
 import { AppContext } from "../store/store";
 import jwt_decode from "jwt-decode";
 import { Preferences } from "@capacitor/preferences";
@@ -21,13 +21,15 @@ export function useDBSync () {
     try{
         dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Subiendo datos..."});
         db.replicate.to(remoteDB).on('complete', function () {
-          console.log('Local => RemoteDB, Ok!')
-          showToast("Sincronizacion OK! (local -> Remoto)",1500);
-    
         }).on('error', function (err) {
           console.log(err);
+        });
+        dbX.replicate.to(remoteDbX).on('complete', function() {
+          showToast("Sincronizacion OK! (local -> Remoto)",1500);
+        }).on('error', function (err) {
           showToast("Ok, se guardo el registro!, pero sin conexion!",1500);
         });
+        
       }
     
       catch(error){

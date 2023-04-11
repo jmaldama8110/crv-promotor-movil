@@ -3,7 +3,7 @@ import { camera, trashOutline } from "ionicons/icons";
 import { useContext, useEffect, useState } from "react";
 
 import { StarRank } from "../../components/StarRank";
-import { useCameraTaker } from "../../hooks/useCameraTaker";
+import { GeneralPhoto, useCameraTaker } from "../../hooks/useCameraTaker";
 import { Geolocation } from "@capacitor/geolocation";
 import { AppContext } from "../../store/store";
 import { MemberInArrears } from "../../reducer/MembersInArrearsReducer";
@@ -15,9 +15,10 @@ import { QuizElement } from "../../reducer/QuizReducer";
 export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, visitData})=>{
 
     const { takePhoto, pics, setPics } = useCameraTaker();
+
     const onPhotoTitleUpdate = (e:any) =>{
         const itemPosition = pics.length - 1;
-        const newData = pics.map( (i:any,n)=>( itemPosition == n  ? { base64str: i.base64str,title: e.target.value } : i ) );
+        const newData = pics.map( (i:GeneralPhoto,n)=>( itemPosition == n  ? { base64str: i.base64str,title: e.target.value,mimetype: i.mimetype, _id: i._id } : i ) );
         setPics([...newData]);
     }
 
@@ -38,7 +39,7 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
     
     const { membersInArrears, dispatchMembersInArrears, visitQuizChecklist, dispatchVisitQuizChecklist } = useContext(AppContext)
 
-    function onSend(){
+    async function onSend(){
         const data = {
             asisstStars,
             harmonyStars,
@@ -92,8 +93,6 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
         }
         dispatchVisitQuizChecklist({ type: 'UPDATE_QUIZ_NOTE',...updateNote})
     }
-
-
     useEffect(() => {
         async function loadCoordinates() {
           const coordsData = await Geolocation.getCurrentPosition();
@@ -101,8 +100,6 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
           setLng(coordsData.coords.longitude);
         }
         loadCoordinates();
-        
-
       }, []);
 
       useEffect( ()=>{
@@ -177,7 +174,8 @@ export const VisitsForm: React.FC<{onSubmit:any, visitData?:any}> = ({onSubmit, 
                     {
                     pics.map((photo, index) => (
                     <IonCol size="6" key={index}>
-                        <IonImg src={`data:image/jpeg;base64,${photo.base64str}`} ></IonImg>
+                        {! photo.base64str &&<IonImg src={`${process.env.REACT_APP_BASE_URL_API}/docs/img?id=${photo._id}`}></IonImg>}
+                        {!!photo.base64str && <IonImg src={`data:image/jpeg;base64,${photo.base64str}`}></IonImg>}
                         {   /// si ya tiene un titulo, lo muestra, de otro modo, muestra el Input
                             photo.title ? <IonLabel>{photo.title}</IonLabel>
                             : <IonInput onIonBlur={onPhotoTitleUpdate} placeholder="Ingresa una descripcion" className="fuente-sm"></IonInput>

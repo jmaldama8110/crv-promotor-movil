@@ -5,8 +5,9 @@ import api from "../../../api/api";
 import { AppContext } from "../../../store/store";
 import { GuaranteesFormEq } from "./GuaranteesFormEq";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
-import { db } from "../../../db";
+import { db, dbX } from "../../../db";
 import { useDBSync } from "../../../hooks/useDBSync";
+import { GeneralPhoto } from "../../../hooks/useCameraTaker";
 
 export const GuaranteesEditEq:React.FC<RouteComponentProps> = ( props )=>{
 
@@ -29,8 +30,13 @@ export const GuaranteesEditEq:React.FC<RouteComponentProps> = ( props )=>{
             return db.put({
               ...guarantee,
               ...data,
+              equipment: {
+                ...data.equipment,
+                photos: data.equipment.photos.map( (i:GeneralPhoto) => ({ _id: i._id , title: i.title })), /// saves skiping  base64str
+              },
               updated_at: Date.now()
             }).then(async  ()=>{
+                await dbX.bulkDocs(data.equipment.photos);
                 await couchDBSyncUpload();
                 props.history.goBack();
             })

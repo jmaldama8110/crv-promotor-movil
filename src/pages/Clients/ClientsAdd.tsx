@@ -1,7 +1,8 @@
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonAlert, useIonToast } from "@ionic/react";
 import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
-import { db } from "../../db";
+import { db, dbX } from "../../db";
+import { GeneralPhoto } from "../../hooks/useCameraTaker";
 import { useDBSync } from "../../hooks/useDBSync";
 import { createAction } from "../../model/Actions";
 import { AppContext } from "../../store/store";
@@ -30,11 +31,15 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
               db.put({
                 ...data,
                 _id: clientIdNew,
+                comprobante_domicilio_pics: data.comprobante_domicilio_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
+                identity_pics: data.identity_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
                 client_type:[2,'INDIVIDUAL'],
                 loan_cycle: 0,
                 status: [1,'Pendiente'],
                 branch: session.branch,
               }).then( async (doc)=>{
+                  await dbX.bulkDocs(data.identity_pics);
+                  await dbX.bulkDocs(data.comprobante_domicilio_pics);
                   // creates the new action when new client is added
                   await createAction( "CREATE_UPDATE_CLIENT" , { _id: clientIdNew },session.user )
                   await couchDBSyncUpload();

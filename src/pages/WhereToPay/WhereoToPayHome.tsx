@@ -4,7 +4,7 @@ import {
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 import 'swiper/css';
 import  JsBarcode from 'jsbarcode';
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
 
@@ -12,6 +12,7 @@ import { RouteComponentProps } from "react-router";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../../components/SliderButtons";
 import { db } from "../../db";
+import { Browser } from "@capacitor/browser";
 
 interface IntermediaryData {
     id: string;
@@ -79,62 +80,94 @@ export const WhereToPayHome: React.FC<RouteComponentProps> = ({match, history}) 
         associates: []
     }))
     setIntermediaries(apiData);
-    
-    const clientId = match.url.split("/")[2]
-    const contractsQuery = await db.find({ selector: { couchdb_type:"CONTRACT"}});
-    const contracts = contractsQuery.docs.filter( (i:any) => i.client_id === clientId);
-    setContractsList(contracts);
-    dismiss();
 
   }
   catch(error){
     dismiss();
     alert('No se encontraron medios donde realizar pago, solicite ayuda');
-    
   }
 }
 
-async function selectIntermediary( e:any) {
 
-  const targetId = e.target.id.replace('ioncard-intermediary-','')
+useEffect( ()=>{
+  async function loadContracts () {
+    const clientId = match.url.split("/")[2]
+    const contractsQuery = await db.find({ selector: { couchdb_type:"CONTRACT"}});
+    const contracts = contractsQuery.docs.filter( (i:any) => i.client_id === clientId);
+    setContractsList(contracts);
+  }
 
-  const selectedItem = intermediaries.find( (i:IntermediaryData)=> i.id === targetId );
-  const clientId = match.url.split("/")[2];
+ 
+  loadContracts();
+
   
-  if( selectedItem ){
-    try{ 
-      present('Cargando referencias...')
+},[]) 
+// async function selectIntermediary( e:any) {
 
-      /** retrieves client data */
-      const clientData:any = await db.get(clientId);
+//   const targetId = e.target.id.replace('ioncard-intermediary-','')
+
+//   const selectedItem = intermediaries.find( (i:IntermediaryData)=> i.id === targetId );
+//   const clientId = match.url.split("/")[2];
   
-      api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
-      // if selectedType === '2' (Pago de Garantía) or selectedType === '6' requires contractId
-      const referenceId = selectedType === '2' ? clientData.id_cliente : selectedContract;
-      const apiRes = await api.get(`/clients/createReference?typeReference=${selectedType}&id=${referenceId}&idIntermediario=${selectedItem.id}`);
+//   if( selectedItem ){
+//     try{ 
+//       present('Cargando referencias...')
 
-      setTipoEvento(apiRes.data[0].tipo_evento);
-      setNombreCliente(apiRes.data[0].nombre_cliente);
-      setTipoIntermediario(apiRes.data[0].nombre);
-      setCodigoReferenciado(apiRes.data[0].referencia);
-      if( selectedItem.contain_barcode && apiRes.data.length){
-        JsBarcode("#code128",apiRes.data[0].referencia,{ fontSize: 14 } );
-      }
+//       /** retrieves client data */
+//       const clientData:any = await db.get(clientId);
+  
+//       api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+//       // if selectedType === '2' (Pago de Garantía) or selectedType === '6' requires contractId
+//       const referenceId = selectedType === '2' ? clientData.id_cliente : selectedContract;
+//       const apiRes = await api.get(`/clients/createReference?typeReference=${selectedType}&id=${referenceId}&idIntermediario=${selectedItem.id}`);
 
-      dismiss();
-    } catch(error){
-      dismiss();
-      console.log(error);
-      alert('No fue posible procesar la peticion de referencias de pago')
-    }
+//       setTipoEvento(apiRes.data[0].tipo_evento);
+//       setNombreCliente(apiRes.data[0].nombre_cliente);
+//       setTipoIntermediario(apiRes.data[0].nombre);
+//       setCodigoReferenciado(apiRes.data[0].referencia);
+//       if( selectedItem.contain_barcode && apiRes.data.length){
+//         JsBarcode("#code128",apiRes.data[0].referencia,{ fontSize: 14 } );
+//       }
+
+//       dismiss();
+//     } catch(error){
+//       dismiss();
+//       console.log(error);
+//       alert('No fue posible procesar la peticion de referencias de pago')
+//     }
     
-    setAssociates(selectedItem.associates);
+//     setAssociates(selectedItem.associates);
      
-  }
-}
+//   }
+// }
  const onSelectTypeNext = async () =>{
-      await loadIntermediaries();
+      // await loadIntermediaries();
  }
+
+
+ async function onOpenLinkPdf() {
+  
+  try{
+    present({message: "Descargando pdf..."});
+     
+    const clientId = match.url.split("/")[2];
+    const clientData:any = await db.get(clientId);
+    
+    api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+    const apiRes = await api.get(`/docs/pdf/tarjeton-digital?typeReference=${selectedType}&contractId=${selectedContract}&clientId=${clientData.id_cliente}`);
+    
+    const url = `${process.env.REACT_APP_BASE_URL_API}/${apiRes.data.downloadPath}`;
+    await Browser.open({ url } );
+
+    dismiss();
+  }
+  catch(error){
+    console.log(error);
+    dismiss();
+    alert('Se presento un problema al intentar abrir el archivo PDF')
+  }
+
+}
   
 
   return (
@@ -151,6 +184,8 @@ async function selectIntermediary( e:any) {
 
 
         <Swiper spaceBetween={50} slidesPerView={1} allowTouchMove={false} >
+
+
           {/** Select Guarantee or Repayment */}
           <SwiperSlide>
             <IonList className="ion-margin">
@@ -171,6 +206,8 @@ async function selectIntermediary( e:any) {
               </IonRadioGroup>            
             </IonList>
           </SwiperSlide>
+
+
           {/** Only when Repayment selected, list contracts*/}
           { selectedType === '6' && // only when Credit type selected
           <SwiperSlide>
@@ -187,57 +224,22 @@ async function selectIntermediary( e:any) {
                     </IonItem> ))
                   }
                   <p></p>
-                  <ButtonSlider disabled={!selectedContract} color='success' label='Continuar' expand='block' onClick={()=>{}} slideDirection="F"/>
+                  <ButtonSlider disabled={!selectedContract} color='success' label='Siguiente' expand='block' onClick={()=>{}} slideDirection="F"/>
                   <p></p>
-                  <ButtonSlider  color='medium' label='Anterior' expand='block' onClick={()=>{}} slideDirection="B"/>
+                  <ButtonSlider  color='medium' label='Anterior' expand='full' onClick={()=>{}} slideDirection="B"/>
                 </IonRadioGroup>              
             </IonList>
           </SwiperSlide>}
 
           <SwiperSlide>
-            <IonList>
-              {
-              intermediaries.map((p: IntermediaryData,n) => (
-                <IntermediaryCard
-                  key={n}
-                  id={p.id} 
-                  name={p.name} 
-                  onSelectIntermediary={selectIntermediary}/>
-              ))}
-              <IonList className="ion-padding">
-                <p></p>
-                <ButtonSlider disabled={!selectedContract} color='success' label='Continuar' expand='block' onClick={()=>{}} slideDirection="F"/>
-                <p></p>
-                <ButtonSlider  color='medium' label='Anterior' expand='block' onClick={()=>{}} slideDirection="B"/>
-              </IonList>
-            </IonList>
-
-          </SwiperSlide>
-
-
-
-          <SwiperSlide>
-          <IonList className="ion-padding">
-            <IonItem>{nombreCliente}</IonItem>
-            <IonItem><IonLabel>Deposito de: {tipoEvento}</IonLabel></IonItem>
-            <IonItem><IonLabel>Donde pagar: {tipoIntermediario}</IonLabel></IonItem>
-            <IonItemDivider><IonLabel>Referencia:</IonLabel></IonItemDivider>
-            <IonItem><h3>{codigoReferenciado}</h3></IonItem>
-            <div className="barcode-container">
-              <svg id="code128" className="barcode-element" ></svg>
-            </div>
-              <div className="barcode-associate">
-              {
-                associates.map( (x:any,n)=>(
-                    <img key={n} src={`data:image/png;base64,${x.logo}`}>
-                    </img>                  
-                ))
-              }
-              </div>
-              <p></p>
-                <IonButton color='success' expand="block">Compartir</IonButton>
+            <IonList className="ion-padding text-center">
+                  <p></p>
+                  <IonButton color='success' expand="block" onClick={onOpenLinkPdf}>Generar Tarjeton PDF</IonButton>
+                  <p></p>
+                  <ButtonSlider  color='medium' label='Anterior' expand='block' onClick={()=>{}} slideDirection="B"/>
             </IonList>
           </SwiperSlide>
+
 
 
         </Swiper>

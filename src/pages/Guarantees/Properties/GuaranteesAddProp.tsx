@@ -9,7 +9,8 @@ import {
 } from "@ionic/react";
 import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
-import { db } from "../../../db";
+import { db, dbX } from "../../../db";
+import { GeneralPhoto } from "../../../hooks/useCameraTaker";
 import { useDBSync } from "../../../hooks/useDBSync";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { AppContext } from "../../../store/store";
@@ -29,16 +30,22 @@ export const GuaranteeAddProp: React.FC<RouteComponentProps> = (props) => {
           client_id,
           created_by: session.user,
           created_at: new Date(),
-          property: data.property
+          ...data,
+          property: {
+            ...data.property,
+            photos: data.property.photos.map( (i:GeneralPhoto) => ({ _id: i._id , title: i.title })), /// saves skiping  base64str
+          },
+          
         }
         dispatchGuaranteesList( {
           type: "ADD_GUARANTEE",
           item: guaranteeItem
         })
         db.put({
+          ...data,
             ...guaranteeItem,
-            ...data
         }).then( async ()=>{
+            await dbX.bulkDocs(data.property.photos);
             await couchDBSyncUpload();
             props.history.goBack();
         }).catch( e =>{

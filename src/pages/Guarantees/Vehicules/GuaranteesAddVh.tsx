@@ -3,10 +3,11 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, Io
 import { RouteComponentProps } from "react-router";
 import { AppContext } from "../../../store/store";
 import { GuaranteesFormVh } from "./GuaranteesFormVh";
-import { db } from "../../../db";
+import { db, dbX } from "../../../db";
 import { useContext } from "react";
 import { Guarantee } from "../../../reducer/GuaranteesReducer";
 import { useDBSync } from "../../../hooks/useDBSync";
+import { GeneralPhoto } from "../../../hooks/useCameraTaker";
 
 export const GuaranteeAddVh:React.FC<RouteComponentProps> = ( props )=>{
 
@@ -24,16 +25,21 @@ export const GuaranteeAddVh:React.FC<RouteComponentProps> = ( props )=>{
             client_id,
             created_by: session.user,
             created_at: new Date(),
-            vehicle: data.vehicle
+            ...data,
+            vehicle: {
+                ...data.vehicle, 
+                photos: data.vehicle.photos.map( (i:GeneralPhoto) => ({ _id: i._id , title: i.title })), /// saves skiping  base64str
+            }
         }
         dispatchGuaranteesList( {
             type: "ADD_GUARANTEE",
             item: guaranteeItem
         })
         db.put({
+            ...data,
             ...guaranteeItem,
-            ...data
         }).then( async ()=>{
+            await dbX.bulkDocs(data.vehicle.photos);
             await couchDBSyncUpload();
             props.history.goBack();
         }).catch( e =>{

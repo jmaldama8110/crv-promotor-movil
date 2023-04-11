@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 
+
 export interface GeneralPhoto {
+  _id: string;
   base64str: string;
   title: string;
+  mimetype: string;
 }
 
 export async function base64FromPath(path: string): Promise<string> {
@@ -36,11 +39,13 @@ export function useCameraTaker() {
     });
   
     const base64Data = await base64FromPath(photo.webPath!);
-    const itemImage:GeneralPhoto = { base64str: base64Data, title:'' }
+    const photoIdNew = Date.now().toString();
+    const itemImage:GeneralPhoto = { base64str: base64Data, title:'', _id: photoIdNew, mimetype: 'image/jpeg'  }
     
     const newPhotos = [...pics, itemImage];
     setPics(newPhotos);
   };
+ 
 
   return {
     takePhoto,

@@ -1,4 +1,4 @@
-import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet, useIonToast } from '@ionic/react';
+import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet, useIonAlert } from '@ionic/react';
 import { useContext, useEffect, useState } from 'react';
 import { db } from '../../db';
 import type { OverlayEventDetail } from '@ionic/core';
@@ -13,15 +13,15 @@ import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
 import { useDBSync } from '../../hooks/useDBSync';
 import { locationOutline } from 'ionicons/icons';
+import api from '../../api/api';
 
 const ClientsHome: React.FC = () => {
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
   const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
-
-  const [showToast] = useIonToast();
-  const { dispatchClientData, session } = useContext(AppContext);
+  const [ showDialog, hideDialog] = useIonAlert();
+   const { dispatchClientData, session } = useContext(AppContext);
   const { couchDBSyncUpload } = useDBSync();
 
   let history = useHistory();
@@ -153,6 +153,8 @@ const ClientsHome: React.FC = () => {
                         })
   }
 
+
+
   return (
     <IonPage>
       <IonHeader>
@@ -196,7 +198,6 @@ const ClientsHome: React.FC = () => {
         }
         
         <IonButton onClick={onShowActions} color='success'>Acciones</IonButton>
-
         </IonList>
 
       </IonContent>

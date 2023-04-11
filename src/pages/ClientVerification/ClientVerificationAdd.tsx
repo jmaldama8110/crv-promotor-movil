@@ -1,7 +1,8 @@
 import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonProgressBar, IonContent } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
-import { db } from "../../db";
+import { db, dbX } from "../../db";
+import { GeneralPhoto } from "../../hooks/useCameraTaker";
 import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
 import { ClientVerificationForm } from "./ClientVerificationForm";
@@ -43,13 +44,14 @@ export const ClientVerificationAdd: React.FC<RouteComponentProps> = ({match,hist
         await db.put({
           couchdb_type: "CLIENT_VERIFICATION",
           ...data,
+          verification_imgs: data.verification_imgs.map( (x:GeneralPhoto) => ({_id: x._id, title: x.title }) ),
           _id: Date.now().toString(),
           client_id: clientId,
           created_by: session.user,
           branch: session.branch,
           created_at: new Date(),
         });
-     
+        await dbX.bulkDocs(data.verification_imgs);
         await couchDBSyncUpload();
       }
       catch(e:any){

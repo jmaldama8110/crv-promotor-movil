@@ -389,7 +389,8 @@ export const GuaranteesFormVh: React.FC<GuaranteeVhFormProps> = (props) => {
                         <IonRow>
                             {pics.map((photo, index) => (
                             <IonCol size="6" key={index}>
-                                <IonImg src={`data:image/jpeg;base64,${photo.base64str}`} ></IonImg>
+                                {!!photo.base64str && <IonImg src={`data:image/jpeg;base64,${photo.base64str}`} ></IonImg>}
+                                {!photo.base64str && <IonImg src={`${process.env.REACT_APP_BASE_URL_API}/docs/img?id=${photo._id}`}></IonImg>}
                             </IonCol>
                             ))}
                         </IonRow>

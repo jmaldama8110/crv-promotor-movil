@@ -114,12 +114,11 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
             { session.officer_rank[0] == 4 && <IonImg src={officerRankN1} alt='Certification social Nivel 1'></IonImg>}
             { session.officer_rank[0] == 5 && <IonImg src={officerRankN2} alt='Certification social Nivel 2'></IonImg>}
             { session.officer_rank[0] == 6 && <IonImg src={officerRankN3} alt='Certification social Nivel 3'></IonImg>}
-            { (session.officer_rank[0] ==4 ||
+            { (session.officer_rank[0] == 4 ||
               session.officer_rank[0] == 5 ||
               session.officer_rank[0] == 6) && <p>Felicidades! has alcando el nivel de certificacion </p>}
           </div>
           <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
-
         </IonList>}
       </IonContent>
       <IonFooter>
