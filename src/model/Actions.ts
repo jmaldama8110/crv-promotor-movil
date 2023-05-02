@@ -1,6 +1,6 @@
 import { db } from "../db";
 
-type ActionName = "CREATE_UPDATE_LOAN" | "CREATE_UPDATE_CLIENT" | "MEMBER_DROPOUT"
+type ActionName = "CREATE_UPDATE_LOAN" | "CREATE_UPDATE_CLIENT" | "MEMBER_DROPOUT" | "MEMBER_NEW"
 
 
 interface ActionsCouchDb {

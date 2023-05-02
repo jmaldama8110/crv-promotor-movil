@@ -54,7 +54,6 @@ export const LoanAppGroupAdd: React.FC<RouteComponentProps> = (props) => {
       <IonContent>
                 <LoanAppGroupForm 
                 onSubmit={onAdd}
-                
                 />
             </IonContent>
         </IonPage>

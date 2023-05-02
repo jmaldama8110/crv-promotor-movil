@@ -26,7 +26,6 @@ export type ActionsLoanAppGroup =
       estatus: string;
       sub_estatus: string;
       members: GroupMember [];
-      dropout: DroupOutType[];
       product: {
         external_id: number;
         min_amount: number;
@@ -77,7 +76,6 @@ export interface LoanAppGroup{
     estatus: string;
     sub_estatus: string;
     members: GroupMember [];
-    dropout: DroupOutType[],
     product: {
       external_id: number;
       min_amount: number;
@@ -119,7 +117,6 @@ export const loanAppGroupDef: LoanAppGroup = {
   estatus: "",
   sub_estatus: "",
   members: [],
-  dropout: [],
   product: {
     external_id: 0,
     min_amount: 1000,
@@ -165,7 +162,6 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
        estatus: action.estatus,
        sub_estatus: action.sub_estatus,
        members: action.members,
-       dropout: action.dropout,
        product: {
           external_id: action.product.external_id,
           min_amount: action.product.min_amount,

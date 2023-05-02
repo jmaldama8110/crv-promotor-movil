@@ -7,10 +7,11 @@ import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import avatar from '../../../src/assets/avatar.svg';
 import { DroupOutType } from "../../reducer/DropoutReducer";
+import { NewMembersType } from "../../reducer/NewMembersReducer";
 
 export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit }) => {
 
-    const { groupMemberList, loanAppGroup, dropoutMembers, dispatchLoanAppGroup, dispatchGroupMember, dispatchMember , dispatchDropoutMembers} = useContext( AppContext);
+    const { groupMemberList, loanAppGroup, dropoutMembers, newMembers, dispatchLoanAppGroup, dispatchGroupMember, dispatchMember , dispatchDropoutMembers} = useContext( AppContext);
     const [sumTotal, setSumTotal] = useState<number>(0)
     const [remaining, setRemaining] = useState<number>(loanAppGroup.apply_amount)
 
@@ -24,7 +25,6 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
         type:"SET_LOAN_APP_GROUP",
         ...loanAppGroup,
         members: groupMemberList,
-        dropout: dropoutMembers,
         apply_amount: sumTotal
       })
     }
@@ -47,7 +47,7 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
       
       if( loanAppGroup._id) {
         dispatchGroupMember({type:'POPULATE_GROUP_MEMBERS', data: loanAppGroup.members});
-        dispatchDropoutMembers({type: "POPULATE_DROPOUTS", data: loanAppGroup.dropout});
+
       }
     },[loanAppGroup])
     
@@ -83,12 +83,35 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
             <IonButton onClick={onAutoFixLoanAmount}>Corregir</IonButton>
             </IonItem>
         }
-          {!!dropoutMembers.length &&
+        {!! newMembers.length &&
           <IonItem>
             <IonLabel>
-              <h1>Bajas del Grupo</h1>
+              <h2>Nuevos Integrantes del Grupo</h2>
             </IonLabel>
-          </IonItem>}
+          </IonItem>
+        }
+        {
+          newMembers.map((i:NewMembersType,n:number) =>(
+            <IonItem key={n}>
+              <IonAvatar slot="start">
+                <img
+                  alt="Perfil de usuario sin foto"
+                  src={avatar}
+                />
+              </IonAvatar>
+              <IonLabel>{ i.fullname }</IonLabel>            
+            </IonItem>            
+          ))
+
+        }
+
+          {!!dropoutMembers.length &&
+            <IonItem>
+              <IonLabel>
+                <h2>Bajas del Grupo</h2>
+              </IonLabel>
+            </IonItem>
+          }
         {
           dropoutMembers.map((i:DroupOutType) =>(
             <IonItem key={i.member_id}>
@@ -101,7 +124,8 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
               <IonLabel>{ i.fullname } {i.reasonType} {i.dropoutReason[1]}</IonLabel>            
             </IonItem>            
           ))
-       }
+        
+        }
 
         <IonButton 
         color='success' 

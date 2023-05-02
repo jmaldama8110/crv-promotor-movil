@@ -18,7 +18,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
   const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
   const { couchDBSyncUpload } = useDBSync();
 
-  const { dispatchGroupData } = useContext(AppContext);
+  const { dispatchGroupData, dropoutMembers } = useContext(AppContext);
   const [clientSearchData, setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
@@ -84,6 +84,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
   
 
   useEffect( ()=>{
+
     if( actions ){
       if( actions.data){
         if(actions.data.action === 'add'){
@@ -111,7 +112,11 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
   },[actions])
 
   useEffect( ()=>{
+    console.log('Dropouts',dropoutMembers);
+  },[])
 
+  useEffect( ()=>{
+    
     async function loadOptions (){
       if( geoActions) {
         if( geoActions.data ){

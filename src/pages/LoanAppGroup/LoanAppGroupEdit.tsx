@@ -11,7 +11,7 @@ import { LoanAppGroupForm } from "./LoanAppGroupForm";
 export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
 
    
-    const { dispatchLoanAppGroup, groupMemberList,dropoutMembers, dispatchSession, session } = useContext(AppContext);
+    const { dispatchLoanAppGroup, groupMemberList,dropoutMembers,newMembers, dispatchSession, session } = useContext(AppContext);
     const { couchDBSyncUpload } = useDBSync();
     useEffect( ()=>{
 
@@ -36,13 +36,24 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
           ...data,
           members: groupMemberList,
           renovation: false,
-          // dropout: dropoutMembers,
           updated_at: Date.now()
         }).then( async function(){
-          await createAction( "CREATE_UPDATE_LOAN", { id_loan: itemId, hasDropouts: !!dropoutMembers.length }, session.user );
+          await createAction( "CREATE_UPDATE_LOAN", { 
+                  id_loan: itemId, 
+                },
+                session.user );
+          await createAction("MEMBER_NEW", {
+            hasNewMembers: !!newMembers.length,
+            newmembers: newMembers,
+          },
+          session.user);
+          await createAction("MEMBER_DROPOUT",{
+            hasDropouts: !!dropoutMembers.length,
+            dropouts: dropoutMembers,
+          },session.user)
           await couchDBSyncUpload();
           //// actions for dropout members
-
+          // QUITAR LOS ARREGLOS DE DROP_OUT Y NEW MEMBERS DEL LOAN APP
            dispatchSession( { type: "SET_LOADING", loading_msg: '',loading: false});
           props.history.goBack();
         })

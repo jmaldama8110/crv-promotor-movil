@@ -1,28 +1,33 @@
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar, useIonToast } from "@ionic/react";
-import { useContext, useEffect } from "react";
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonToast } from "@ionic/react";
+import { useContext } from "react";
 import { RouteComponentProps } from "react-router";
-import { db, remoteDB } from "../../../db";
+
 import { GroupMember } from "../../../reducer/GroupMembersReducer";
 import { AppContext } from "../../../store/store";
 import { LoanAppMemberForm } from "./LoanAppMemberForm";
+import { NewMembersType } from "../../../reducer/NewMembersReducer";
 
 export const LoanAppMemberAdd: React.FC<RouteComponentProps> = (props) => {
   
   
-  const { dispatchGroupMember } = useContext(AppContext);
+  const { dispatchNewMembers } = useContext(AppContext);
 
   function onAdd (data: any){
     /// Save new record
-    
-    const item: GroupMember = {
-      ...data,
-      _id: Date.now().toString(),
+
+    const item: NewMembersType = {
+          ...data,
+          _id: Date.now().toString(),
     }
-
-      dispatchGroupMember({ type: 'ADD_GROUP_MEMBER',item });
-      props.history.goBack();
+    
+    // const item2: GroupMember = {
+    //   ...data,
+    //   _id: Date.now().toString(),
+    // }
+    dispatchNewMembers({ type: "ADD_NEW_MEMBER",item });
+    // dispatchGroupMember( { type: "ADD_GROUP_MEMBER", item: item2 })
+    props.history.goBack();
   }
-
 
   return (
     <IonPage>

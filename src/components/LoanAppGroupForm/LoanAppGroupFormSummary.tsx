@@ -12,10 +12,11 @@ import { DroupOutType } from "../../reducer/DropoutReducer";
 import { GroupMember } from "../../reducer/GroupMembersReducer";
 import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
+import { NewMembersType } from "../../reducer/NewMembersReducer";
 
 
 export const LoanAppGroupFormSummary: React.FC = () => {
-  const { groupMemberList, loanAppGroup, dropoutMembers } = useContext(AppContext);
+  const { groupMemberList, loanAppGroup, dropoutMembers, newMembers } = useContext(AppContext);
 
 
   return (
@@ -57,6 +58,14 @@ export const LoanAppGroupFormSummary: React.FC = () => {
                               }
 
                         </IonGrid>
+      <IonItem><IonLabel>Nuevos Integrantes:</IonLabel></IonItem>
+                        <IonGrid>
+                            { newMembers.map((i:NewMembersType, n:number)=> (
+                                <IonRow key={n}><IonLabel className="xs"></IonLabel>- {i.fullname.slice(0,20)} </IonRow> ) )
+                              }
+
+                        </IonGrid>
+
       <IonItem><IonLabel>Bajas:</IonLabel></IonItem>
                         <IonGrid>
                             { dropoutMembers.map((i:DroupOutType)=> (

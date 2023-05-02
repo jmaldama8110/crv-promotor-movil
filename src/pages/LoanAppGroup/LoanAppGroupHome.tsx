@@ -7,9 +7,12 @@ import { ContractsHome } from "../Contracts/ContractsHome";
 
 export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
 
-    const { dispatchLoanAppGroup, dispatchGroupMember }  = useContext( AppContext) ;
+    const { dispatchLoanAppGroup, dispatchGroupMember, dispatchNewMembers, dispatchDropoutMembers }  = useContext( AppContext) ;
     const onAddNew =  () =>{
       dispatchGroupMember( { type: 'POPULATE_GROUP_MEMBERS', data:[]});
+      dispatchNewMembers( { type: "POPULATE_NEW_MEMBERS", data:[]});
+      dispatchDropoutMembers( { type: "POPULATE_DROPOUTS", data: []});
+
       dispatchLoanAppGroup( {type: 'RESET_LOAN_APP_GROUP'});
         props.history.push(`loanapps/add`);
     }

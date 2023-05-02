@@ -25,7 +25,7 @@ export const LoanApplicationHome: React.FC<RouteComponentProps> = (props) => {
           <IonItemDivider><IonLabel>Solicitudes del cliente</IonLabel></IonItemDivider>
             <LoanAppCard {...props} />
             
-            <IonButton onClick={onAddNew} disabled>Nueva Solicitud</IonButton>
+            <IonButton onClick={onAddNew}>Nueva Solicitud</IonButton>
                 
             <IonItemDivider><IonLabel>Contratos Activos</IonLabel></IonItemDivider>
                   <ContractsHome {...props} />

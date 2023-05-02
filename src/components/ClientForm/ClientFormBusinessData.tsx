@@ -3,17 +3,11 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
 import { formatDate } from "../../utils/numberFormatter";
-import { SearchData } from "../SelectDropSearch";
 import { ButtonSlider } from "../SliderButtons";
 
 export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
   
   const [rfc, setRfc] = useState<string>("");
-  const [tributaryRegime, setTributaryRegime] = useState<string>('');
-  const [tributaryRegCatalog] = useState<SearchData[]>([
-    { id: "1", etiqueta: "Persona Fisica AE" },
-    { id: "2", etiqueta: "Persona Moral" },
-  ]);
 
   const { clientData } = useContext(AppContext);  
   const [bisOwnOrRent, setOwnOrRent] = useState(false);
@@ -33,7 +27,6 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
         setBisStartedDate(clientData.business_data.business_start_date);
         setBiStartedDateFormatted( formatDate( clientData.business_data.business_start_date));
         setBusinessPhone( clientData.business_data.business_phone);
-        setTributaryRegime( clientData.tributary_regime[0]);
         setRfc( clientData.rfc);
         setNotBis( clientData.not_bis);
       }
@@ -45,13 +38,6 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
       business_phone: businessPhone,
       business_start_date: bisStartedDate,
       business_owned: bisOwnOrRent,
-      tributary_regime: [
-        tributaryRegime,
-        tributaryRegime
-          ? tributaryRegCatalog.find((i: any) => i.id == tributaryRegime)!
-              .etiqueta
-          : "",
-      ],
       rfc,
       not_bis
     }
@@ -106,22 +92,6 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
           <IonInput type="text" value={businessPhone} onIonChange={ (e)=> setBusinessPhone(e.detail.value!)} disabled={not_bis}></IonInput>
       </IonItem>
 
-      <IonItem>
-        <IonLabel position="stacked">Regimen Fiscal</IonLabel>
-        <IonSelect
-          disabled={not_bis}
-          value={tributaryRegime}
-          okText="Ok"
-          cancelText="Cancelar"
-          onIonChange={(e) => setTributaryRegime(e.detail.value)}
-        >
-          {tributaryRegCatalog.map((c: any) => (
-            <IonSelectOption key={c.id} value={c.id}>
-              {c.etiqueta}
-            </IonSelectOption>
-          ))}
-        </IonSelect>
-      </IonItem>
       <IonItem>
         <IonLabel position="stacked">RFC</IonLabel>
         <IonInput

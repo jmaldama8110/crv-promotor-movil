@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import React, { createContext, useReducer } from "react";
 import { SessionReducer, Session, ActionsSession } from "../reducer/SessionReducer";
 import { ClientDataReducer, ClientData, ActionsClientData, clientDataDef } from "../reducer/ClientDataReducer";
 import { GuaranteesReducer, Guarantee, ActionsGuarantee } from "../reducer/GuaranteesReducer";
@@ -11,6 +11,7 @@ import { ActionsDropout, DropoutReducer, DroupOutType } from "../reducer/Dropout
 import { ActionsClientVerification, ClientVerification, clientVerificationDefault, ClientVerificationReducer } from "../reducer/ClientVerificationReducer";
 import { ActionsMembersInArrears, MemberInArrears, MembersInArreasReducer } from "../reducer/MembersInArrearsReducer";
 import { ActionsQuiz, QuizElement, QuizReducer } from "../reducer/QuizReducer";
+import { ActionsNewMembers, NewMembersReducer, NewMembersType } from "../reducer/NewMembersReducer";
 
 type AppContextProviderProps = {
   children: React.ReactNode
@@ -49,6 +50,9 @@ interface SharedContext {
   visitQuizChecklist: QuizElement[];
   dispatchVisitQuizChecklist: React.Dispatch<ActionsQuiz>;
 
+  newMembers: NewMembersType[];
+  dispatchNewMembers: React.Dispatch<ActionsNewMembers>;
+
 }
 
 export const AppContext = createContext<SharedContext >({} as SharedContext);
@@ -79,6 +83,7 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
   const [clientVerification, dispatchClientVerification] = useReducer(ClientVerificationReducer, clientVerificationDefault);
   const [membersInArrears, dispatchMembersInArrears ] = useReducer(MembersInArreasReducer, []);
   const [visitQuizChecklist, dispatchVisitQuizChecklist] = useReducer(QuizReducer,[]);
+  const [newMembers, dispatchNewMembers] = useReducer(NewMembersReducer,[]);
   const sharedCtx: SharedContext = {
     session,
     dispatchSession,
@@ -103,7 +108,9 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
     membersInArrears,
     dispatchMembersInArrears,
     visitQuizChecklist,
-    dispatchVisitQuizChecklist
+    dispatchVisitQuizChecklist,
+    newMembers,
+    dispatchNewMembers
   }
   
 
