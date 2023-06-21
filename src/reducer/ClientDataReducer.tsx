@@ -1,3 +1,24 @@
+export interface DocumentIdProperties { 
+  age: string;
+  voter_key: string;
+  nationality: string;          
+  expiration_date: string;
+  doc_number: string;
+  folio_number: string;
+  dob: string;
+  ocr_number: string;
+  sex: string;
+  lastname: string;
+  second_lastname: string;
+  name: string;
+  duplicates: string;
+  curp: string;
+  street_address: string;
+  suburb_address: string;
+}
+
+
+
 export type ActionsClientData = {
   type: "SET_CLIENT";
   name: string;
@@ -40,9 +61,17 @@ export type ActionsClientData = {
   ocupation: [string, string];
   rfc: string;
   status: [number, string];
-  tributary_regime: [string, string];
+  
   comment: string;
   identity_pics: any[];
+  identity_verification: {
+    uuid: string;
+    status: "sent" | "pending";
+    result: "ok" | "waiting" | "fail";
+    documentData: DocumentIdProperties;
+    created_at: string;
+    updated_at: string;
+  };
   comprobante_domicilio_pics: any[];
   _id?: string;
   _rev?: string;
@@ -92,9 +121,17 @@ export interface ClientData {
     ocupation: [string, string];
     rfc: string;
     status: [number, string];
-    tributary_regime: [string, string];
+    
     comment: string;
     identity_pics: any[];
+    identity_verification: {
+      uuid: string;
+      status: "sent" | "pending";
+      result: "ok" | "waiting" | "fail";
+      created_at: string;
+      updated_at: string;
+      documentData: DocumentIdProperties;
+    };
     comprobante_domicilio_pics: any[];  
     _id?: string;
     _rev?: string;
@@ -140,9 +177,34 @@ export const clientDataDef: ClientData = {
   second_lastname: "",
   sex: [0, ''],
   status: [0, ''],
-  tributary_regime: ['', ''],
+  
   comment: '',
   identity_pics: [],
+  identity_verification: {
+    uuid: '',
+    status: 'pending',
+    result: 'waiting',
+    created_at: '',
+    updated_at: '',
+    documentData: {
+      age: '',
+      voter_key: '',
+      nationality: '',
+      name: '',
+      lastname: '',
+      second_lastname: '',
+      dob: '',
+      doc_number: '',
+      duplicates: '',
+      expiration_date: '',
+      folio_number: '',
+      ocr_number: '',
+      sex: '',
+      curp: '',
+      street_address: '',
+      suburb_address: ''
+    }
+  },
   comprobante_domicilio_pics: [],
   _id: "",
   _rev: ""
@@ -195,9 +257,9 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         ocupation: action.ocupation,
         rfc: action.rfc,
         status: action.status,
-        tributary_regime: action.tributary_regime,
         comment: action.comment,
         identity_pics: action.identity_pics,
+        identity_verification: action.identity_verification,
         comprobante_domicilio_pics: action.comprobante_domicilio_pics,
         _id: action._id,
         _rev: action._rev

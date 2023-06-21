@@ -87,6 +87,8 @@ import { VisitsHome } from "./pages/Visits/VisitsHome";
 import { VisitsAdd } from "./pages/Visits/VisitsAdd";
 import { VisitsEdit } from "./pages/Visits/VisitsEdit";
 import { WhereToPayHome } from "./pages/WhereToPay/WhereoToPayHome";
+import { ActionLog } from "./pages/ActionLog/ActionLog";
+import { DigitalArchive } from "./pages/Clients/DigitalArchive";
 
 
 setupIonicReact();
@@ -196,9 +198,13 @@ const App: React.FC = () => {
             <Route exact path="/contracts/:contractId/visits/add" component={VisitsAdd}></Route>
             <Route exact path="/contracts/:contractId/visits/edit/:id" component={VisitsEdit}></Route>
             <Route exact path="/wheretopay/:id" component={WhereToPayHome}></Route>
+            <Route exact path="/digitalachive/:id" component={DigitalArchive}></Route>
+            
 
+            <Route exact path="/actionlog" component={ActionLog}></Route>
             <Route exact path="/supervisor" component={SupervisorHome}></Route>
             <Route exact path="/notifications" component={Notifications}></Route>
+            
             <Route exact path="/" component={MyProfile}></Route>
 
           </IonRouterOutlet>

@@ -21,6 +21,13 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   const [colonyId, setColonyId] = useState<string>("");
   const myColonySelectList = useRef<any>(null);
 
+
+  const [ext_number, setExtNumber] = useState('');
+  const [int_number, setIntNumber] = useState('');
+  const [street_reference, setStreetReference] = useState('');
+  const [road, setRoad] = useState<number>(0);
+  const [roadCatalog, setRoadCatalog] = useState<any[]>([]);
+
   const [colonyCat, setColonyCat] = useState<ColonyType[]>([]);
   const [colonyName, setColonyName] = useState<string>("");
   const [cityId, setCityId] = useState<string>('');
@@ -32,7 +39,14 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   const [countryId, setCountryId] = useState<string>('');
   const [countryName, setCountryName] = useState<string>("");
 
+  let render = true;
+
   useEffect( ()=>{
+
+    if( render){
+      render = false;
+      LoadCatalog();
+    }
 
     if( clientData._id){ // loads up onyl when edit client mode (_id not empty)
       if( clientData.address.length ){ // populates Colonies component
@@ -41,11 +55,30 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             setMyCp(homeAddress.post_code);
             populateColoniesByPostCode( homeAddress.post_code, setColonyCat);
             setAddressL1( homeAddress.address_line1);
+
+            setExtNumber( homeAddress.ext_number);
+            setIntNumber( homeAddress.int_number);
+            setStreetReference( homeAddress.street_reference);
+
           }
 
       }
     }
   
+    async function LoadCatalog (){
+
+      try{
+
+        await db.createIndex(  { index: { fields: ['couchdb_type','name']}} );
+        const dbData = await db.find({  selector: {
+                                    couchdb_type: "CATALOG",
+                                    name: "CATA_TipoVialidad" }})
+        setRoadCatalog(dbData.docs.filter( (i:any) => i.activo ));
+      }
+      catch(e){
+
+      }
+    }
 
   },[clientData])
 
@@ -96,11 +129,30 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   
   },[colonyCat]);
 
+  useEffect( ()=> {
+
+  /// if we are editing, then set the current value of the roadType ID
+  if( clientData._id && roadCatalog.length ){
+    const homeAddress = clientData.address.find( (i:any) => ( i.type === addressType))
+    if( homeAddress && !!homeAddress.road )
+      if( homeAddress.road.length > 0 ){
+        setRoad( homeAddress.road[0]);
+      }
+      
+  }
+  },[roadCatalog])
+
   function onSubmit() {
+
+    const roadItem = roadCatalog.find( (x:any) => x.id == road )
     
     const data = {
       type: addressType,
       address_line1,
+      ext_number,
+      int_number,
+      street_reference,
+      road: road ? [road, roadItem.descripcion ] : [0,''],
       country: [countryId, countryName],
       province: [provinceId, provinceName],
       municipality: [municipalityId, municipalityName],
@@ -138,6 +190,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   }, [colonyId]);
 
 
+
   return (
 
     
@@ -160,6 +213,11 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
                     populateColoniesByPostCode(addressPrev.post_code, setColonyCat);
                     // setColonyId( addressPrev.colony[0]);
                     setAddressL1( addressPrev.address_line1);
+
+                    setExtNumber( addressPrev.ext_number);
+                    setIntNumber( addressPrev.int_number);
+                    setStreetReference( addressPrev.street_reference);
+                    setRoad( addressPrev.road[0]);
                   }
                 }
             }}
@@ -226,6 +284,58 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             onIonBlur={(e: any) => setAddressL1(e.target.value.toUpperCase())}
           ></IonInput>
         </IonItem>
+
+        <IonItem>
+          <IonLabel position="stacked">
+            Numero Exterior
+          </IonLabel>
+          <IonInput
+            type="text"
+            value={ext_number}
+            onIonChange={(e) => setExtNumber(e.detail.value!)}
+          ></IonInput>
+        </IonItem>
+
+        <IonItem>
+          <IonLabel position="stacked">
+            Numero Interior
+          </IonLabel>
+          <IonInput
+            type="text"
+            value={int_number}
+            onIonChange={(e) => setIntNumber(e.detail.value!)}
+          ></IonInput>
+        </IonItem>
+
+        <IonItem>
+          <IonLabel position="stacked">
+            Referencia(s)
+          </IonLabel>
+          <IonInput
+            type="text"
+            value={street_reference}
+            onIonChange={(e) => setStreetReference(e.detail.value!)}
+            onIonBlur={(e: any) => setStreetReference(e.target.value.toUpperCase())}
+          ></IonInput>
+        </IonItem>
+
+
+        <IonItem>
+        <IonLabel position="stacked">Tipo Vialidad</IonLabel>
+        <IonSelect
+          value={road}
+          okText="Ok"
+          cancelText="Cancelar"
+          onIonChange={(e) => setRoad(e.detail.value)}
+        >
+          {roadCatalog.map((c: any) => (
+            <IonSelectOption key={c.id} value={c.id}>
+              {c.descripcion}
+            </IonSelectOption>
+          ))}
+        </IonSelect>
+      </IonItem>
+
         <p></p>
           <ButtonSlider onClick={onSubmit} slideDirection={'F'} color='medium' expand="block" label="Siguiente" />
           <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />

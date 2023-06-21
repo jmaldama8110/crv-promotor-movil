@@ -13,15 +13,13 @@ import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
 import { useDBSync } from '../../hooks/useDBSync';
 import { locationOutline } from 'ionicons/icons';
-import api from '../../api/api';
 
 const ClientsHome: React.FC = () => {
 
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
   const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
-  const [ showDialog, hideDialog] = useIonAlert();
-   const { dispatchClientData, session } = useContext(AppContext);
+  const { dispatchClientData } = useContext(AppContext);
   const { couchDBSyncUpload } = useDBSync();
 
   let history = useHistory();
@@ -61,7 +59,8 @@ const ClientsHome: React.FC = () => {
       { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
       { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
       { text: 'Referencias & Personas', data: { action: 'related-people', routerLink:  `/clients/${clientSelected.id}/related-people` } },
-      { text: 'Tarjeton Digital', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
+      { text: 'Tarjeton de Pago', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
+      { text: 'Expediente Digital', data: { action: 'digital-archive', routerLink:  `/digitalachive/${clientSelected.id}` } },
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
@@ -96,6 +95,8 @@ const ClientsHome: React.FC = () => {
         if( actions.data.action === 'related-people')
             history.push(actions.data.routerLink);
         if( actions.data.action === 'tarjeton')
+            history.push(actions.data.routerLink);
+        if( actions.data.action === 'digital-archive')
             history.push(actions.data.routerLink);
 
 

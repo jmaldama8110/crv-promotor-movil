@@ -51,7 +51,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
       { text: 'Nuevo Grupo', role:"destructive",data: { action: 'add', routerLink:'/groups/add' } },
       { text: 'Editar', data: { action:"edit", routerLink: `/groups/edit/${clientSelected.id}` } },
       { text: 'Solicitudes & Creditos', data: { action: 'loanapps', routerLink: `/groups/${clientSelected.id}/loanapps`} },
-      { text: 'Tarjeton Digital', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
+      { text: 'Tarjeton de Pago', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
       { text: 'Ver Documentos', data: { action: 'docs', routerLink:  `/docs` } },
       { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },
     ] :
@@ -110,10 +110,6 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
       }
     }
   },[actions])
-
-  useEffect( ()=>{
-    console.log('Dropouts',dropoutMembers);
-  },[])
 
   useEffect( ()=>{
     

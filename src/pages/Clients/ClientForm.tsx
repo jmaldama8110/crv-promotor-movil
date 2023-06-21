@@ -113,7 +113,6 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
     dispatchClientData({
       type: "SET_CLIENT",
       ...clientData,
-      tributary_regime: data.tributary_regime,
       rfc: data.rfc,
       not_bis: data.not_bis,
       business_data: {

@@ -3,7 +3,7 @@ import { db } from "../db";
 type ActionName = "CREATE_UPDATE_LOAN" | "CREATE_UPDATE_CLIENT" | "MEMBER_DROPOUT" | "MEMBER_NEW"
 
 
-interface ActionsCouchDb {
+export interface ActionsCouchDb {
     _id: string;
     couchdb_type: "ACTION",
     name: ActionName;

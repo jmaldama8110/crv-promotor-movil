@@ -5,10 +5,12 @@ import { GeneralPhoto, useCameraTaker } from "../../hooks/useCameraTaker";
 import { AppContext } from "../../store/store";
 import { ButtonSlider } from "../SliderButtons";
 
+
 export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
 
     const { takePhoto, pics, setPics } = useCameraTaker();
-    const { clientData} = useContext(AppContext);
+    const { clientData } = useContext(AppContext);
+ 
 
     const onPhotoTitleUpdate = (e:any) =>{
         const itemPosition = pics.length - 1;
@@ -27,26 +29,31 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
 
     const onSubmit = () =>{
         const data = {
-            identity_pics: pics,
+            identity_pics: pics
         }
         
         onNext(data);
     }
+    
 
     return (
         <IonList className="ion-padding">
-        <div>
-            <IonItem><IonLabel>Identificación (INE frontal y trasera)</IonLabel></IonItem>            
+        <div className="margin-bottom-sm">
+            
+            <IonItem>
+                <IonLabel>Identificación (INE frontal y trasera)</IonLabel>
+            </IonItem>            
+            
             <IonGrid>
                 <IonRow>
                     {
                     pics.map((photo, index) => (
-                    <IonCol size="6" key={index}>
+                    <IonCol size="6" key={index} >
                         {! photo.base64str &&<IonImg src={`${process.env.REACT_APP_BASE_URL_API}/docs/img?id=${photo._id}`}></IonImg>}
                         {!! photo.base64str && <IonImg src={`data:image/jpeg;base64,${photo.base64str}`}></IonImg>}
                         {   /// si ya tiene un titulo, lo muestra, de otro modo, muestra el Input
                             photo.title ? <IonLabel>{photo.title}</IonLabel>
-                            : <IonInput onIonBlur={onPhotoTitleUpdate} placeholder="Ingresa una descripcion" className="fuente-sm"></IonInput>
+                            : <IonInput onIonBlur={onPhotoTitleUpdate} placeholder="Ingresa una descripcion" className="fuente-sm" ></IonInput>
                         }   
                     </IonCol>
                     
@@ -54,13 +61,16 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
                     }
                 </IonRow>
             </IonGrid>
+
             
-            <IonButton onClick={() => takePhoto(20)}>
-                <IonIcon icon={camera}></IonIcon>
-            </IonButton>
-            { !!pics.length &&<IonButton color='warning' onClick={ ()=>{
-                setPics([]);
-            }}><IonIcon icon={trashOutline}></IonIcon></IonButton>}
+
+
+            <IonButton onClick={() => takePhoto(20)}><IonIcon icon={camera} ></IonIcon></IonButton>
+            { !!pics.length &&
+            <IonButton color='warning'  onClick={ ()=>{ setPics([]) }}><IonIcon icon={trashOutline} ></IonIcon></IonButton>}
+            
+             
+            
         </div>
         <ButtonSlider color="primary" label='Siguiente' expand="block" onClick={onSubmit} slideDirection={"F"}></ButtonSlider>
         <ButtonSlider color="medium" label='Anterior'  expand="block" onClick={() => {} } slideDirection={"B"}></ButtonSlider>

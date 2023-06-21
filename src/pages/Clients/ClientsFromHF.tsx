@@ -71,6 +71,7 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
               }
             }
             const apiRes2 = await api.get(`/clients/hf?externalId=${IdCliente}`);
+            
             const newData = apiRes2.data as ClientData
 
             /// validates whether the client exist locally or not
