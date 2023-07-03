@@ -79,8 +79,10 @@ export const IdentityVerification = () =>{
             setStatus(clientData.identity_verification.status);
             setResult( clientData.identity_verification.result);
             setUuid( clientData.identity_verification.uuid);
+            
             if( clientData.identity_verification.documentData )
                 setDocumentData( clientData.identity_verification.documentData);
+                    
         }
     },[clientData])
 
@@ -131,25 +133,25 @@ export const IdentityVerification = () =>{
 
                 if( biometrics.result && proofLife.result ) {
                     setResult('ok');
-                   
-                    setDocumentData({
-                        age:              findDocDataValue(apiRes2.data.documentData, 'Age'),
-                        voter_key:        findDocDataValue(apiRes2.data.documentData, 'Voter Key'),
-                        nationality:      findDocDataValue(apiRes2.data.documentData, 'Nationality Code'),          
-                        expiration_date:  findDocDataValue(apiRes2.data.documentData, 'Date of Expiry'),
-                        doc_number:       findDocDataValue(apiRes2.data.documentData, 'Document Number'),
-                        folio_number:     findDocDataValue(apiRes2.data.documentData, 'Folio Number'),
-                        dob:              findDocDataValue(apiRes2.data.documentData, 'Date of Birth'),
-                        ocr_number:       findDocDataValue(apiRes2.data.documentData, 'OCR Number'),
-                        sex:              findDocDataValue(apiRes2.data.documentData, 'Sex'),
-                        lastname:         findDocDataValue(apiRes2.data.documentData, 'Father Surname'),
-                        second_lastname:  findDocDataValue(apiRes2.data.documentData, 'Mother Surname'),
-                        name:             findDocDataValue(apiRes2.data.documentData, 'Name'),
-                        duplicates:       findDocDataValue(apiRes2.data.documentData, 'Number of Duplicates'),
-                        curp:             findDocDataValue(apiRes2.data.documentData, 'Personal Number'),
-                        street_address:   findDocDataValue(apiRes2.data.documentData, 'Address Street'),
-                        suburb_address:   findDocDataValue(apiRes2.data.documentData, 'Address Suburb'),
-                    } )
+                   const documentDataTmp: DocumentIdProperties = {
+                    age:              findDocDataValue(apiRes2.data.documentData, 'Age'),
+                    voter_key:        findDocDataValue(apiRes2.data.documentData, 'Voter Key'),
+                    nationality:      findDocDataValue(apiRes2.data.documentData, 'Nationality Code'),          
+                    expiration_date:  findDocDataValue(apiRes2.data.documentData, 'Date of Expiry'),
+                    doc_number:       findDocDataValue(apiRes2.data.documentData, 'Document Number'),
+                    folio_number:     findDocDataValue(apiRes2.data.documentData, 'Folio Number'),
+                    dob:              findDocDataValue(apiRes2.data.documentData, 'Date of Birth'),
+                    ocr_number:       findDocDataValue(apiRes2.data.documentData, 'OCR Number'),
+                    sex:              findDocDataValue(apiRes2.data.documentData, 'Sex'),
+                    lastname:         findDocDataValue(apiRes2.data.documentData, 'Father Surname'),
+                    second_lastname:  findDocDataValue(apiRes2.data.documentData, 'Mother Surname'),
+                    name:             findDocDataValue(apiRes2.data.documentData, 'Name'),
+                    duplicates:       findDocDataValue(apiRes2.data.documentData, 'Number of Duplicates'),
+                    curp:             findDocDataValue(apiRes2.data.documentData, 'Personal Number'),
+                    street_address:   findDocDataValue(apiRes2.data.documentData, 'Address Street'),
+                    suburb_address:   findDocDataValue(apiRes2.data.documentData, 'Address Suburb'),
+                };
+                setDocumentData( documentDataTmp)
                     // setDocuPortrait(apiRes2.data.documentPortraitImage);
                     // setSelfi(apiRes2.data.faceImage);  
 
@@ -161,7 +163,7 @@ export const IdentityVerification = () =>{
                                 ...clientDbData.identity_verification,                  
                                 result: 'ok',
                                 updated_at: (new Date()).toISOString(),
-                                documentData
+                                documentData: documentDataTmp
                                 }
                             }).then( async ()=>{
                                 await couchDBSyncUpload();

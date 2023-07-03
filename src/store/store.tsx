@@ -12,6 +12,7 @@ import { ActionsClientVerification, ClientVerification, clientVerificationDefaul
 import { ActionsMembersInArrears, MemberInArrears, MembersInArreasReducer } from "../reducer/MembersInArrearsReducer";
 import { ActionsQuiz, QuizElement, QuizReducer } from "../reducer/QuizReducer";
 import { ActionsNewMembers, NewMembersReducer, NewMembersType } from "../reducer/NewMembersReducer";
+import { ActionsUpdatesLog, UpdateLog, UpdatesLogReducer } from "../reducer/UpdateLogsReducer";
 
 type AppContextProviderProps = {
   children: React.ReactNode
@@ -53,6 +54,9 @@ interface SharedContext {
   newMembers: NewMembersType[];
   dispatchNewMembers: React.Dispatch<ActionsNewMembers>;
 
+  updatesLog: UpdateLog[];
+  dispatchUpdatesLog: React.Dispatch<ActionsUpdatesLog>;
+
 }
 
 export const AppContext = createContext<SharedContext >({} as SharedContext);
@@ -84,6 +88,7 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
   const [membersInArrears, dispatchMembersInArrears ] = useReducer(MembersInArreasReducer, []);
   const [visitQuizChecklist, dispatchVisitQuizChecklist] = useReducer(QuizReducer,[]);
   const [newMembers, dispatchNewMembers] = useReducer(NewMembersReducer,[]);
+  const [updatesLog, dispatchUpdatesLog] = useReducer(UpdatesLogReducer, []);
   const sharedCtx: SharedContext = {
     session,
     dispatchSession,
@@ -110,7 +115,9 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
     visitQuizChecklist,
     dispatchVisitQuizChecklist,
     newMembers,
-    dispatchNewMembers
+    dispatchNewMembers,
+    updatesLog,
+    dispatchUpdatesLog
   }
   
 

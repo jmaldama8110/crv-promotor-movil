@@ -166,6 +166,8 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
 
     return (
         <IonList className="ion-padding">
+
+
             <IonItemDivider>
                 <IonLabel>Datos personales</IonLabel>
             </IonItemDivider>
@@ -257,8 +259,8 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                   <IonInput type="text" value={numero_vertical} onIonChange={(e=>setNumeroVertical(e.detail.value!))} onIonBlur={(e:any)=>setNumeroVertical(e.target.value.toUpperCase())}></IonInput>
         </IonItem>
         
+        <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' disabled={!name} />
 
-        <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' />
       </IonList>
     
 

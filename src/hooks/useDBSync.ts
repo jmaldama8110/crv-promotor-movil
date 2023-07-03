@@ -54,16 +54,6 @@ export function useDBSync () {
         dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
         showToast('Estas en modo sin conexion...'+e.message, 1500)
       }
-      // db.replicate.from( remoteDB).on('complete', ()=>{
-        
-      //   dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-      //   console.log('Remote => Local, Ok!');
-        
-      // }).on('error', (err:any)=>{
-        
-      //   dispatchSession({type: "SET_LOADING",loading: false,loading_msg: ""});
-      //   showToast('Estas en modo sin conexion...'+err.message, 1500)
-      // })
     }
 
 

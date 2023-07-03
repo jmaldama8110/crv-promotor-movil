@@ -14,9 +14,6 @@ import {
   IonItem,
   IonLabel,
   IonImg,
-  IonFab,
-  IonFabButton,
-  IonIcon,
 } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router"; 
@@ -24,7 +21,6 @@ import { useDBSync } from "../../hooks/useDBSync";
 import { AppContext } from "../../store/store";
 import { Login, LOGIN_KEY_PREFERENCES } from "../Session/Login";
 import { App, AppInfo } from '@capacitor/app';
-import { add } from 'ionicons/icons';
 
 
 import officerRankN1 from '../../assets/officer_rank_n1.png';
@@ -85,6 +81,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
     LoadAppInfo();
    },[])
 
+  
    function onActionLog () {
       props.history.push('/actionlog')
    }
@@ -129,7 +126,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
           </div>
           <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
             <p></p>
-          <IonButton onClick={onActionLog} expand="block" color='light'>Bitacora</IonButton>
+          <IonButton onClick={onActionLog} expand="block" color='light'>Actualizaciones HF</IonButton>
         </IonList>}
         
       </IonContent>

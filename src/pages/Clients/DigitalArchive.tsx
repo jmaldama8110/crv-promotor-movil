@@ -7,20 +7,19 @@ import { ClientData } from "../../reducer/ClientDataReducer";
 import { IdentityVerification } from "../../components/DigitalArchive/IdentityVerification";
 
 import { ButtonSlider } from "../../components/SliderButtons";
-import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import 'swiper/css';
 
 
 export const DigitalArchive: React.FC<RouteComponentProps> = (props)=>{
 
-  const { dispatchSession, dispatchClientData } = useContext(AppContext);
+  const { dispatchClientData } = useContext(AppContext);
   let loaded = false;
   useEffect( ()=> {
 
     async function LoadClientData() {
 
       const itemId = props.match.url.replace("/digitalachive/", "");
-      dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
         db.get(itemId)
           .then( async (data) => {
             
@@ -30,8 +29,6 @@ export const DigitalArchive: React.FC<RouteComponentProps> = (props)=>{
               ...newData
             });
             
-            dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
-            console.log(newData);
           })
           .catch((err) => {
             alert("No fue posible recuperar el cliente: " + itemId);

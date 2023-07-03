@@ -38,6 +38,7 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
 
     return (
         <IonList className="ion-padding">
+
         <div className="margin-bottom-sm">
             
             <IonItem>
@@ -62,18 +63,15 @@ export const ClientFormIdentity:React.FC< { onNext:any }> = ( { onNext }) =>{
                 </IonRow>
             </IonGrid>
 
-            
-
-
             <IonButton onClick={() => takePhoto(20)}><IonIcon icon={camera} ></IonIcon></IonButton>
             { !!pics.length &&
             <IonButton color='warning'  onClick={ ()=>{ setPics([]) }}><IonIcon icon={trashOutline} ></IonIcon></IonButton>}
             
-             
             
         </div>
-        <ButtonSlider color="primary" label='Siguiente' expand="block" onClick={onSubmit} slideDirection={"F"}></ButtonSlider>
-        <ButtonSlider color="medium" label='Anterior'  expand="block" onClick={() => {} } slideDirection={"B"}></ButtonSlider>
+        <ButtonSlider color="primary" className="margin-bottom-sm" label='Siguiente' expand="block" onClick={onSubmit} slideDirection={"F"}></ButtonSlider>
+            <ButtonSlider color="medium" label='Anterior'  expand="block" onClick={() => {} } slideDirection={"B"}></ButtonSlider>
+
     </IonList>        
     );
 }
