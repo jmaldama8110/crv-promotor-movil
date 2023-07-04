@@ -210,24 +210,23 @@ const App: React.FC = () => {
           </IonRouterOutlet>
 
           <IonTabBar slot="bottom" onClick={onTabChange}>
-            <IonTabButton tab="tab4" href="/">
+            <IonTabButton tab="home" href="/">
               <IonIcon icon={personCircleOutline} />
               <IonLabel>Mi Perfil</IonLabel>
             </IonTabButton>
-            
-            <IonTabButton tab="tab1" href="/clients" disabled={!session.current_token} >
+            <IonTabButton tab="clients" href="/clients" disabled={!session.current_token} >
               <IonIcon icon={personAddOutline} />
               <IonLabel>Clientes</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab2" href="/groups" disabled={!session.current_token}>
+            <IonTabButton tab="groups" href="/groups" disabled={!session.current_token}>
               <IonIcon icon={peopleOutline} />
               <IonLabel>Grupos</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab3" href="/supervisor" disabled>
+            <IonTabButton tab="supervisor" href="/supervisor" disabled>
               <IonIcon icon={lockClosedOutline} />
               <IonLabel>Supervisor</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab5" href="/notifications" disabled>
+            <IonTabButton tab="notifications" href="/notifications" disabled>
               <IonIcon icon={notificationsCircleOutline} />
               <IonLabel>Mensajes</IonLabel>
             </IonTabButton>

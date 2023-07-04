@@ -1,13 +1,14 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import {IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar} from '@ionic/react';
 
 import './SupervisorHome.css';
+import {lockClosedOutline} from "ionicons/icons";
 
 const SupervisorHome: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Supervisor</IonTitle>
+          <IonTitle><IonIcon icon={lockClosedOutline} /> Supervisor</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
