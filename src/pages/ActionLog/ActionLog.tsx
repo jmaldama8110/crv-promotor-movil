@@ -4,28 +4,27 @@ import { ellipse  } from 'ionicons/icons';
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
-export const ActionLog = () => {
+import { useDBSync } from "../../hooks/useDBSync";
+import { UpdateLog } from "../../reducer/UpdateLogsReducer";
 
-  
+
+export const ActionLog = () => {  
   const { session, updatesLog, dispatchUpdatesLog } = useContext(AppContext);
   const [showAlert] = useIonAlert();
   const [showLoading, dismissLoading] = useIonLoading();
   const [allValid, setAllValid] = useState(false);
+  const { couchDBSyncDownload } = useDBSync();
 
-  let loaded = false;
+  let loaded = true;
 
   function mapActionsTypes ( actionName: string ) {
         switch( actionName) {
           case 'CREATE_UPDATE_LOAN':
-            return 'Solicitud (nueva/actualizar)'
+            return `SOLICITUD NUEVA O RENOVACION`
           case 'CREATE_UPDATE_CLIENT':
-            return 'Cliente (nuevo/actualizar)'
-          case 'MEMBER_DROPOUT':
-            return 'Baja (de integrante en un grupo)';
-          case 'MEMBER_NEW':
-            return 'Ingreso/Reingreso'
+            return  `ACTUALIZAR O CREAR CLIENTE`
           default: 
-            return ''
+            return ``
         }
 
     }
@@ -33,15 +32,30 @@ export const ActionLog = () => {
     
   useEffect(() => {
     async function onPopulate() {
+      await couchDBSyncDownload()
       try {
-        const data = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
-        const userActions:any = data.docs.filter( 
+        
+        const queryData = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
+        const userActions:any = queryData.docs.filter( 
           (i:any) => 
           i.created_by === session.user && 
           i.status ==='Pending'
           );
+
           
-        dispatchUpdatesLog( { type: 'POPULATE_UPDATE_LOGS', data: userActions})
+        const data: UpdateLog[] = userActions.map( (i:any) => ( {
+                                                                        _id: i._id,
+                                                                        name: `${mapActionsTypes(i.name)}`,
+                                                                        status: i.status,
+                                                                        hf_info: {
+                                                                          client_name: i.data.client_name,
+                                                                          hf_client_id: i.data.id_cliente,
+                                                                          hf_application_id: i.data.id_solicitud
+                                                                        },
+                                                                        isOk: i.isOk,
+                                                                        errors: !i.errors ? [] : i.errors }))
+      
+        dispatchUpdatesLog( { type: 'POPULATE_UPDATE_LOGS', data})
       }
       catch(e){
         console.log(e);
@@ -49,8 +63,8 @@ export const ActionLog = () => {
       }
     }
   
-    if (!loaded) {
-      loaded = true;
+    if (loaded) {
+      loaded = false;
       onPopulate();
     }
     return ()=> {
@@ -62,7 +76,7 @@ export const ActionLog = () => {
 
     showLoading({ message: 'Validando...' });
 
-    api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
+    api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
     let apiCalls = 0, noErrors = true; /// when noErrors is false, ends the buckle
 
     try {
@@ -74,28 +88,35 @@ export const ActionLog = () => {
         if( apiRes.data.errors.length > 0){
           noErrors = false;
           const docTrx:any = await db.get(idTrx);
-          const docData:any = await db.get(docTrx.data._id); /// retrieves the document with the presented error
 
           try {
               // sends email with
-            api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
-            await api.post(`/sendemail?toEmail=${session.user}&templateId=d-ad5b9e1906714eecba6f75766d510df8&fromEmail=soporte.hf@grupoconserva.mx`,{
-              actionType: mapActionsTypes(docTrx.name),
-              clientName: `${docData.name} ${docData.lastname} ${docData.second_lastname}`,
-              errors:  apiRes.data.errors.map( (e:any) => (`Dato incorrecto: ${e.property}`))
-            })
+            api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+            const emailTo = process.env.NODE_ENV === 'development' ? 'josman.gomez.aldama@gmail.com' : session.user
             
-  
+            await api.post(`/sendemail?toEmail=${emailTo}&templateId=d-644621db309643f0aba469b4e229f776&fromEmail=soporte.hf@grupoconserva.mx`,
+            { /// Data for email Template
+              actionType: mapActionsTypes(docTrx.name),
+              clientName: mapActionsTypes(docTrx.name),
+              errors:  apiRes.data.errors.map( (e:any) => (JSON.stringify(e)))
+            })
+
           } catch (err) {
             alert('Error al intentar enviar el correo...')
           }
         }
+        
         dispatchUpdatesLog( {
             type: "UPDATE_UPDATE_LOG",
             idx: idTrx,
             status: 'Pending',
+            hf_info: {
+              client_name: updatesLog[apiCalls].hf_info?.client_name,
+              hf_client_id: updatesLog[apiCalls].hf_info?.hf_client_id,
+              hf_application_id: updatesLog[apiCalls].hf_info?.hf_application_id
+            },
             isOk: apiRes.data.errors.length == 0,
-            errors: apiRes.data.errors
+            errors: apiRes.data.errors.map( (e:any )=>(JSON.stringify(e)))
           });
         apiCalls ++;
       }
@@ -112,6 +133,7 @@ export const ActionLog = () => {
       }
     }
     catch(e){
+      
       dismissLoading();
       alert(`Algunas validaciones no fueron superadas al actualizar el sistema, se ha generado un ticket de seguimiento: ${session.user}`);
     }
@@ -130,12 +152,10 @@ export const ActionLog = () => {
         const apiRes = await api.get(`/actions/exec?id=${idTrx}`);
         
         dispatchUpdatesLog( {
-          type: "UPDATE_UPDATE_LOG",
-          idx: idTrx,
-          status: 'Done',
-          isOk: true,
-          errors: []
+          type: "REMOVE_UPDATE_LOG",
+          idx: idTrx          
         });
+        
 
       }
       catch(e){
@@ -149,7 +169,7 @@ export const ActionLog = () => {
           errors: ['Error al hacer update en el HF']
         });
 
-        alert('Hubo un error al intentar la acción EXEC, contacte a Soporte técnico')
+        
       }
       dismissLoading();
       apiCalls ++;
@@ -173,7 +193,7 @@ export const ActionLog = () => {
       <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton />
-          </IonButtons>        
+          </IonButtons>
           <IonTitle>Bitácora de Acciones</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -184,16 +204,14 @@ export const ActionLog = () => {
           {allValid && <IonButton color='success' onClick={onExecAll} disabled={!updatesLog.length}>Aplicar Todo</IonButton>}
           
         <IonList>
-          { updatesLog.reverse().map( (item) => (
+          { updatesLog.reverse().map( (item:UpdateLog) => (
             <IonItem key={item._id}>
               <IonIcon slot="start" color={ item.isOk ? 'success' : 'danger'} icon={ item.status === 'Pending'  ? ellipse : '' }></IonIcon>
               <IonLabel>
                 <h2>{ item.name }</h2>
-                <p> Estatus: { item.status } / {item._id.slice(-6)} </p>
+                <p> Cliente: { item.hf_info?.client_name }   </p>
                 { item.errors!.length > 0 &&<IonButton color='light' id={`${item._id}`} onClick={onIgnoreAction}>Ignorar</IonButton>}
-                <ul>
-                  {item.errors?.map( (e:any, n:number) => <li key={n}>{e.property}</li>)}
-                </ul>
+                
               </IonLabel>
             </IonItem>
           ))}

@@ -12,7 +12,8 @@ import { Preferences } from "@capacitor/preferences";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
 import jwt_decode from "jwt-decode";
-import logoOfficerCertification from '../../assets/officer_certification_logo.png';
+import logoConserva from '../../assets/logo-conserva-new.png';
+
 
 export const LOGIN_KEY_PREFERENCES = 'promotor-movil-preferences';
 
@@ -104,8 +105,8 @@ export const Login: React.FC<RouteComponentProps> = ({ history }) => {
   return (
         <IonList className="ion-padding">
           <div className="image-container shadow margin-left-md margin-right-md">
-            <IonImg src={logoOfficerCertification} alt='Certification social'></IonImg>
-            <p>Reconocimiento a promotores por aplicar responsablemente acciones que fortalecen el microcrédito </p>
+            <IonImg src={logoConserva} alt='Certification social'></IonImg>
+            <p>Conserva Movil </p>
           </div>
           <p></p>
           <IonItem>

@@ -5,27 +5,40 @@ import { RouteComponentProps } from "react-router";
 import { GroupMember } from "../../../reducer/GroupMembersReducer";
 import { AppContext } from "../../../store/store";
 import { LoanAppMemberForm } from "./LoanAppMemberForm";
-import { NewMembersType } from "../../../reducer/NewMembersReducer";
 
 export const LoanAppMemberAdd: React.FC<RouteComponentProps> = (props) => {
   
   
-  const { dispatchNewMembers } = useContext(AppContext);
+  const { dispatchGroupMember,groupMemberList } = useContext(AppContext);
 
   function onAdd (data: any){
-    /// Save new record
 
-    const item: NewMembersType = {
-          ...data,
-          _id: Date.now().toString(),
+    const itemData: GroupMember = {
+      apply_amount:  data.apply_amount,
+      approved_amount: data.apply_amount,
+      client_id: data.client_id,
+      disbursment_mean: data.disbursment_mean,
+      estatus: "INGRESO",
+      sub_estatus: "NUEVO",
+      dropout_reason: [0,''],
+      fullname: data.fullname,
+      id_cliente: data.id_cliente,
+      id_member: 0,
+      id_persona: data.id_persona,
+      curp: data.curp,
+      insurance: {
+        id: Date.now(),
+        beneficiary: data.beneficiary,
+        relationship: data.relationship,
+        percentage: data.percentage
+      },
+      loan_cycle: data.loan_cycle,
+      position: data.position,
+      previous_amount: '0',
+      _id: groupMemberList.length.toString(),
     }
     
-    // const item2: GroupMember = {
-    //   ...data,
-    //   _id: Date.now().toString(),
-    // }
-    dispatchNewMembers({ type: "ADD_NEW_MEMBER",item });
-    // dispatchGroupMember( { type: "ADD_GROUP_MEMBER", item: item2 })
+    dispatchGroupMember( { type: "ADD_GROUP_MEMBER", item: itemData })
     props.history.goBack();
   }
 

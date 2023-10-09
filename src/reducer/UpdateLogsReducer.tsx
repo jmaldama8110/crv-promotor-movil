@@ -19,6 +19,11 @@ export type ActionsUpdatesLog =
     status: "Done" | "Pending";
     isOk: boolean,
     errors: any[];
+    hf_info?: {
+      client_name: string | undefined;
+      hf_client_id: number | undefined;
+      hf_application_id: number | undefined;
+    }
   }
   
   
@@ -27,6 +32,11 @@ export interface UpdateLog {
   name: string, 
   status: "Done" | "Pending", // pending | done
   isOk: boolean;
+  hf_info?: {
+    client_name: string | undefined;
+    hf_client_id: number | undefined;
+    hf_application_id: number | undefined;
+  }
   errors?: any[]; // thrown errors by validation
 }
 
@@ -47,7 +57,12 @@ export const UpdatesLogReducer = (state: State, action: ActionsUpdatesLog) => {
           ?   { ...i,
                 status: action.status,
                 isOk: action.isOk,
-                errors: action.errors              
+                errors: action.errors,
+                hf_info: {
+                  client_name: action.hf_info?.client_name,
+                  hf_client_id: action.hf_info?.hf_client_id,
+                  hf_application_id: action.hf_info?.hf_application_id
+                }
               }: i) )
     default:
       return state;

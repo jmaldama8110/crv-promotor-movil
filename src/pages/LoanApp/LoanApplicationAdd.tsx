@@ -21,8 +21,6 @@ export const LoanApplicationAdd: React.FC<RouteComponentProps> = (props) => {
         dispatchSession({ type: "SET_LOADING", loading_msg: "Guardando...", loading: true})
         const newIdLoan = Date.now().toString();
         const clientInfo:ClientData = await db.get(clientId);
-        console.log(clientInfo);
-        console.log(data);
 
         const newLoanApp = {
             _id: newIdLoan,

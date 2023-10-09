@@ -1,44 +1,51 @@
-import { DroupOutType } from "./DropoutReducer";
 import { GroupMember } from "./GroupMembersReducer";
 
 export type ActionsLoanAppGroup =
   | {
-      type: "SET_LOAN_APP_GROUP";
-      _id: string;
-      apply_by: string;
-      id_cliente: string;
-      id_solicitud: string;
-      loan_officer: string;
-      branch: string;
-      id_producto: string;
-      id_disposicion: string;
-      apply_amount: number;
-      approved_total: number;
-      term: number;
-      frequency: [string, string];
-      first_repay_date: string;
-      disbursment_date: string
-      disbursment_mean: number;
+    type: "SET_LOAN_APP_GROUP";
+    _id: string;
+    couchdb_type: 'LOANAPP_GROUP',
+    apply_by: string;
+    apply_at: string;
+    renovation: boolean;
+    GL_financeable: boolean;
+    id_cliente: number;
+    id_solicitud: number;
+    loan_officer: number;
+    branch: [number, string];
+    id_producto: number;
+    id_disposicion: number;
+    apply_amount: number;
+    approved_total: number;
+    term: number;
+    frequency: [string, string];
+    first_repay_date: string;
+    disbursment_date: string;
+    disbursment_mean: string;
+    liquid_guarantee: number;
+    loan_cycle: number;
+    created_by: string; 
+    created_at: string;
+    estatus: string;
+    sub_estatus: string;
+    dropout: any[],
+    status: [number, string],
+    members: GroupMember [];
+    product: {
+      GL_financeable: boolean;
+      external_id: number;
       liquid_guarantee: number;
-      loan_cycle: string;
-      created_by: string; 
-      created_at: string;
-      estatus: string;
-      sub_estatus: string;
-      members: GroupMember [];
-      product: {
-        external_id: number;
-        min_amount: number;
-        max_amount: number;
-        step_amount: number;
-        min_term: number;
-        max_term: number;
-        product_name: string;
-        term_types: any[];
-        rate: number;
-        tax: number;
-      }
-      coordinates: [number, number];
+      min_amount: number;
+      max_amount: number;
+      step_amount: number;
+      min_term: number;
+      max_term: number;
+      product_name: string;
+      term_types: any[];
+      rate: number;
+      tax: number;
+    }
+    coordinates: [number, number];     
     } |
     {
       type: 'RESET_LOAN_APP_GROUP';
@@ -50,34 +57,40 @@ export interface TermType {
       year_periods: string;
   }
 
+
 export interface LoanAppGroup{
     _id: string;
     couchdb_type: 'LOANAPP_GROUP',
     apply_by: string;
+    apply_at: string;
     renovation: boolean;
     GL_financeable: boolean;
-    id_cliente: string;
-    id_solicitud: string;
-    loan_officer: string;
-    branch: string;
-    id_producto: string;
-    id_disposicion: string;
+    id_cliente: number;
+    id_solicitud: number;
+    loan_officer: number;
+    branch: [number, string];
+    id_producto: number;
+    id_disposicion: number;
     apply_amount: number;
     approved_total: number;
     term: number;
     frequency: [string, string];
     first_repay_date: string;
     disbursment_date: string;
-    disbursment_mean: number;
+    disbursment_mean: string;
     liquid_guarantee: number;
-    loan_cycle: string;
+    loan_cycle: number;
     created_by: string; 
     created_at: string;
     estatus: string;
     sub_estatus: string;
+    status: [number, string],
+    dropout: any[],
     members: GroupMember [];
     product: {
+      GL_financeable: boolean;
       external_id: number;
+      liquid_guarantee: number;
       min_amount: number;
       max_amount: number;
       step_amount: number;
@@ -97,27 +110,32 @@ export const loanAppGroupDef: LoanAppGroup = {
   renovation: true,
   GL_financeable: false,
   apply_by: "",
-  id_cliente: "",
-  id_solicitud: "",
-  loan_officer: "",
-  branch: "",
-  id_producto: "",
-  id_disposicion: "",
+  apply_at: "",
+  id_cliente: 0,
+  id_solicitud: 0,
+  loan_officer: 0,
+  branch: [0, ""],
+  id_producto: 0,
+  id_disposicion: 0,
   apply_amount: 0,
   approved_total: 0,
   term: 0,
   frequency: ["", ""],
   first_repay_date: "",
-  disbursment_date: '',
-  disbursment_mean: 0,
+  disbursment_date: "",
+  disbursment_mean: "",
   liquid_guarantee: 10,
-  loan_cycle: "",
+  loan_cycle: 0,
   created_by: "", 
   created_at: "",
   estatus: "",
   sub_estatus: "",
+  status: [0, ""],
+  dropout: [],
   members: [],
   product: {
+    GL_financeable: false,
+    liquid_guarantee: 10,
     external_id: 0,
     min_amount: 1000,
     max_amount: 1000000,
@@ -142,6 +160,7 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
         ...state,
        _id: action._id,
        apply_by: action.apply_by,
+       apply_at: action.apply_at,
        id_cliente: action.id_cliente,
        id_solicitud: action.id_solicitud,
        loan_officer: action.loan_officer,
@@ -163,6 +182,8 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
        sub_estatus: action.sub_estatus,
        members: action.members,
        product: {
+          GL_financeable: action.product.GL_financeable,
+          liquid_guarantee: action.product.liquid_guarantee,    
           external_id: action.product.external_id,
           min_amount: action.product.min_amount,
           max_amount: action.product.max_amount,
@@ -175,7 +196,6 @@ export const LoanAppGroupReducer = (state: State, action: ActionsLoanAppGroup) =
           tax: action.product.tax
        },
        coordinates: action.coordinates
-
       };
     case "RESET_LOAN_APP_GROUP": 
       return {

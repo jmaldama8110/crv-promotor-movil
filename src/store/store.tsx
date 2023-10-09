@@ -7,11 +7,11 @@ import { ActionsGroupData, GroupData, groupDataDef, GroupDataReducer } from "../
 import { ActionsLoanAppGroup, LoanAppGroup, loanAppGroupDef, LoanAppGroupReducer } from "../reducer/LoanAppGroupReducer";
 import { ActionsGroupMember, GroupMember, GroupMembersReducer } from "../reducer/GroupMembersReducer";
 import { ActionsMember, MemberReducer,groupMemberDef } from "../reducer/GroupMemberReducer";
-import { ActionsDropout, DropoutReducer, DroupOutType } from "../reducer/DropoutReducer";
+
 import { ActionsClientVerification, ClientVerification, clientVerificationDefault, ClientVerificationReducer } from "../reducer/ClientVerificationReducer";
 import { ActionsMembersInArrears, MemberInArrears, MembersInArreasReducer } from "../reducer/MembersInArrearsReducer";
 import { ActionsQuiz, QuizElement, QuizReducer } from "../reducer/QuizReducer";
-import { ActionsNewMembers, NewMembersReducer, NewMembersType } from "../reducer/NewMembersReducer";
+
 import { ActionsUpdatesLog, UpdateLog, UpdatesLogReducer } from "../reducer/UpdateLogsReducer";
 
 type AppContextProviderProps = {
@@ -39,8 +39,6 @@ interface SharedContext {
   groupMember: GroupMember;
   dispatchMember: React.Dispatch<ActionsMember>;
 
-  dropoutMembers: DroupOutType[];
-  dispatchDropoutMembers: React.Dispatch<ActionsDropout>;
 
   clientVerification: ClientVerification;
   dispatchClientVerification: React.Dispatch<ActionsClientVerification>;
@@ -51,8 +49,6 @@ interface SharedContext {
   visitQuizChecklist: QuizElement[];
   dispatchVisitQuizChecklist: React.Dispatch<ActionsQuiz>;
 
-  newMembers: NewMembersType[];
-  dispatchNewMembers: React.Dispatch<ActionsNewMembers>;
 
   updatesLog: UpdateLog[];
   dispatchUpdatesLog: React.Dispatch<ActionsUpdatesLog>;
@@ -83,11 +79,9 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
   const [ loanAppGroup, dispatchLoanAppGroup] = useReducer( LoanAppGroupReducer, loanAppGroupDef);
   const [ groupMemberList, dispatchGroupMember] = useReducer( GroupMembersReducer, []);
   const [ groupMember, dispatchMember] = useReducer(MemberReducer, groupMemberDef);
-  const [ dropoutMembers, dispatchDropoutMembers] = useReducer( DropoutReducer, []);
   const [clientVerification, dispatchClientVerification] = useReducer(ClientVerificationReducer, clientVerificationDefault);
   const [membersInArrears, dispatchMembersInArrears ] = useReducer(MembersInArreasReducer, []);
   const [visitQuizChecklist, dispatchVisitQuizChecklist] = useReducer(QuizReducer,[]);
-  const [newMembers, dispatchNewMembers] = useReducer(NewMembersReducer,[]);
   const [updatesLog, dispatchUpdatesLog] = useReducer(UpdatesLogReducer, []);
   const sharedCtx: SharedContext = {
     session,
@@ -106,16 +100,12 @@ export const AppContextProvider = ( props: AppContextProviderProps) =>{
     dispatchGroupMember,
     groupMember,
     dispatchMember,
-    dropoutMembers,
-    dispatchDropoutMembers,
     clientVerification,
     dispatchClientVerification,
     membersInArrears,
     dispatchMembersInArrears,
     visitQuizChecklist,
     dispatchVisitQuizChecklist,
-    newMembers,
-    dispatchNewMembers,
     updatesLog,
     dispatchUpdatesLog
   }

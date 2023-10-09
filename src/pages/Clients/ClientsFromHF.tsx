@@ -16,7 +16,6 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
     const [clientName, setClientName ] = useState<string>('');
     const [loanAppStatus, setLoanAppStatus ] = useState<string>('');
     const [createNewLoanApp, setCreateNewLoanApp] = useState<boolean>(false);
-    const [createContract, setCreateContract] = useState<boolean>(false);
     const [idLoanApplication, setIdLoanApplication] = useState<number>(0);
     const [idClient, setIdClient] = useState<number>(0);
     const [ClientIdLocal, setClientIdLocal] = useState<string>('');
@@ -35,7 +34,7 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
       setFullName('');
       setClientName('');
       setLoanAppStatus('');
-      setCreateContract(false);
+      
       setCreateNewLoanApp(false);
       setIdLoanApplication(0);
       setIdClient(0);
@@ -130,9 +129,11 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
         alert('No fue posible guardar!')
       }
     }
+
+
     async function onSaveWithRenovation( data:any) {
-      
-      try{
+    
+      try {
         dispatchSession({ type:"SET_LOADING", loading_msg: "Guardando...", loading: true}); 
         // saves de Client info, this is already checked if locally exists by SearchByCurpOrId
         const newClientId = Date.now().toString()
@@ -143,13 +144,54 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
             _id: newClientId,
             status: [2,'Aprovado'],
           });
-        } 
+        }
+        //// active contract List
+        const apiRes2 = await api.get(`/clients/hf/getBalance?idCliente=${idClient}`);
+        const contractList = apiRes2.data;
 
-        const loanExist = await loanAppNewExist( idClient );
+        for( let x = 0; x < contractList.length; x++){
+          /// iterates through the contract list
+          const contractExist = await contractNewExist( contractList[x].idContrato);
+          if( !contractExist ){
+              /// if the contract does not exists, create it
+              const newContract = {
+                  ...apiRes2.data[0],
+                  _id: Date.now().toString(),
+                  client_id: clientExistLocal ? ClientIdLocal : newClientId,
+                  created_by: session.user,
+                  created_at: new Date().toISOString(),
+                  branch: session.branch,
+                  couchdb_type: "CONTRACT",
+               }
+               await db.put(newContract);
+          }
 
-        if( !loanExist && createNewLoanApp ){
-          const apiRes = await api.get(`/clients/hf/loanapps?branchId=${session.branch[0]}&applicationId=${idLoanApplication}`);
-          const newLoanAppId= Date.now().toString()
+        }
+        const apiRes = await api.get(`/clients/hf/loanapps?branchId=${session.branch[0]}&applicationId=${idLoanApplication}`);
+        const contractLoanAppExist = await solicitudIdExist(apiRes.data.id_solicitud);
+        const contractLoanAppId= Date.now().toString();
+
+        if( !contractLoanAppExist ) {
+          const activeLoanApp: any = {
+            ...apiRes.data,
+            _id: contractLoanAppId,
+            dropout: [],
+            apply_by: clientExistLocal ? ClientIdLocal : newClientId,
+            renovation: false,
+            apply_at: new Date().toISOString(),
+            created_by: session.user,
+            created_at: new Date().toISOString(),
+            branch: session.branch,
+            couchdb_type: "LOANAPP",
+          }
+          await db.put(activeLoanApp);
+
+        }
+
+        if( createNewLoanApp ){
+          const newLoanAppId= Date.now().toString();
+          const newMembersData = convertMembersDataFromActiveToNew(apiRes.data.members);
+          
           const newLoaApp: any = {
             ...apiRes.data,
             _id: newLoanAppId,
@@ -163,34 +205,26 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
             created_at: new Date().toISOString(),
             branch: session.branch,
             couchdb_type: "LOANAPP",
+            estatus: "TRAMITE",
+            sub_estatus: "NUEVO TRAMITE",
+            status: [1,"NUEVO TRAMITE"],
+            members: newMembersData 
           };
+
           await db.put(newLoaApp);
-          await createAction( "CREATE_UPDATE_LOAN" , { id_loan: newLoanAppId },session.user )
+          await createAction( "CREATE_UPDATE_LOAN" , 
+          {
+            id_loan: newLoanAppId,
+            _id: '',
+            client_name: `${data.name} ${data.lastname} ${data.second_lastname}`,
+            id_cliente: apiRes.data.id_cliente ? apiRes.data.id_cliente : 0,
+            id_solicitud: apiRes.data.id_solicitud? apiRes.data.id_solicitud: 0
+          },
+          session.user )
+
         }
 
-        //// active contract List
-        if( createContract ){
-          const apiRes2 = await api.get(`/clients/hf/getBalance?idCliente=${idClient}`);
-          const contractList = apiRes2.data;
-          for( let x = 0; x < contractList.length; x++){
-            /// iterates through the contract list
-            const contractExist = await contractNewExist( contractList[x]);
-            if( !contractExist ){
-              /// if the contract does not exists, create it
-              const newContract = 
-                  {
-                    ...apiRes2.data[0],
-                    _id: Date.now().toString(),
-                    client_id: clientExistLocal ? ClientIdLocal : newClientId,
-                    created_by: session.user,
-                    created_at: new Date().toISOString(),
-                    branch: session.branch,
-                    couchdb_type: "CONTRACT",
-                }
-                await db.put(newContract);
-            }
-          }
-        }
+
         ////// Finally, puts ans Syncs
         await couchDBSyncUpload();
         dispatchSession({ type:"SET_LOADING", loading_msg: "", loading: false}); 
@@ -212,27 +246,51 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
     },[])
 
 
-  
-    async function loanAppNewExist(IdCliente: number){
-        await db.createIndex( {index: { fields: ["couchdb_type"]}});
-        const data = await db.find({selector: { couchdb_type: 'LOANAPP' }})
-        const loan = data.docs.find((i:any) => i.id_cliente == IdCliente  )
-        return !!loan;
-
-   }
+    function convertMembersDataFromActiveToNew( membersData: any[]){
+      return membersData.map( (i:any)=>(
+        {
+          _id: i._id,
+          id_member: i.id_member,
+          id_cliente: i.id_cliente,
+          fullname: i.fullname,
+          estatus: "TRAMITE",
+          sub_estatus: "NUEVO TRAMITE",
+          position: i.position,
+          apply_amount: i.apply_amount,
+          approved_amount: i.approved_amount,
+          previous_amount: i.previous_amount,
+          loan_cycle: i.loan_cycle,
+          disbursment_mean: i.disbursment_mean,
+          insurance: i.insurance
+        }  ))
+    }
+   
    async function contractNewExist(IdContract: number){
-     try{
-        await db.createIndex( {index: { fields: ["couchdb_type"]}});
-        const data = await db.find({selector: {
-          couchdb_type: 'CONTRACT'
-        }})
-         const contract = data.docs.find((i:any) => i.idContrato == IdContract  )
-        return !!contract;
-     }
-     catch(e){
-      console.log(e);
-      return false;
-     }
+      try{
+          await db.createIndex( {index: { fields: ["couchdb_type"]}});
+          const data = await db.find({selector: {
+            couchdb_type: 'CONTRACT'
+          }})
+          const contract = data.docs.find((i:any) => i.idContrato == IdContract  )
+          return !!contract;
+      }
+      catch(e){
+        console.log(e);
+        return false;
+      }
+    }
+  async function solicitudIdExist( idsol: number) {
+    try{
+      await db.createIndex( {index: { fields: ["couchdb_type"]}});
+      const data = await db.find({selector: {
+        couchdb_type: 'LOANAPP'
+      }})
+      const loanApp = data.docs.find((i:any) => i.id_solicitud == idsol  )
+      return !!loanApp;
+    }
+    catch(e){
+      return false
+    }
   }
 
   return (
@@ -280,16 +338,7 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
                           checked={createNewLoanApp}
                           onIonChange={async (e) =>setCreateNewLoanApp(e.detail.checked)} />
                         </IonItem>
-                        <IonItem>
-                          <IonLabel>Registrar Contracto activo</IonLabel>
-                            <IonCheckbox
-                            checked={createContract}
-                            onIonChange={async (e) =>setCreateContract(e.detail.checked)} />
-                        </IonItem>
-                        
                         </>
-
-
             }
 
             { hide && <ClientForm onSubmit={ externalId === '0' ? onSaveWithRenovation : onSaveOnlyClient} /> }

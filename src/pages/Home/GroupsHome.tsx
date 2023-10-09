@@ -18,7 +18,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
   const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
   const { couchDBSyncUpload } = useDBSync();
 
-  const { dispatchGroupData, dropoutMembers } = useContext(AppContext);
+  const { dispatchGroupData } = useContext(AppContext);
   const [clientSearchData, setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',

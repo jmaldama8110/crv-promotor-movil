@@ -41,7 +41,14 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
                   await dbX.bulkDocs(data.identity_pics);
                   await dbX.bulkDocs(data.comprobante_domicilio_pics);
                   // creates the new action when new client is added
-                  await createAction( "CREATE_UPDATE_CLIENT" , { _id: clientIdNew },session.user )
+                  await createAction( "CREATE_UPDATE_CLIENT" , { 
+                    _id: clientIdNew,
+                    id_loan: '',
+                    client_name:`${data.name} ${data.lastname} ${data.second_lastname}`,
+                    id_cliente: 0,
+                    id_solicitud: 0,
+                  },
+                    session.user )
                   await couchDBSyncUpload();
                   dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
                   history.goBack();

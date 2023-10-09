@@ -42,20 +42,20 @@
     padding: 1rem;
 }
 .shadow {
-    box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1), 0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 -4em 4em rgba(0, 0, 0, 0.3), 0 0 0 2px rgb(255, 255, 255), 0.3em 0.3em 1em rgba(0, 0, 0, 0.2);
 }
 
 .image-container ion-img{
-    width: 40%;
+    width: 100%;
     margin: auto;
+    
 }
 
 .image-container p {
-    color: #676767;
+    color: gray;
     text-align: center;
     font-size: small;
     max-width: 300px;
     margin:auto;
-    
 }
 /* */

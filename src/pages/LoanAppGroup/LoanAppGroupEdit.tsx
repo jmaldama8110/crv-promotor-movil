@@ -11,7 +11,7 @@ import { LoanAppGroupForm } from "./LoanAppGroupForm";
 export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
 
    
-    const { dispatchLoanAppGroup, groupMemberList,dropoutMembers,newMembers, dispatchSession, session } = useContext(AppContext);
+    const { dispatchLoanAppGroup, groupMemberList, dispatchSession, session } = useContext(AppContext);
     const { couchDBSyncUpload } = useDBSync();
     useEffect( ()=>{
 
@@ -29,6 +29,8 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
     
     const onSave = async (data:any) => {
       const itemId = props.match.url.split("/")[5];
+
+      props.history.goBack();
       dispatchSession( { type: "SET_LOADING", loading_msg: 'Guardando...',loading: true});
       db.get(itemId).then( async (loanInfo:any) => {
         return db.put({
@@ -38,19 +40,18 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
           renovation: false,
           updated_at: Date.now()
         }).then( async function(){
+
+          const clientData:any = await db.get(loanInfo.apply_by);
+
           await createAction( "CREATE_UPDATE_LOAN", { 
-                  id_loan: itemId, 
-                },
-                session.user );
-          await createAction("MEMBER_NEW", {
-            hasNewMembers: !!newMembers.length,
-            newmembers: newMembers,
-          },
-          session.user);
-          await createAction("MEMBER_DROPOUT",{
-            hasDropouts: !!dropoutMembers.length,
-            dropouts: dropoutMembers,
-          },session.user)
+                _id: '',    
+                id_loan: itemId,
+                client_name: `${clientData.name} ${clientData.lastname} ${clientData.second_lastname}`,
+                id_cliente: clientData.id_cliente,
+                id_solicitud: clientData.id_solicitud
+              },
+              session.user );
+  
           await couchDBSyncUpload();
           //// actions for dropout members
           // QUITAR LOS ARREGLOS DE DROP_OUT Y NEW MEMBERS DEL LOAN APP

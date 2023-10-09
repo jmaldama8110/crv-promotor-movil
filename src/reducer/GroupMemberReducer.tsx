@@ -22,6 +22,7 @@ export const groupMemberDef: GroupMember = {
     disbursment_mean: 2,
     estatus: '',
     sub_estatus: '',
+    dropout_reason: [0,''],
     insurance: {
         beneficiary: "",
         relationship: "",

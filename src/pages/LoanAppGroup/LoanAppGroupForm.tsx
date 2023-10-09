@@ -8,11 +8,12 @@ import { LoanAppGroupFormSummary } from "../../components/LoanAppGroupForm/LoanA
 import { LoanAppGroupFormGenerals } from "../../components/LoanAppGroupForm/LoanAppGroupFormGenerals";
 import { AppContext } from "../../store/store";
 import { useContext, useEffect } from "react";
+import { db } from "../../db";
 
 
 export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
  
-  const { dispatchLoanAppGroup, loanAppGroup, dispatchNewMembers, dispatchGroupMember, groupMemberList, dispatchDropoutMembers } = useContext( AppContext );
+  const { dispatchLoanAppGroup, loanAppGroup,  dispatchGroupMember, groupMemberList } = useContext( AppContext );
 
   /** Product selection */
   function onProductNext (data:any) {
@@ -28,6 +29,7 @@ export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
 
   /** General conditions */
   function onGeneralNext (data:any){
+
     dispatchLoanAppGroup({
       type: "SET_LOAN_APP_GROUP",
       ...loanAppGroup,
@@ -37,30 +39,26 @@ export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
   }
 
 
-  function onMembersNext (){ 
-    /// nothing to do, since members are manages by another state (GroupMembers)
+  async function onMembersNext (){ 
+
   }
 
 
   function onSend() {
     dispatchLoanAppGroup( { type: 'RESET_LOAN_APP_GROUP'})
     dispatchGroupMember( { type:"POPULATE_GROUP_MEMBERS", data: []})
-    dispatchDropoutMembers( { type: "POPULATE_DROPOUTS", data: []});
-    dispatchNewMembers( { type: "POPULATE_NEW_MEMBERS", data: []});
 
     onSubmit( loanAppGroup );
-  
-  
+
   }
 
   useEffect( ()=>{
     return ()=>{
-      dispatchLoanAppGroup( { type: 'RESET_LOAN_APP_GROUP'})
-      dispatchGroupMember( { type:"POPULATE_GROUP_MEMBERS", data: []})
-      dispatchDropoutMembers( { type: "POPULATE_DROPOUTS", data: []});
-      dispatchNewMembers( { type: "POPULATE_NEW_MEMBERS", data: []});
+        dispatchLoanAppGroup( { type: 'RESET_LOAN_APP_GROUP'})
+        dispatchGroupMember( { type:"POPULATE_GROUP_MEMBERS", data: []})
       }
   },[])
+
   
   return (
     <Swiper spaceBetween={50} slidesPerView={1} allowTouchMove={false}>
@@ -71,7 +69,7 @@ export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
       <SwiperSlide>
           <LoanAppGroupFormGenerals onSubmit={onGeneralNext} />
       </SwiperSlide>
-      
+    
       <SwiperSlide>
         <LoanAppGroupFormMembers onSubmit={onMembersNext}/>
 

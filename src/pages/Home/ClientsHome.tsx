@@ -189,7 +189,7 @@ const ClientsHome: React.FC = () => {
         {!!clientSelected.id &&
         <div>
           <IonItem>
-            <IonLabel>Id Cliente: {clientDetail.id_cliente ? clientDetail.id_cliente: 'Sin Registro HF'} </IonLabel>
+            <IonLabel style={ clientDetail.id_cliente ? {}: { backgroundColor: "yellow"} }>Id Cliente: {clientDetail.id_cliente ? clientDetail.id_cliente : 'Sin Registro HF'} </IonLabel>
           </IonItem>
           <IonItem button onClick={onShowGeoActions}>
             <IonIcon icon={locationOutline}></IonIcon> 

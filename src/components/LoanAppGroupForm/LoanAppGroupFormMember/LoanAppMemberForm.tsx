@@ -58,16 +58,17 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
                 return !found
               })
               const newData = newSearchList.map( (i:any)=>(
-                  {   id: i._id,
-                            rev: i._rev,
-                            etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`,
-                            data: {
-                              id_cliente: i.id_cliente,
-                              id_persona: i.id_persona,
-                              name: i.name,
-                              curp: i.curp,
-                              loan_cycle: i.loan_cycle
-                            }
+                  {   
+                    id: i._id,
+                    rev: i._rev,
+                    etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}`,
+                    data: {
+                      id_cliente: i.id_cliente,
+                      id_persona: i.id_persona,
+                      name: i.name,
+                      curp: i.curp,
+                      loan_cycle: i.loan_cycle
+                    }
                 }))
               
               setClientSearchData( newData as SearchData[]);

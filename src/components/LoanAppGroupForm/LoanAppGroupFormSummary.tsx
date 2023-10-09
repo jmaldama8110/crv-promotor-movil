@@ -8,15 +8,14 @@ import {
   IonRow,
 } from "@ionic/react";
 import { useContext } from "react";
-import { DroupOutType } from "../../reducer/DropoutReducer";
+
 import { GroupMember } from "../../reducer/GroupMembersReducer";
 import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
-import { NewMembersType } from "../../reducer/NewMembersReducer";
 
 
 export const LoanAppGroupFormSummary: React.FC = () => {
-  const { groupMemberList, loanAppGroup, dropoutMembers, newMembers } = useContext(AppContext);
+  const { groupMemberList, loanAppGroup } = useContext(AppContext);
 
 
   return (
@@ -55,21 +54,6 @@ export const LoanAppGroupFormSummary: React.FC = () => {
                         <IonGrid>
                             { groupMemberList.map((i:GroupMember)=> (
                                 <IonRow key={i._id}><IonLabel className="xs">{formatLocalCurrency(parseFloat(i.apply_amount))}</IonLabel><IonLabel className="xs"> - {i.fullname.slice(0,20)} ({i.position.slice(0,1)}) </IonLabel></IonRow>) )
-                              }
-
-                        </IonGrid>
-      <IonItem><IonLabel>Nuevos Integrantes:</IonLabel></IonItem>
-                        <IonGrid>
-                            { newMembers.map((i:NewMembersType, n:number)=> (
-                                <IonRow key={n}><IonLabel className="xs"></IonLabel>- {i.fullname.slice(0,20)} </IonRow> ) )
-                              }
-
-                        </IonGrid>
-
-      <IonItem><IonLabel>Bajas:</IonLabel></IonItem>
-                        <IonGrid>
-                            { dropoutMembers.map((i:DroupOutType)=> (
-                                <IonRow key={i.member_id}><IonLabel className="xs"></IonLabel>- {i.fullname.slice(0,20)} ({i.reasonType}) <IonLabel className="xs">({i.dropoutReason[1]}) </IonLabel></IonRow>) )
                               }
 
                         </IonGrid>

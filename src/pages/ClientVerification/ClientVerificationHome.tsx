@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
-import { formatDate, formatLocalDateShort } from "../../utils/numberFormatter";
+import { formatDate } from "../../utils/numberFormatter";
 
 
 export const ClientVerificationHome: React.FC<RouteComponentProps> = ({match, history})=> {

@@ -63,6 +63,8 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
 
   function onNext () {
     const data = {
+      GL_financeable: false,
+      liquid_guarantee: 10,
       min_amount: minAmout,
       max_amount: maxAmount,
       step_amount: stepAmount,

@@ -8,10 +8,6 @@ export type ActionsGroupMember =
     type: "ADD_GROUP_MEMBER",
     item: GroupMember
   }
-  | {
-    type: "REMOVE_GROUP_MEMBER",
-    idx: string; // member id
-  }
   |{
     type: "UPDATE_GROUP_MEMBER",
     idx: string;
@@ -20,6 +16,9 @@ export type ActionsGroupMember =
     beneficiary: string;
     relationship: string;
     percentage: number;
+    estatus: string;
+    sub_estatus: string;
+    dropout_reason: [number, string],
     disbursment_mean: 1 | 2;
   }
   
@@ -39,10 +38,12 @@ export interface GroupMember {
   disbursment_mean: 1 | 2,
   estatus: string;
   sub_estatus: string;
+  dropout_reason: [number, string],
   insurance: {
-    beneficiary: string,
-    relationship: string,
-    percentage: number
+    id?:number;
+    beneficiary: string;
+    relationship: string;
+    percentage: number;
   }
 }
 
@@ -55,8 +56,6 @@ export const GroupMembersReducer = (state: State, action: ActionsGroupMember) =>
       return action.data;
     case "ADD_GROUP_MEMBER":
       return [ ...state, action.item]
-    case "REMOVE_GROUP_MEMBER":
-        return state.filter( (i:GroupMember)=> (i._id !== action.idx))
     case "UPDATE_GROUP_MEMBER": 
         return state.map( (i:GroupMember) => 
         ( i._id === action.idx 
@@ -64,7 +63,11 @@ export const GroupMembersReducer = (state: State, action: ActionsGroupMember) =>
                 position: action.position,
                 apply_amount: action.apply_amount,
                 disbursment_mean: action.disbursment_mean,
-                insurance: { 
+                estatus: action.estatus,
+                sub_estatus: action.sub_estatus,
+                dropout_reason: action.dropout_reason,
+                insurance: {
+                  ...i.insurance,
                   beneficiary: action.beneficiary,
                   relationship: action.relationship,
                   percentage: action.percentage

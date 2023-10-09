@@ -42,7 +42,6 @@ interface GroupLoanApplicationHF {
 
 interface MemberHf extends GroupMember{
   isActive: boolean;
-  
 }
 
 export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.SetStateAction<number>>, onSubmit: any}> = ({ setProgress, onSubmit }) => {
@@ -104,7 +103,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       setLoanApp( apiRes.data.loan_app);
       const newMemberData: MemberHf[] = apiRes
                                         .data.
-                                        loan_app.members.map( (mem:MemberHf)=>(
+                                        loan_app.members.map( (mem:MemberHf, count:number)=>(
                                       { _id: '',
                                         id_member: mem.id_member,
                                         id_cliente: mem.id_cliente,
@@ -118,9 +117,10 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
                                         approved_amount: mem.approved_amount,
                                         loan_cycle: mem.loan_cycle,
                                         disbursment_mean: mem.disbursment_mean,
-                                        estatus: mem.estatus,
-                                        sub_estatus: mem.sub_estatus,
+                                        estatus: 'TRAMITE',
+                                        sub_estatus: 'NUEVO TRAMITE',
                                         insurance: {
+                                          id: count,
                                           beneficiary: mem.insurance.beneficiary,
                                           relationship: mem.insurance. relationship,
                                           percentage: mem.insurance.percentage,
@@ -258,16 +258,18 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
           disbursment_mean: mem.disbursment_mean,
           estatus: mem.estatus,
           sub_estatus: mem.sub_estatus,
+          dropout_reason: mem.dropout_reason,
           insurance: {
+            id: mem.insurance.id,
             beneficiary: mem.insurance.beneficiary,
             relationship: mem.insurance. relationship,
-              percentage: mem.insurance.percentage,
+            percentage: mem.insurance.percentage,
           },
           isActive: !!isFound,
           client_id: !!isFound ? isFound._id : '',
         }
     })
-    // setLoanApp({ ...loan_app,members: newMemberData });
+    
     setMembersHf( newMemberData);
   }
 

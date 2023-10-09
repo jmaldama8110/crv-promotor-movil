@@ -63,7 +63,14 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
       }).then( async ()=>{
         await dbX.bulkDocs(data.identity_pics);
         await dbX.bulkDocs(data.comprobante_domicilio_pics);
-        await createAction("CREATE_UPDATE_CLIENT", { _id: itemId }, session.user);
+        await createAction("CREATE_UPDATE_CLIENT", 
+        { 
+          _id: itemId,
+          id_loan: '',
+          client_name: `${data.name} ${data.lastname} ${data.second_lastname}`,
+          id_cliente: data.id_cliente,
+          id_solicitud: 0
+         }, session.user);
         await couchDBSyncUpload();
         dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
         history.goBack();

@@ -1,7 +1,14 @@
 import { db } from "../db";
 
-type ActionName = "CREATE_UPDATE_LOAN" | "CREATE_UPDATE_CLIENT" | "MEMBER_DROPOUT" | "MEMBER_NEW"
+type ActionName = "CREATE_UPDATE_LOAN" | "CREATE_UPDATE_CLIENT" 
 
+type ActionDataProperty = {
+    id_loan: string;
+    _id: string;
+    client_name?: string;  
+    id_cliente?: number;
+    id_solicitud?: number;
+}
 
 export interface ActionsCouchDb {
     _id: string;
@@ -9,11 +16,11 @@ export interface ActionsCouchDb {
     name: ActionName;
     created_at: Date;
     created_by: string;
-    data: any
+    data: ActionDataProperty
     status: "Done" | "Pending";
 }
 
-export async function createAction (action_name:ActionName, data:any, user: string){
+export async function createAction (action_name:ActionName, data:ActionDataProperty, user: string){
 
     const action: ActionsCouchDb = {
         _id: Date.now().toString(),

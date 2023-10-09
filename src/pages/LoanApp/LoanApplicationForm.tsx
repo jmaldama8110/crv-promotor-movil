@@ -75,32 +75,27 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                   couchdb_type: "PRODUCT"
                 }
               }).then( (data:any) =>{
-                const newData = data.docs.filter( (i:any) => ( (i.external_id === 5 || i.external_id === 12 ) ))
+                const newData = data.docs.filter( (i:any) => ( (i.external_id == 5 || i.external_id == 12 || i.external_id == 4 ) ))
                 setProductList( newData);
             })
            })
 
     },[])
 
-
+    async function LoadDestCatalog () {
+        const query = await db.find({
+            selector: {
+            couchdb_type: "CATALOG",
+            name: "CATA_destinoCredito"
+            }
+        });
+        const newDestinationsData: LoanDestination[] = query.docs.map((i:any)=> ({ _id: i._id, description:i.descripcion, status:false  }) )
+        setDestinations(newDestinationsData)
+    }
     useEffect( ()=>{
         if( !props.loanapp ){
-                /// only when form is in new Loan app
-            db.createIndex( {
-                index: { fields: [ "couchdb_type"] }
-            }).then( function (){
-                db.find({
-                    selector: {
-                    couchdb_type: "CATALOG",
-                    name: "CATA_destinoCredito"
-                    }
-                }).then( (data:any) =>{
-                    /// converts from loanDestinatios Catalog to locally have an array of selected destinations and its status TRUE or FALSE
-                    const newDestinationsData: LoanDestination[] = data.docs.map((i:any)=> ({ _id: i._id, description:i.descripcion, status:false  }) )
-                    setDestinations(newDestinationsData);
-                })
-            })
-            }
+            LoadDestCatalog();        
+        }
     },[])
 
     useEffect( ()=> {
@@ -111,17 +106,18 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
             setLng(coordsData.coords.longitude);
           }
         loadCoordinates();
+        LoadDestCatalog();
         
         if( props.loanapp ){
             /// si estamos editando el Loan
             if( props.loanapp.pics){
             setPics( props.loanapp.pics);
             }
+
             if(props.loanapp.loandests){
-                setDestinations(props.loanapp.loandests);
-                
+                let loanDestData = props.loanapp.dest;
+                setDestinations(loanDestData);
             }
-            
             if( props.loanapp.product){
 
                 setSegment(props.loanapp.product.external_id);
@@ -133,7 +129,7 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                 setMinTerm(props.loanapp.product.min_term);
                 setMaxTerm(props.loanapp.product.max_term);
                 setProductName(props.loanapp.product.product_name);
-                setProductTermTypes(props.loanapp.product.allowed_term_type);
+                setProductTermTypes(props.loanapp.product.term_types);
                 setProductRate(props.loanapp.product.rate);
                 setTax(props.loanapp.product.tax);
             }

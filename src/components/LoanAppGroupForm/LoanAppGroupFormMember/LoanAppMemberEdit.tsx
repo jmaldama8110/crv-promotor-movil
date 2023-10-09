@@ -3,17 +3,16 @@ import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-com
 import { useContext, useEffect, useRef, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { db } from "../../../db";
-import { DroupOutType } from "../../../reducer/DropoutReducer";
+
 
 import { GroupMember } from "../../../reducer/GroupMembersReducer";
-
 import { AppContext } from "../../../store/store";
 import { LoanAppMemberForm } from "./LoanAppMemberForm";
 
 
 export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
 
-    const { dispatchMember,groupMember, groupMemberList, dispatchDropoutMembers,dispatchGroupMember  } = useContext(AppContext);
+    const { dispatchMember,groupMember, groupMemberList,dispatchGroupMember  } = useContext(AppContext);
 
     let render = true;
     const [reasonTypes] = useState(["CANCELACION","RECHAZO","CASTIGO"])
@@ -41,21 +40,68 @@ export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
         const itemId = urlData[size - 1]
 
         const member = groupMemberList.find( (i:GroupMember) => i._id === itemId) as GroupMember
-        const newDropout: DroupOutType = {
-          member_id: itemId,
-          id_cliente: member.id_cliente,
-          id_persona: member.id_persona,
-          fullname: member.fullname,
-          reasonType,
-          dropoutReason: [dropoutReason.id, dropoutReason.etiqueta],
-          updated_at: (new Date()).toISOString(),
-        }
-        dispatchDropoutMembers({ type:"ADD_DROPOUT",item: newDropout})
-        dispatchGroupMember({ type:"REMOVE_GROUP_MEMBER", 
-          idx: itemId 
+
+        const dropStatus = mapReasonTypeToStatus(reasonType);
+        
+        dispatchGroupMember({ type:"UPDATE_GROUP_MEMBER", 
+          idx: itemId,
+          position: member.position,
+          apply_amount: member.apply_amount,
+          estatus: dropStatus.estatus,
+          sub_estatus: dropStatus.substatus,
+          dropout_reason: dropStatus.dropout_reason as [number, string],
+          disbursment_mean: member.disbursment_mean,
+          percentage: member.insurance.percentage,
+          beneficiary: member. insurance.beneficiary,
+          relationship: member.insurance.relationship
         })
       props.history.goBack(); 
       }
+    }
+
+    function mapReasonTypeToStatus ( reasonType: string ){
+      /*
+          CANCELACION 
+          estatus: CANCELADO
+          substatus: CANCELACION/ABANDONO
+
+          RECHAZO
+          estatus: RECHAZADO
+          substatus: RECHAZADO
+
+          CASTIGO
+          estatus: RECHAZADO
+          substatus: CASTIGADO
+
+       */
+        switch( reasonType){
+          case "CANCELACION": 
+            return {
+              estatus: "CANCELADO",
+              substatus: "CANCELACION/ABANDONO",
+              dropout_reason: [dropoutReason.id, dropoutReason.etiqueta]
+            }
+          case "RECHAZO":
+            return {
+              estatus: "RECHAZADO",
+              substatus: "RECHAZADO",
+              dropout_reason: [dropoutReason.id, dropoutReason.etiqueta]
+            }
+          case "CASTIGO":
+            return {
+              estatus: "RECHAZADO",
+              substatus: "CASTIGADO",
+              dropout_reason: [dropoutReason.id, dropoutReason.etiqueta]
+            }
+          default:
+            return {
+              estatus: "CANCELADO",
+              substatus: "CANCELACION/ABANDONO",
+              dropout_reason: [dropoutReason.id, dropoutReason.etiqueta]
+            }
+        }
+
+
     }
 
     useEffect( ()=>{
@@ -114,7 +160,10 @@ export const LoanAppMemberEdit: React.FC<RouteComponentProps> = (props) => {
         beneficiary: data.beneficiary,
         relationship: data.relationship,
         percentage: data.percentage,
-        disbursment_mean: data.disbursment_mean
+        disbursment_mean: data.disbursment_mean,
+        estatus: 'TRAMITE',
+        sub_estatus: 'NUEVO TRAMITE',
+        dropout_reason: [0,'']
       })
       props.history.goBack();     
       

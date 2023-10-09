@@ -52,28 +52,30 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
               couchdb_type: "CATALOG",
               name: "CATA_sexo"
             }
-          }).then( data =>{
-            setSexCatalog(data.docs);
+          }).then( dataSexCatalog =>{
+            setSexCatalog(dataSexCatalog.docs);
             
             db.find( {
               selector: {
                 couchdb_type: "PROVINCE"
               }
-            }).then( data =>{
-              setProvinces(data.docs);
+            }).then( dataProvices =>{
+              setProvinces(dataProvices.docs);
               db.find({
                 selector: {
                   couchdb_type: "CATALOG",
                   name: "CATA_nacionalidad"
                 }
-              }).then( data =>{
-                setNationCatalog( data.docs );
+              }).then( dataNationCatalog =>{
+                setNationCatalog( dataNationCatalog.docs );
+                
                 db.find({
                   selector: {
                     couchdb_type: "COUNTRY"
                   }
-                }).then( data =>{
-                  setCountries(data.docs)
+                }).then( dataCountries =>{
+                  setCountries(dataCountries.docs)
+                  
                   if(clientData._id){
                     setName(clientData.name);
                     setLastname( clientData.lastname);
@@ -89,6 +91,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                     setNumeroVertical(clientData.numero_vertical);
                     setNationality(clientData.nationality[0])
                     setCountryOfBirth( clientData.country_of_birth[0]);
+                    
                   }                  
                 })
               })

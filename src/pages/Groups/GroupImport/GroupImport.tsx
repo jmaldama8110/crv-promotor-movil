@@ -91,7 +91,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
         const loanExist = await loanAppExist( data.loan_app.id_solicitud);
         if( !loanExist){
           const newLoanAppIdGrp = Date.now().toString()
-          const newLoaApp: LoanAppGroup = {
+          const newLoanApp: LoanAppGroup = {
             ...data.loan_app,
             members: data.membersHf,
             _id: newLoanAppIdGrp,
@@ -104,13 +104,13 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
             branch: session.branch,
             couchdb_type: "LOANAPP_GROUP",
           };
-          await db.put(newLoaApp);
-          // await createAction( "CREATE_UPDATE_LOAN" , { id_loan: newLoanAppIdGrp },session.user )
+          
+          await db.put(newLoanApp);
         }
         ////
         if( data.createNewLoanApp ){
           const newLoanAppIdGrp = Date.now().toString()
-          const newLoaApp: LoanAppGroup = {
+          const newLoanApp: LoanAppGroup = {
             ...data.loan_app,
             members: data.membersHf,
             _id: newLoanAppIdGrp,
@@ -128,8 +128,16 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
             sub_estatus: "NUEVO TRAMITE",
             couchdb_type: "LOANAPP_GROUP",
           };
-          await db.put(newLoaApp);
-          await createAction( "CREATE_UPDATE_LOAN" , { id_loan: newLoanAppIdGrp },session.user )
+          await db.put(newLoanApp);
+          await createAction( "CREATE_UPDATE_LOAN" , 
+          { 
+            _id: '',
+            id_loan: newLoanAppIdGrp,
+            client_name: data.group_data.group_name,
+            id_cliente: data.group_data.id_cliente,
+            id_solicitud: data.loan_app.id_solicitud
+           },
+          session.user )
 
         }
       //// traer el prestamo ACTIVO para consultar saldo si es que no ha sido sincronizado

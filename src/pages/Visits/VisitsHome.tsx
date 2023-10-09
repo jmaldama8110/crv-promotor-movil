@@ -50,6 +50,7 @@ export const VisitsHome: React.FC<RouteComponentProps> = ({
   }
   useEffect(() => {
 
+  
     loadData();
   }, []);
   return (

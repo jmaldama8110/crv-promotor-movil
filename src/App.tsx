@@ -72,7 +72,6 @@ import { ClientsFromHF } from "./pages/Clients/ClientsFromHF";
 import { GroupAdd } from "./pages/Groups/GroupAdd";
 import { LoanAppGroupHome } from "./pages/LoanAppGroup/LoanAppGroupHome";
 import { GroupEdit } from "./pages/Groups/GroupEdit";
-import { LoanAppGroupAdd } from "./pages/LoanAppGroup/LoanAppGroupAdd";
 import { LoanAppGroupEdit } from "./pages/LoanAppGroup/LoanAppGroupEdit";
 import { LoanAppMemberAdd } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberAdd";
 import { LoanAppMemberEdit } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberEdit";
@@ -90,9 +89,7 @@ import { WhereToPayHome } from "./pages/WhereToPay/WhereoToPayHome";
 import { ActionLog } from "./pages/ActionLog/ActionLog";
 import { DigitalArchive } from "./pages/Clients/DigitalArchive";
 
-
 setupIonicReact();
-
 
 const App: React.FC = () => {
   let render = true;
@@ -183,7 +180,6 @@ const App: React.FC = () => {
             <Route exact path="/groups/edit/:id" component={GroupEdit}></Route>
 
             <Route exact path="/groups/:id/loanapps" component={LoanAppGroupHome}></Route>
-            <Route exact path="/groups/:id/loanapps/add" component={LoanAppGroupAdd}></Route>
             <Route exact path="/groups/:id/loanapps/edit/:id" component={LoanAppGroupEdit}></Route>
 
             <Route exact path="/groups/:id/loanapps/add/members/add" component={LoanAppMemberAdd}></Route>

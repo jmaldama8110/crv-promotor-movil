@@ -1,7 +1,7 @@
 import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, useIonLoading, useIonToast } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
-import { db, remoteDB } from "../../db";
+import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 import { createAction } from "../../model/Actions";
 import { AppContext } from "../../store/store";
@@ -11,26 +11,21 @@ import { LoanApplicationForm } from "./LoanApplicationForm";
 export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
 
     const [loan,setLoan] = useState({})
-    const [showToast] = useIonToast();
+    
     const { dispatchSession, session } = useContext(AppContext);
     const { couchDBSyncUpload } = useDBSync();
+    let render = true;
 
     useEffect( ()=>{
-
-      const itemId = props.match.url.split("/")[5];
-      db.get(itemId)
-        .then( (loan:any) => {
-          db.get(loan.product).then( (prod) =>{
-            const newData = {
-              ...loan,
-              product: prod
-            }
-            setLoan(newData);
-          })
-        })
-        .catch((err) => {
-          alert("No fue posible recuperar datos del cliente: " + itemId);
-        });
+        async function LoadData() {
+          const itemId = props.match.url.split("/")[5];
+          const loanData:any = await db.get(itemId);
+          setLoan(loanData);
+        }
+        if( render) {
+          render = false;
+          LoadData();
+        }
     },[])
     
     const onSave = async (data:any) => {
@@ -42,7 +37,16 @@ export const LoanApplicationEdit: React.FC<RouteComponentProps> = (props) => {
           ...data,
           updated_at: Date.now()
         }).then(async ()=> {
-          await createAction( "CREATE_UPDATE_LOAN", { id_loan: itemId}, session.user )
+          const clientData:any = await db.get(loanInfo.apply_by);
+          await createAction( "CREATE_UPDATE_LOAN",
+          { 
+            _id: '',
+            id_loan: itemId,
+            client_name: `${clientData.name} ${clientData.lastname} ${clientData.second_lastname}`,
+            id_cliente: clientData.id_cliente,
+            id_solicitud: clientData.id_solicitud
+          },
+           session.user )
           await couchDBSyncUpload();
           dispatchSession({ type: "SET_LOADING", loading_msg: "", loading: false})
           props.history.goBack();
