@@ -1,19 +1,19 @@
 import { Preferences } from "@capacitor/preferences";
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonList,
-  IonButton,
-  RefresherEventDetail,
-  IonRefresher,
-  IonRefresherContent,
-  IonFooter,
-  IonItem,
-  IonLabel,
-  IonImg,
+    IonPage,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonButton,
+    RefresherEventDetail,
+    IonRefresher,
+    IonRefresherContent,
+    IonFooter,
+    IonItem,
+    IonLabel,
+    IonImg, IonIcon,
 } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router"; 
@@ -26,6 +26,7 @@ import { App, AppInfo } from '@capacitor/app';
 import officerRankN1 from '../../assets/officer_rank_n1.png';
 import officerRankN2 from '../../assets/officer_rank_n2.png';
 import officerRankN3 from '../../assets/officer_rank_n3.png';
+import {personCircleOutline} from "ionicons/icons";
 
 export const MyProfile: React.FC<RouteComponentProps> = (props) => {
 
@@ -90,7 +91,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Mi Perfil</IonTitle>
+            <IonTitle><IonIcon icon={personCircleOutline}  /> Mi Perfil</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent >

@@ -74,7 +74,7 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
       term_types: productTermTypes,
       rate: productRate,
       tax,
-      external_id: currSegment
+      external_id: parseInt(currSegment)
     }
     
     onSubmit(data);

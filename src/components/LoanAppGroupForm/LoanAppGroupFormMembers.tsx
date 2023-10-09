@@ -31,7 +31,7 @@ export const LoanAppGroupFormMembers: React.FC<{ onSubmit:any }> = ( { onSubmit 
       let sum = 0, remain = 0;
       for (let i = 0; i < groupMemberList.length; i++){
         if( groupMemberList[i].estatus !== 'CANCELADO' )
-        sum = sum + parseFloat(groupMemberList[i].apply_amount);
+        sum = sum + (groupMemberList[i].apply_amount);
       }
       remain = loanAppGroup.apply_amount - sum;
       setSumTotal(sum);

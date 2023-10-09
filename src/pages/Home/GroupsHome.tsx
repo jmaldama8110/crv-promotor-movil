@@ -1,7 +1,7 @@
 import { Browser } from '@capacitor/browser';
 import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonItemDivider, IonItemGroup, IonLabel, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, RefresherEventDetail, useIonActionSheet } from '@ionic/react';
 import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
-import { locationOutline } from 'ionicons/icons';
+import {locationOutline, peopleOutline} from 'ionicons/icons';
 import { useContext, useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -151,7 +151,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Grupos</IonTitle>
+          <IonTitle><IonIcon icon={peopleOutline}/> Grupos</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

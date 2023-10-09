@@ -1,4 +1,5 @@
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from "@ionic/react";
+import {IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon} from "@ionic/react";
+import {notificationsCircleOutline} from "ionicons/icons";
 
 
 
@@ -7,7 +8,7 @@ export const Notifications: React.FC = () => {
     <IonPage>
     <IonHeader>
       <IonToolbar>
-        <IonTitle>Notifications</IonTitle>
+        <IonTitle><IonIcon icon={notificationsCircleOutline} /> Notifications</IonTitle>
       </IonToolbar>
     </IonHeader>
     <IonContent fullscreen>

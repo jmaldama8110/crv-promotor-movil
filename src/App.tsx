@@ -73,6 +73,7 @@ import { GroupAdd } from "./pages/Groups/GroupAdd";
 import { LoanAppGroupHome } from "./pages/LoanAppGroup/LoanAppGroupHome";
 import { GroupEdit } from "./pages/Groups/GroupEdit";
 import { LoanAppGroupEdit } from "./pages/LoanAppGroup/LoanAppGroupEdit";
+
 import { LoanAppMemberAdd } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberAdd";
 import { LoanAppMemberEdit } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberEdit";
 import { GroupFromHF } from "./pages/Groups/GroupFromHF";
@@ -88,6 +89,7 @@ import { VisitsEdit } from "./pages/Visits/VisitsEdit";
 import { WhereToPayHome } from "./pages/WhereToPay/WhereoToPayHome";
 import { ActionLog } from "./pages/ActionLog/ActionLog";
 import { DigitalArchive } from "./pages/Clients/DigitalArchive";
+import { LoanAppGroupAdd } from "./pages/LoanAppGroup/LoanAppGroupAdd";
 
 setupIonicReact();
 
@@ -180,6 +182,7 @@ const App: React.FC = () => {
             <Route exact path="/groups/edit/:id" component={GroupEdit}></Route>
 
             <Route exact path="/groups/:id/loanapps" component={LoanAppGroupHome}></Route>
+            <Route exact path="/groups/:id/loanapps/add" component={LoanAppGroupAdd}></Route>
             <Route exact path="/groups/:id/loanapps/edit/:id" component={LoanAppGroupEdit}></Route>
 
             <Route exact path="/groups/:id/loanapps/add/members/add" component={LoanAppMemberAdd}></Route>
@@ -206,24 +209,23 @@ const App: React.FC = () => {
           </IonRouterOutlet>
 
           <IonTabBar slot="bottom" onClick={onTabChange}>
-            <IonTabButton tab="tab4" href="/">
+            <IonTabButton tab="home" href="/">
               <IonIcon icon={personCircleOutline} />
               <IonLabel>Mi Perfil</IonLabel>
             </IonTabButton>
-            
-            <IonTabButton tab="tab1" href="/clients" disabled={!session.current_token} >
+            <IonTabButton tab="clients" href="/clients" disabled={!session.current_token} >
               <IonIcon icon={personAddOutline} />
               <IonLabel>Clientes</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab2" href="/groups" disabled={!session.current_token}>
+            <IonTabButton tab="groups" href="/groups" disabled={!session.current_token}>
               <IonIcon icon={peopleOutline} />
               <IonLabel>Grupos</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab3" href="/supervisor" disabled>
+            <IonTabButton tab="supervisor" href="/supervisor" disabled>
               <IonIcon icon={lockClosedOutline} />
               <IonLabel>Supervisor</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="tab5" href="/notifications" disabled>
+            <IonTabButton tab="notifications" href="/notifications" disabled>
               <IonIcon icon={notificationsCircleOutline} />
               <IonLabel>Mensajes</IonLabel>
             </IonTabButton>

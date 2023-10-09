@@ -29,8 +29,6 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
     
     const onSave = async (data:any) => {
       const itemId = props.match.url.split("/")[5];
-
-      props.history.goBack();
       dispatchSession( { type: "SET_LOADING", loading_msg: 'Guardando...',loading: true});
       db.get(itemId).then( async (loanInfo:any) => {
         return db.put({
@@ -46,7 +44,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
           await createAction( "CREATE_UPDATE_LOAN", { 
                 _id: '',    
                 id_loan: itemId,
-                client_name: `${clientData.name} ${clientData.lastname} ${clientData.second_lastname}`,
+                client_name: `${clientData.group_name}`,
                 id_cliente: clientData.id_cliente,
                 id_solicitud: clientData.id_solicitud
               },

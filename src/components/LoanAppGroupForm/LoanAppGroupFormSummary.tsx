@@ -53,7 +53,7 @@ export const LoanAppGroupFormSummary: React.FC = () => {
       <IonItem><IonLabel>Integrantes</IonLabel></IonItem>
                         <IonGrid>
                             { groupMemberList.map((i:GroupMember)=> (
-                                <IonRow key={i._id}><IonLabel className="xs">{formatLocalCurrency(parseFloat(i.apply_amount))}</IonLabel><IonLabel className="xs"> - {i.fullname.slice(0,20)} ({i.position.slice(0,1)}) </IonLabel></IonRow>) )
+                                <IonRow key={i._id}><IonLabel className="xs">{formatLocalCurrency((i.apply_amount))}</IonLabel><IonLabel className="xs"> - {i.fullname.slice(0,20)} ({i.position.slice(0,1)}) </IonLabel></IonRow>) )
                               }
 
                         </IonGrid>

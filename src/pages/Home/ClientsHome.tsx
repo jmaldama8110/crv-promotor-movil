@@ -12,7 +12,7 @@ import {
 import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
 import { useDBSync } from '../../hooks/useDBSync';
-import { locationOutline } from 'ionicons/icons';
+import {locationOutline, personAddOutline} from 'ionicons/icons';
 
 const ClientsHome: React.FC = () => {
 
@@ -160,7 +160,7 @@ const ClientsHome: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Clientes</IonTitle>
+          <IonTitle><IonIcon icon={personAddOutline}  /> Clientes</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

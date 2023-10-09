@@ -14,7 +14,7 @@ export const LoanAppMemberAdd: React.FC<RouteComponentProps> = (props) => {
   function onAdd (data: any){
 
     const itemData: GroupMember = {
-      apply_amount:  data.apply_amount,
+      apply_amount:  parseInt(data.apply_amount),
       approved_amount: data.apply_amount,
       client_id: data.client_id,
       disbursment_mean: data.disbursment_mean,

@@ -15,7 +15,7 @@ export const groupMemberDef: GroupMember = {
     fullname: '',
     curp: '',
     position:  '',
-    apply_amount: '',
+    apply_amount: 0,
     previous_amount: '',
     approved_amount: '',
     loan_cycle: 0,

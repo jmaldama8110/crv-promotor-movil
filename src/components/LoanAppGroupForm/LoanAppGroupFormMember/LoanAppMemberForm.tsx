@@ -115,7 +115,7 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
             setCurp( groupMember.curp);
             setPosition( groupMember.position);
             setFullname(groupMember.fullname);
-            setApplyAmount( groupMember.apply_amount);
+            setApplyAmount( groupMember.apply_amount.toString());
             setLoanCycle( groupMember.loan_cycle);
             setPreviousAmount( groupMember.previous_amount);
             setBeneficiary( groupMember.insurance.beneficiary);
@@ -161,7 +161,7 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
             id_cliente: clientSelected.data.id_cliente,
             id_persona: clientSelected.data.id_persona,
             curp,
-            apply_amount,
+            apply_amount: parseInt(apply_amount),
             fullname,
             position,
             loan_cycle,

@@ -8,8 +8,6 @@ import { LoanAppGroupFormSummary } from "../../components/LoanAppGroupForm/LoanA
 import { LoanAppGroupFormGenerals } from "../../components/LoanAppGroupForm/LoanAppGroupFormGenerals";
 import { AppContext } from "../../store/store";
 import { useContext, useEffect } from "react";
-import { db } from "../../db";
-
 
 export const LoanAppGroupForm: React.FC< {onSubmit:any}> = ( {onSubmit}) => {
  

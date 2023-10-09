@@ -12,7 +12,7 @@ export type ActionsGroupMember =
     type: "UPDATE_GROUP_MEMBER",
     idx: string;
     position: string;
-    apply_amount: string;
+    apply_amount: number;
     beneficiary: string;
     relationship: string;
     percentage: number;
@@ -31,7 +31,7 @@ export interface GroupMember {
   fullname: string;
   curp: string;
   position:  string;
-  apply_amount: string,
+  apply_amount: number,
   previous_amount: string,
   approved_amount: string,
   loan_cycle: number,

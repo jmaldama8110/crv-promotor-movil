@@ -8,13 +8,12 @@ import { db } from "../../db";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { LoanAppGroup } from "../../reducer/LoanAppGroupReducer";
 
-import { createAction } from "../../model/Actions";
-
 export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
 
     const {  session, dispatchSession }  = useContext( AppContext) ;
     const [showAlert] = useIonAlert();
     const [loans, setLoans] = useState<LoanAppGroup[]>([]);
+    
     let render = true;
     
     const onAddNew = async () =>{
@@ -53,22 +52,13 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
                   db.put({
                       ...newLoanApp
                   }).then( async (doc)=>{
-                    const clientData:any = await db.get(loanGroupActive.apply_by);
-                      await createAction( "CREATE_UPDATE_LOAN", 
-                      { _id: '',
-                        id_loan: newId,
-                        client_name: `${clientData.group_name}`,
-                        id_cliente: loanGroupActive.id_cliente,
-                        id_solicitud: loanGroupActive.id_solicitud
-                      }
-                      , session.user )
                       props.history.push(`loanapps/edit/${newId}`);
                     }).catch( e =>{
                       console.log(e);
-                    alert('No se pudo guardar la solicitud...')
                   })
             } else{
-              alert('Solicitud en estatus: PRESTAMO ACTIVO no se encontro!')
+              // alert('Solicitud en estatus: PRESTAMO ACTIVO no se encontro!')
+              props.history.push('loanapps/add')
             }
             }
         }
@@ -164,17 +154,12 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
                 </IonCard>
               ))}
 
-                <IonButton onClick={onAddNew}>Crear</IonButton>
+                <IonButton onClick={onAddNew} >Nuevo</IonButton>
             <IonItemDivider><IonLabel>Contratos Activos</IonLabel></IonItemDivider>
                   <ContractsHome {...props} />
           </IonList>
         </IonContent>
       </IonPage>
     );
-}
-
-
-function couchDBSyncUpload() {
-  throw new Error("Function not implemented.");
 }
 

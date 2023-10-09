@@ -57,13 +57,16 @@ const LoanAppCard: React.FC<RouteComponentProps> = ({match}) => {
 
   useEffect( ()=>{
 
+
     async function loadData (){
+      const clientId = match.url.split("/")[2];
       dispatchSession({ type:"SET_LOADING", loading_msg: "Cargando...", loading: true });
       const query = await db.find({
         selector: {
           couchdb_type: "LOANAPP" }});
+      const queryFiltered = query.docs.filter( (i:any)=>(i.apply_by === clientId )) 
         
-      const loanList: LoanAppDisplay[] = query.docs.map( (i:any) =>({
+      const loanList: LoanAppDisplay[] = queryFiltered.map( (i:any) =>({
         _id: i._id,
         estatus: i.estatus,
         product_name: i.product.product_name,
