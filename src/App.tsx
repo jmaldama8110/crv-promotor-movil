@@ -14,9 +14,9 @@ import { IonReactRouter } from "@ionic/react-router";
 import {
   peopleOutline,
   personCircleOutline,
-  lockClosedOutline,
   personAddOutline,
   notificationsCircleOutline,
+  constructOutline
 } from "ionicons/icons";
 
 import ClientsHome from "./pages/Home/ClientsHome";
@@ -69,6 +69,7 @@ import { BeneficiariesAdd } from "./pages/RelatedPeople/Beneficiaries/Beneficiar
 import { BeneficiariesEdit } from "./pages/RelatedPeople/Beneficiaries/BeneficiariesEdit";
 
 import { ClientsFromHF } from "./pages/Clients/ClientsFromHF";
+
 import { GroupAdd } from "./pages/Groups/GroupAdd";
 import { LoanAppGroupHome } from "./pages/LoanAppGroup/LoanAppGroupHome";
 import { GroupEdit } from "./pages/Groups/GroupEdit";
@@ -145,6 +146,7 @@ const App: React.FC = () => {
             <Route exact path="/clients/socioeconomics/edit/:id" component={SocioEconomicsForm}></Route>
             <Route exact path="/clients/add" component={ClientsAdd}></Route>
             <Route exact path="/clients/add-from-hf/:external_id" component={ClientsFromHF}></Route> 
+            
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
             <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>
             <Route exact path="/clients/:id/loanapps/edit/:id" component={LoanApplicationEdit}></Route>
@@ -221,9 +223,9 @@ const App: React.FC = () => {
               <IonIcon icon={peopleOutline} />
               <IonLabel>Grupos</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="supervisor" href="/supervisor" disabled>
-              <IonIcon icon={lockClosedOutline} />
-              <IonLabel>Supervisor</IonLabel>
+            <IonTabButton tab="supervisor" href="/actionlog">
+              <IonIcon icon={constructOutline} />
+              <IonLabel>HighFinance</IonLabel>
             </IonTabButton>
             <IonTabButton tab="notifications" href="/notifications" disabled>
               <IonIcon icon={notificationsCircleOutline} />

@@ -18,6 +18,19 @@ export const LoanAppGroupFormSummary: React.FC = () => {
   const { groupMemberList, loanAppGroup } = useContext(AppContext);
 
 
+  function getStyle (value: string){
+    if( value === 'CANCELADO'|| value=== 'RECHAZADO')
+      return { 
+        textDecoration: 'line-through'
+      }
+    if(value === 'INGRESO' )
+      return {
+        color: 'green'
+      }
+    return {
+
+    }
+  }
   return (
     <IonList className="ion-padding">
       <IonItemDivider>
@@ -53,7 +66,7 @@ export const LoanAppGroupFormSummary: React.FC = () => {
       <IonItem><IonLabel>Integrantes</IonLabel></IonItem>
                         <IonGrid>
                             { groupMemberList.map((i:GroupMember)=> (
-                                <IonRow key={i._id}><IonLabel className="xs">{formatLocalCurrency((i.apply_amount))}</IonLabel><IonLabel className="xs"> - {i.fullname.slice(0,20)} ({i.position.slice(0,1)}) </IonLabel></IonRow>) )
+                                <IonRow key={i._id}><IonLabel className="xs" style={getStyle(i.estatus)} >{formatLocalCurrency((i.apply_amount))}</IonLabel><IonLabel className="xs" style={getStyle(i.estatus)}> - {i.fullname.slice(0,20)} ({i.position.slice(0,1)}) </IonLabel></IonRow>) )
                               }
 
                         </IonGrid>

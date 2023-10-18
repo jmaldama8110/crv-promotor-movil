@@ -145,17 +145,17 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
         <ClientFormPersonalData onNext={onPersonalDataNext} />
       </SwiperSlide>
       
-      <SwiperSlide>
+      {/* <SwiperSlide>
         <ClientFormIdentity onNext={onIdentityDocsNext} />
-      </SwiperSlide>
+      </SwiperSlide> */}
 
        <SwiperSlide>
         <ClientFormAddress addressType={"DOMICILIO"} onNext={onHomeAddressNext} />
       </SwiperSlide>
 
-      <SwiperSlide>
+      {/* <SwiperSlide>
         <ClientFormComprobanteDomicilio onNext={onComprobanteDomicilioNext} />
-      </SwiperSlide>
+      </SwiperSlide> */}
      
       <SwiperSlide>
         <ClientFormEconomics onNext={onEconomicsData}  />

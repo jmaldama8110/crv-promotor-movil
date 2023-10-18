@@ -33,7 +33,7 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
   const { session,dispatchSession } = useContext(AppContext);
   const [info,setInfo] = useState<AppInfo>();
   const [envs, setEnvs] = useState<[string,string]>(['',''])
-  const { couchDBSyncDownload } = useDBSync();
+  const { couchDBSyncDownload, couchDBSyncUpload } = useDBSync();
 
   function onCloseSession (){
 
@@ -67,7 +67,8 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
   }
 
   async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
-    await couchDBSyncDownload();
+    await couchDBSyncUpload();
+    // await couchDBSyncDownload();
       event.detail.complete();
    }
 
@@ -83,10 +84,6 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
    },[])
 
   
-   function onActionLog () {
-      props.history.push('/actionlog')
-   }
-
   return (
     <IonPage>
       <IonHeader>
@@ -126,8 +123,6 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
               session.officer_rank[0] == 6) && <p>Felicidades! has alcando el nivel de certificacion </p>}
           </div>
           <IonButton onClick={onCloseSession} expand="block" color="tertiary">Cerrar Sesion</IonButton>
-            <p></p>
-          <IonButton onClick={onActionLog} expand="block" color='light'>Actualizaciones HF</IonButton>
         </IonList>}
         
       </IonContent>

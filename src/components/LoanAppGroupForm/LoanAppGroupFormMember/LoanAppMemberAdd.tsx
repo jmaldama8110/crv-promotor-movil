@@ -34,7 +34,7 @@ export const LoanAppMemberAdd: React.FC<RouteComponentProps> = (props) => {
       },
       loan_cycle: data.loan_cycle,
       position: data.position,
-      previous_amount: '0',
+      previous_amount: 0,
       _id: groupMemberList.length.toString(),
     }
     

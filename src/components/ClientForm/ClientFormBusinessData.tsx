@@ -8,11 +8,17 @@ import { ButtonSlider } from "../SliderButtons";
 export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
   
   const [rfc, setRfc] = useState<string>("");
+  const [rfcError, setRfcError] = useState<boolean>(false);
 
   const { clientData } = useContext(AppContext);  
   const [bisOwnOrRent, setOwnOrRent] = useState(false);
+
   const [businessName, setBusinessName] = useState<string>("");
+  const [businessNameError, setBusinessNameError] = useState<boolean>(false);
+
   const [businessPhone, setBusinessPhone] = useState<string>("");
+  const [businessPhoneError, setBusinessPhoneError] = useState<boolean>(false);
+
   const [not_bis, setNotBis] = useState<boolean>(false);
 
   const [bisStartedDate, setBisStartedDate] = useState("");
@@ -60,6 +66,10 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
           type="text"
           value={businessName}
           onIonChange={(e) => setBusinessName(e.detail.value!)}
+          onIonBlur={(e: any) => e.target.value ? setBusinessName(e.target.value.toUpperCase()): setBusinessNameError(true)}
+          onIonFocus={()=> setBusinessNameError(false)}
+          style={ businessNameError ? {border: "1px dotted red"}: {}}
+
           disabled={not_bis}
         ></IonInput>
       </IonItem>
@@ -68,13 +78,13 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
         <IonText slot="end">{bisStartedDateFormatted}</IonText>
         <IonPopover trigger="open-bis-start-date-input" showBackdrop={false}>
           <IonDatetime
-            
-            presentation="date"
+            presentation="month-year"
             value={bisStartedDate}
             onIonChange={(ev: any) => {
               setBisStartedDate(ev.detail.value!);
               setBiStartedDateFormatted(formatDate(ev.detail.value!));
             }}
+            
           />
         </IonPopover>
       </IonItem>
@@ -89,7 +99,17 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
       </IonItem>
       <IonItem>
           <IonLabel position="stacked" >Telefono del negocio</IonLabel>
-          <IonInput type="text" value={businessPhone} onIonChange={ (e)=> setBusinessPhone(e.detail.value!)} disabled={not_bis}></IonInput>
+          <IonInput 
+            type="text" 
+            value={businessPhone} 
+            onIonChange={ (e)=> setBusinessPhone(e.detail.value!.replace(/\D/g,''))} 
+            onIonBlur={(e: any) => e.target.value.replace(/\D/g,'') ? setBusinessPhone(e.target.value.replace(/\D/g,'')): setBusinessPhoneError(true)}
+            onIonFocus={()=> setBusinessPhoneError(false)}
+            style={ businessPhoneError ? {border: "1px dotted red"}: {}}
+  
+            disabled={not_bis}>
+            
+            </IonInput>
       </IonItem>
 
       <IonItem>
@@ -100,9 +120,25 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
           required
           value={rfc}
           onIonChange={(e) => setRfc(e.detail.value!)}
+          onIonBlur={(e: any) => e.target.value ? setRfc(e.target.value.toUpperCase()): setRfcError(true)}
+          onIonFocus={()=> setRfcError(false)}
+          style={ rfcError ? {border: "1px dotted red"}: {}}
+
         ></IonInput>
       </IonItem>
-          <ButtonSlider onClick={onSubmit} slideDirection={'F'} color='medium' expand="block" label="Siguiente" />
+      <p>
+        { businessNameError && <i style={{color: "gray"}}>* Nombre o descripcion del negocio es un datos obligatorio<br/></i> }
+        {! bisStartedDate && <i style={{color: "gray"}}>* Elige un mes/año cuando inicio su negocio<br/></i> }
+        { businessPhoneError && <i style={{color: "gray"}}>* Un numero de telefono es obligatorio<br/></i> }
+        { rfcError && <i style={{color: "gray"}}>* El RFC es obligatorio<br/></i> }
+      </p>
+          <ButtonSlider 
+            disabled={ businessNameError || !bisStartedDate || businessPhoneError || rfcError }
+            onClick={onSubmit} 
+            slideDirection={'F'} 
+            color='medium' 
+            expand="block" 
+            label="Siguiente" />
           <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />
 
     </IonList>

@@ -244,7 +244,7 @@ export const ContractDetail: React.FC<RouteComponentProps> = ({ match }) => {
               {!showPdf &&
                 <>
                   <IonButton onClick={onViewAccountStatement} color='medium' disabled>Ver PDF</IonButton>
-                  <IonButton onClick={onOpenLinkPdf} color='success'>Abir PDF</IonButton>
+                  <IonButton onClick={onOpenLinkPdf} color='success' disabled>Abrir PDF</IonButton>
                 </>
               }
               { showPdf &&

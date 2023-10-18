@@ -109,7 +109,7 @@ import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
               </p>
               
               <IonButton color='success' routerLink={`/contracts/${i._id}/visits`}>Visitas</IonButton>
-              <IonButton color='warning' routerLink={`/contracts/${i.contractId}`}>Edo cta</IonButton>
+              <IonButton color='warning' routerLink={`/contracts/${i.contractId}`}>Movimientos</IonButton>
               
             </IonCardContent>
           </IonCard>

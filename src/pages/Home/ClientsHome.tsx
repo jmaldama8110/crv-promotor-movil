@@ -19,7 +19,7 @@ const ClientsHome: React.FC = () => {
   const [present] = useIonActionSheet();
   const [actions, setActions] = useState<OverlayEventDetail>();
   const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
-  const { dispatchClientData } = useContext(AppContext);
+  const { dispatchClientData, session } = useContext(AppContext);
   const { couchDBSyncUpload } = useDBSync();
 
   let history = useHistory();
@@ -42,7 +42,9 @@ const ClientsHome: React.FC = () => {
     setTimeout(async () => {
       await couchDBSyncUpload();
       const data:any = await db.find({ selector: { couchdb_type:"CLIENT" }});
-      const newData: SearchData[] = data.docs.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
+      const query = data.docs.filter( (i:any) => i.branch[0] === session.branch[0] );
+      
+      const newData: SearchData[] = query.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
       setClientSearchData(newData);
       event.detail.complete();
     },2000);

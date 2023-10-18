@@ -149,7 +149,20 @@ useEffect( ()=>{
           ))}
         </IonSelect>
       </IonItem>
-          <ButtonSlider onClick={onSubmit} slideDirection={'F'} color='medium' expand="block" label="Siguiente" />
+      <p>
+        {!ocupation.id && <i style={{color: "gray"}}>* Ocupación es un dato obligatorio<br/></i>}
+        {!profession.id && <i style={{color: "gray"}}>* Profesión es un dato obligatorio<br/></i>}
+        {!economicActivity.id && <i style={{color: "gray"}}>* Actividad Económica es un dato obligatorio<br/></i>}
+        {!educationLevel && <i style={{color: "gray"}}>* Escolaridad es un dato obligatorio<br/></i>}
+        {!maritalStatus && <i style={{color: "gray"}}>* Estado civil es un dato obligatorio<br/></i>}
+      </p>
+          <ButtonSlider
+            disabled={ !ocupation.id || !profession.id || !economicActivity.id || !educationLevel || !maritalStatus} 
+            onClick={onSubmit} 
+            slideDirection={'F'} 
+            color='medium' 
+            expand="block" 
+            label="Siguiente" />
           <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />
 
     </IonList>

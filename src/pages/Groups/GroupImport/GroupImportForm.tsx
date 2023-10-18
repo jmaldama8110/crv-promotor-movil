@@ -132,9 +132,24 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       
       dismiss();
     }
-    catch(err){
+    catch(err:any){
       dismiss();
-      alert('No fue posible procesar la peticion...')
+      try{
+
+        const emailTo = process.env.NODE_ENV === 'development' ? 'josman.gomez.aldama@gmail.com' : session.user       
+        await api.post(`/sendemail?toEmail=${emailTo}&templateId=d-644621db309643f0aba469b4e229f776&fromEmail=soporte.hf@grupoconserva.mx`,
+        { /// Data for email Template
+          actionType: "IMPORTAR Una solicitud de grupo",
+          clientName: selectLoan.nombreCliente,
+          errors: err.message
+        })
+
+      }
+      catch(e){
+        alert('NO fue posible enviar el correo a soporte')
+      }
+
+      alert(`No fue posible procesar las solicitudes al HF`)
     }
 
   };
@@ -274,13 +289,12 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
   }
 
 
-  function onUpdateIsActive(e:any){
+  function onUpdateIsActive(clientId:number){
     /// sets an item as Checked when item is click,
     /// the action can be cancel, still does not validates that
     /// it validetes when the final button is called at the next swipe
-    const clientIdIsActive = parseInt( e.target.id)
     const newData = membersHf.map( (i:MemberHf)=> {
-      if( (i.id_cliente == clientIdIsActive) ){
+      if( (i.id_cliente == clientId ) ){
         return {
           ...i,
           isActive: true
@@ -292,6 +306,43 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       }
     })
     setMembersHf(newData);
+
+  }
+
+
+  async function onImportAllMembers() {
+
+    let apiCall = 0;
+    present({message: `Importando...` })
+
+    while ( apiCall < membersHf.length ){
+
+      try {
+        
+          const idCliente = membersHf[apiCall].id_cliente;
+          const apiRes = await api.get(`/clients/hf?externalId=${idCliente}`);
+          const newClientId = Date.now().toString()
+
+          if( ! (membersHf[apiCall].isActive) ){  
+            await db.put({ ...apiRes.data, 
+                            couchdb_type: 'CLIENT',
+                            _id: newClientId,
+                            status: [2,'Aprovado'] });
+              
+          }
+          onUpdateIsActive(idCliente)
+        
+      }
+      catch(e){
+        apiCall = membersHf.length
+        console.log(e);  
+      }
+      console.log(apiCall);
+      apiCall++;
+    }
+    dismiss();
+
+
 
   }
 
@@ -418,10 +469,14 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
 
       <SwiperSlide>
         <IonList className="ion-padding">
+          <IonItem>
+            <IonLabel>Integrantes:</IonLabel>
+            <IonButton color="warning" onClick={onImportAllMembers}>Importar Todos</IonButton>
+          </IonItem>
         {
           membersHf.length ?
           membersHf.map((i: MemberHf,n:number) => (
-            <IonItem key={n} button routerLink={`/clients/add-from-hf/${i.id_cliente}`} id={`${i.id_cliente}`} onClick={onUpdateIsActive}>
+            <IonItem key={n} button id={`${i.id_cliente}`} >
               <IonAvatar slot="start" id={`${i.id_cliente}`}>
                 <img
                   alt="Perfil de usuario sin foto"
@@ -465,7 +520,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
                                     <IonLabel className="xs">{i.fullname}</IonLabel>
                                   </IonCol>
                                   <IonCol>
-                                    <IonLabel> {formatLocalCurrencyV2(parseFloat(i.approved_amount),"","","")}</IonLabel>
+                                    <IonLabel> {formatLocalCurrencyV2(i.approved_amount,"","","")}</IonLabel>
                                   </IonCol>
 
                                 </IonRow>) )

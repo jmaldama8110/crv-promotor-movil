@@ -13,6 +13,7 @@ const root = createRoot(container!);
 // Call the element loader after the platform has been bootstrapped
 defineCustomElements(window);
 
+
 root.render(
   <React.StrictMode>
     <AppContextProvider>

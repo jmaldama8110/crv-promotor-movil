@@ -32,7 +32,7 @@ export const ActionLog = () => {
     
   useEffect(() => {
     async function onPopulate() {
-      await couchDBSyncDownload()
+      
       try {
         
         const queryData = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
@@ -83,11 +83,12 @@ export const ActionLog = () => {
 
       while( apiCalls < updatesLog.length && noErrors ){
         const idTrx = updatesLog[apiCalls]._id
+        
         const apiRes = await api.get(`/actions/validate?id=${idTrx}`);
         
         if( apiRes.data.errors.length > 0){
           noErrors = false;
-          const docTrx:any = await db.get(idTrx);
+          
 
           try {
               // sends email with
@@ -96,8 +97,8 @@ export const ActionLog = () => {
             
             await api.post(`/sendemail?toEmail=${emailTo}&templateId=d-644621db309643f0aba469b4e229f776&fromEmail=soporte.hf@grupoconserva.mx`,
             { /// Data for email Template
-              actionType: mapActionsTypes(docTrx.name),
-              clientName: mapActionsTypes(docTrx.name),
+              actionType: mapActionsTypes(updatesLog[apiCalls].name),
+              clientName: updatesLog[apiCalls].hf_info?.client_name,
               errors:  apiRes.data.errors.map( (e:any) => (JSON.stringify(e)))
             })
 
@@ -155,7 +156,6 @@ export const ActionLog = () => {
           type: "REMOVE_UPDATE_LOG",
           idx: idTrx          
         });
-        
 
       }
       catch(e){

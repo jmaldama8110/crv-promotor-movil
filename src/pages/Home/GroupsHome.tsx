@@ -18,7 +18,7 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
   const [geoActions, setGeoActions] = useState<OverlayEventDetail>();
   const { couchDBSyncUpload } = useDBSync();
 
-  const { dispatchGroupData } = useContext(AppContext);
+  const { dispatchGroupData, session } = useContext(AppContext);
   const [clientSearchData, setClientSearchData ] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
@@ -38,7 +38,9 @@ const GroupsHome: React.FC<RouteComponentProps> = ({history}) => {
     setTimeout(async () => {
       await couchDBSyncUpload();
       const data:any = await db.find({ selector: { couchdb_type:"GROUP" }});
-      const newData: SearchData[] = data.docs.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.group_name}` }))
+      const query = data.docs.filter( (i:any) => i.branch[0] === session.branch[0] );
+
+      const newData: SearchData[] = query.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.group_name}` }))
       setClientSearchData( newData)
       event.detail.complete();
     }, 2000);

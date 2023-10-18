@@ -32,8 +32,8 @@ export interface GroupMember {
   curp: string;
   position:  string;
   apply_amount: number,
-  previous_amount: string,
-  approved_amount: string,
+  previous_amount: number,
+  approved_amount: number,
   loan_cycle: number,
   disbursment_mean: 1 | 2,
   estatus: string;

@@ -117,7 +117,7 @@ export const LoanAppMemberForm: React.FC<{ onSubmit: any}> = ({onSubmit})=>{
             setFullname(groupMember.fullname);
             setApplyAmount( groupMember.apply_amount.toString());
             setLoanCycle( groupMember.loan_cycle);
-            setPreviousAmount( groupMember.previous_amount);
+            setPreviousAmount( groupMember.previous_amount.toString());
             setBeneficiary( groupMember.insurance.beneficiary);
             setPercentage( groupMember.insurance.percentage);
             setRelationship( groupMember.insurance.relationship);

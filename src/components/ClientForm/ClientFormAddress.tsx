@@ -17,14 +17,22 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   const [bis_address_same, setBisAddressSame] = useState<boolean>(false);
 
   const [address_line1, setAddressL1] = useState<string>(""); 
+  const [addressLine1Error, setAddressL1Error] = useState<boolean>(false); 
   const [myCP, setMyCp] = useState<string>("");
+  const [myCpError, setMyCpError] = useState<boolean>(false);
+
   const [colonyId, setColonyId] = useState<string>("");
+  
   const myColonySelectList = useRef<any>(null);
 
 
   const [ext_number, setExtNumber] = useState('');
+  const [extNumberError, setExtNumberError] = useState<boolean>(false);
   const [int_number, setIntNumber] = useState('');
+  const [intNumberError, setIntNumberError] = useState<boolean>(false);
   const [street_reference, setStreetReference] = useState('');
+  const [streetReferenceError, setStreetReferenceError] = useState<boolean>(false);
+  
   const [road, setRoad] = useState<number>(0);
   const [roadCatalog, setRoadCatalog] = useState<any[]>([]);
 
@@ -235,6 +243,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             type="text"
             value={myCP}
             onIonChange={(e) => setMyCp(e.detail.value!)}
+            onIonBlur={(e:any)=> !e.target.value ? setMyCpError(true) : null }
+            onIonFocus={ ()=> setMyCpError(false)}
+            style={ myCpError ? {border: "1px dotted red"}: {}}
           ></IonInput>
         </IonItem>
 
@@ -247,6 +258,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             okText="Ok"
             cancelText="Cancelar"
             onIonChange={(e) => setColonyId(e.detail.value)}
+            style={ !colonyId ? {border: "1px dotted red"}: {}}
           >
             {colonyCat.map((c: any) => (
               <IonSelectOption key={c._id} value={c._id}>
@@ -258,11 +270,11 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
 
         <IonItem>
           <IonLabel position="stacked">Ciudad / Localidad</IonLabel>
-          <IonInput type="text" value={cityName}></IonInput>
+          <IonInput type="text" value={cityName} disabled></IonInput>
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Municipio</IonLabel>
-          <IonInput type="text" value={municipalityName}></IonInput>
+          <IonInput type="text" value={municipalityName} disabled></IonInput>
         </IonItem>
 
         <IonItem>
@@ -270,7 +282,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
           <IonInput
             type="text"
             value={provinceName + ", " + countryName}
-          ></IonInput>
+           disabled></IonInput>
         </IonItem>
 
         <IonItem>
@@ -281,7 +293,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             type="text"
             value={address_line1}
             onIonChange={(e) => setAddressL1(e.detail.value!)}
-            onIonBlur={(e: any) => setAddressL1(e.target.value.toUpperCase())}
+            onIonBlur={(e: any) => e.target.value ? setAddressL1(e.target.value.toUpperCase()): setAddressL1Error(true)}
+            onIonFocus={()=> setAddressL1Error(false)}
+            style={ addressLine1Error ? {border: "1px dotted red"}: {}}
           ></IonInput>
         </IonItem>
 
@@ -293,6 +307,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             type="text"
             value={ext_number}
             onIonChange={(e) => setExtNumber(e.detail.value!)}
+            onIonBlur={(e: any) => e.target.value ? setExtNumber(e.target.value.toUpperCase()): setExtNumberError(true)}
+            onIonFocus={()=> setExtNumberError(false)}
+            style={ extNumberError ? {border: "1px dotted red"}: {}}
           ></IonInput>
         </IonItem>
 
@@ -304,6 +321,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             type="text"
             value={int_number}
             onIonChange={(e) => setIntNumber(e.detail.value!)}
+            onIonBlur={(e: any) => e.target.value ? setIntNumber(e.target.value.toUpperCase()): setIntNumberError(true)}
+            onIonFocus={()=> setIntNumberError(false)}
+            style={ intNumberError ? {border: "1px dotted red"}: {}}
           ></IonInput>
         </IonItem>
 
@@ -315,7 +335,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             type="text"
             value={street_reference}
             onIonChange={(e) => setStreetReference(e.detail.value!)}
-            onIonBlur={(e: any) => setStreetReference(e.target.value.toUpperCase())}
+            onIonBlur={(e: any) => e.target.value ? setStreetReference(e.target.value.toUpperCase()): setStreetReferenceError(true)}
+            onIonFocus={()=> setStreetReferenceError(false)}
+            style={ streetReferenceError ? {border: "1px dotted red"}: {}}
           ></IonInput>
         </IonItem>
 
@@ -327,6 +349,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
           okText="Ok"
           cancelText="Cancelar"
           onIonChange={(e) => setRoad(e.detail.value)}
+          style={ !road ? {border: "1px dotted red"}: {}}
         >
           {roadCatalog.map((c: any) => (
             <IonSelectOption key={c.id} value={c.id}>
@@ -336,8 +359,24 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
         </IonSelect>
       </IonItem>
 
-        <p></p>
-          <ButtonSlider onClick={onSubmit} slideDirection={'F'} color='medium' expand="block" label="Siguiente" className="margin-bottom-sm"/>
+        <p>
+          { myCpError && <i style={{color: "gray"}}>* Codigo postal es obligatorio para continuar<br/></i>}
+          { !colonyId && <i style={{color: "gray"}}>* Usa el codigo postal para buscar la lista de asentamientos o colonias disponible<br/></i>}
+          { addressLine1Error && <i style={{color: "gray"}}>* Ingresa el nombre de la calle o vialidad<br/></i>}
+          { extNumberError && <i style={{color: "gray"}}>* Numero exterior obligatorio (si no tiene, debe colocar SN<br/></i>}
+          { intNumberError && <i style={{color: "gray"}}>* Numero interior obligatorio (si no tiene, debe colocar SN<br/></i>}
+          { streetReferenceError && <i style={{color: "gray"}}>* Referencia es obligatoria: (ej.: color de la fachada, porton, etc)<br/></i>}
+          { !road && <i style={{color: "gray"}}>* Tipo de vialidad es obligatoria<br/></i>}
+
+
+        </p>
+          <ButtonSlider  disabled={ myCpError || !colonyId || addressLine1Error || extNumberError || intNumberError || streetReferenceError || !road }
+            onClick={onSubmit} 
+            slideDirection={'F'} 
+            color='medium' 
+            expand="block" 
+            label="Siguiente" 
+            className="margin-bottom-sm"/>
           <ButtonSlider onClick={()=>{}} slideDirection={'B'} color="light" expand="block" label="Anterior" />
     </IonList>
   );

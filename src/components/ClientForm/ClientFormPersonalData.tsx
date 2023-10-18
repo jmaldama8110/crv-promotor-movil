@@ -11,18 +11,26 @@ import { ButtonSlider } from "../SliderButtons";
 export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => {
 
     const [name, setName] = useState<string>("");
+    const [nameError, setNameError] = useState<boolean>(false);
+
     const [lastname, setLastname] = useState<string>("");
+    const [lastnameError, setLastnameError] = useState<boolean>(false);
+
     const [second_lastname, setSecondLastName] = useState<string>("");
     const [clave_ine, setClaveIne] = useState<string>("");
+    const [claveIneError, setClaveIneError] = useState<boolean>(false);
+
     const [numero_emisiones, setNumeroEmisiones] = useState<string>("");
+    const [numeroEmisionesError, setNumeroEmisionesError] = useState<boolean>(false);
+
     const [numero_vertical, setNumeroVertical] = useState<string>("");
+    const [numeroVerticalError, setNumeroVerticalError] = useState<boolean>(false);
 
 
     const [sex,setSex] = useState<[number, string]>([3,'Mujer']);
     const [sexCatalog, setSexCatalog] = useState<any[]>([]);
 
     const [provinceOfBirth, setProvinceOfBirth ] = useState<[string,string]>(['','']);
-   
     const [provinces, setProvinces] = useState<any[]>([]);
 
     const [countryOfBirth, setCountryOfBirth] = useState<string>('');
@@ -37,7 +45,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     const [phoneStatus, setPhoneStatus] = useState<boolean>(false);
     const [curp, setCurp] = useState<string>("");
     const [curpStatus, setCurpStatus] = useState<boolean>(false);
-    const { clientData,dispatchSession } = useContext(AppContext);
+    const { clientData } = useContext(AppContext);
 
     let render = true;
 
@@ -103,6 +111,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
         render = false;
       }
     },[clientData])
+
  
 
     useEffect(() => {
@@ -167,6 +176,15 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
   
     }
 
+    function onNameBlur (e:any) {
+      if( e.target.value )
+        setName(e.target.value.toUpperCase());
+      else      
+        setNameError(true);
+    }
+
+
+
     return (
         <IonList className="ion-padding">
 
@@ -176,11 +194,11 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
             </IonItemDivider>
             <IonItem>
                 <IonLabel position="stacked">Nombre(s)</IonLabel>
-                <IonInput type="text" value={name} onIonChange={(e=>setName(e.detail.value!))} onIonBlur={(e:any)=>setName(e.target.value.toUpperCase())}></IonInput>
+                <IonInput type="text" value={name} onIonChange={(e=>setName(e.detail.value!))} onIonBlur={onNameBlur} style={ nameError ? { border: "1px dotted red"} :{ } } onIonFocus={()=> setNameError(false)}></IonInput>
             </IonItem>
             <IonItem>
                 <IonLabel position="stacked">Apellido Paterno</IonLabel>
-                <IonInput type="text" value={lastname} onIonChange={(e=>setLastname(e.detail.value!))} onIonBlur={(e:any)=>setLastname(e.target.value.toUpperCase())}></IonInput>
+                <IonInput type="text" value={lastname} onIonChange={(e=>setLastname(e.detail.value!))} onIonBlur={(e:any)=> e.target.value ? setLastname(e.target.value.toUpperCase()): setLastnameError(true)} onIonFocus={ ()=> setLastnameError(false)} style={ lastnameError ? { border: "1px dotted red"} :{ } }></IonInput>
             </IonItem>
             <IonItem>
                 <IonLabel position="stacked">Apellido Materno</IonLabel>
@@ -223,6 +241,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           okText="Ok"
           cancelText="Cancelar"
           onIonChange={(e) => setCountryOfBirth(e.detail.value)}
+          style={ !countryOfBirth ? {border: "1px dotted red"}: {}}
         >
           {countries.map((c: any) => (
             <IonSelectOption key={c._id} value={c._id}>
@@ -238,7 +257,8 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           value={nationality}
           okText="Ok"
           cancelText="Cancelar"
-          onIonChange={(e) => setNationality(e.detail.value)}
+          onIonChange={(e) =>setNationality(e.detail.value) }
+          style={ !nationality ? {border: "1px dotted red"}: {}}
         >
           {nationCatalog.map((c: any) => (
             <IonSelectOption key={c.id} value={c.id}>
@@ -251,18 +271,31 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
         <IonItemDivider><IonLabel>Datos del INE</IonLabel></IonItemDivider>
         <IonItem>
                   <IonLabel position="stacked">Clave INE</IonLabel>
-                  <IonInput type="text" value={clave_ine} onIonChange={(e=>setClaveIne(e.detail.value!))} onIonBlur={(e:any)=>setClaveIne(e.target.value.toUpperCase())}></IonInput>
+                  <IonInput type="text" value={clave_ine} onIonChange={(e=>setClaveIne(e.detail.value!))} onIonBlur={(e:any)=> e.target.value ? setClaveIne(e.target.value.toUpperCase()): setClaveIneError(true)} onIonFocus={ ()=> setClaveIneError(false)} style={ claveIneError ? {border: "1px dotted red"}: {} }></IonInput>
         </IonItem>
         <IonItem>
                   <IonLabel position="stacked">Numero Emisiones</IonLabel>
-                  <IonInput type="text" value={numero_emisiones} onIonChange={(e=>setNumeroEmisiones(e.detail.value!))} onIonBlur={(e:any)=>setNumeroEmisiones(e.target.value.toUpperCase())}></IonInput>
+                  <IonInput type="text" value={numero_emisiones} onIonChange={(e=>setNumeroEmisiones(e.detail.value!))} onIonBlur={(e:any)=> e.target.value ? setNumeroEmisiones(e.target.value.toUpperCase()): setNumeroEmisionesError(true)} onIonFocus={ ()=> setNumeroEmisionesError(false)} style={ numeroEmisionesError ? { border: "1px dotted red"}: {} }></IonInput>
         </IonItem>
         <IonItem>
                   <IonLabel position="stacked">Numero Vertical</IonLabel>
-                  <IonInput type="text" value={numero_vertical} onIonChange={(e=>setNumeroVertical(e.detail.value!))} onIonBlur={(e:any)=>setNumeroVertical(e.target.value.toUpperCase())}></IonInput>
+                  <IonInput type="text" value={numero_vertical} onIonChange={(e=>setNumeroVertical(e.detail.value!))} onIonBlur={ (e:any)=>e.target.value ? setNumeroVertical(e.target.value.toUpperCase()): setNumeroVerticalError(true)} onIonFocus={ ()=> setNumeroVerticalError(false)} style={ numeroVerticalError? {border: "1px dotted red"}: {}}></IonInput>
         </IonItem>
-        
-        <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' disabled={!name} />
+        <p>
+          {nameError && <i style={{color: "gray"}}>* El nombre proporcionado es invalido <br/></i>}
+          {lastnameError && <i style={{color: "gray"}}>* El apellido proporcionado es invalido: al menos un apellido es necesario<br/></i>}
+          {!curpStatus && <i style={{color: "gray"}}>* CURP No valido, verifique la secuencia de caracteres<br/></i>}
+          {!phoneStatus && <i style={{color: "gray"}}>* Numero de celular no valido, verifique que 10 digitos (999)9999999<br/></i>}
+          
+          {claveIneError && <i style={{color: "gray"}}>* Clave del IFE/INE invalida<br/></i>}
+          {numeroEmisionesError && <i style={{color: "gray"}}>* Numero de emisiones invalido<br/></i>}
+          {numeroVerticalError && <i style={{color: "gray"}}>* Numero vertical es invalido<br/></i>}
+
+          {!countryOfBirth && <i style={{color: "gray"}}>* País de Nacimiento es obligatorio<br/></i>}
+          {!nationality && <i style={{color: "gray"}}>* Nacionalidad es obligatorio<br/></i>}
+
+        </p>
+        <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' disabled={ nameError || lastnameError || !curpStatus ||!phoneStatus || !countryOfBirth || !nationality}  />
 
       </IonList>
     
