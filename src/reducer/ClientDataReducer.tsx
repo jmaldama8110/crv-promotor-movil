@@ -57,7 +57,6 @@ export type ActionsClientData = {
   loan_cycle: number;
   marital_status: [number, string];
   nationality: [number, string];
-  not_bis: boolean;
   ocupation: [string, string];
   rfc: string;
   status: [number, string];
@@ -117,7 +116,6 @@ export interface ClientData {
     loan_cycle: number;
     marital_status: [number, string];
     nationality: [number, string];
-    not_bis: boolean;
     ocupation: [string, string];
     rfc: string;
     status: [number, string];
@@ -168,7 +166,6 @@ export const clientDataDef: ClientData = {
   marital_status: [1, ''],
   name: "",
   nationality: [0, ''],
-  not_bis: false,
   ocupation: ['', '0'],
   phones: [],
   identities: [],
@@ -177,7 +174,6 @@ export const clientDataDef: ClientData = {
   second_lastname: "",
   sex: [0, ''],
   status: [0, ''],
-  
   comment: '',
   identity_pics: [],
   identity_verification: {
@@ -253,7 +249,6 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         loan_cycle: action.loan_cycle,
         marital_status: action.marital_status,
         nationality: action.nationality,
-        not_bis: action.not_bis,
         ocupation: action.ocupation,
         rfc: action.rfc,
         status: action.status,

@@ -201,12 +201,12 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
       
             sched.push({
               number: i,
-              amount: getRound(cuota),
-              principal: getRound(capital_periodo),
-              interest: getRound(interes_periodo),
-              tax: getRound(impuesto_periodo),
+              amount: getRound(cuota,100),
+              principal: getRound(capital_periodo,100),
+              interest: getRound(interes_periodo,100),
+              tax: getRound(impuesto_periodo,100),
               insurance: 0,
-              balance: getRound(saldo)
+              balance: getRound(saldo,100)
             });
           }
         }

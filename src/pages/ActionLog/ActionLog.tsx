@@ -1,19 +1,16 @@
 import { IonHeader, IonToolbar, IonContent, IonList, IonTitle, IonItem, IonIcon, IonLabel, IonPage, IonButtons, IonBackButton, useIonLoading, IonButton, useIonAlert } from "@ionic/react"
 import { useContext, useEffect, useState } from "react";
 import { ellipse  } from 'ionicons/icons';
-import { db } from "../../db";
+import { dbX } from "../../db";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
-import { useDBSync } from "../../hooks/useDBSync";
 import { UpdateLog } from "../../reducer/UpdateLogsReducer";
-
 
 export const ActionLog = () => {  
   const { session, updatesLog, dispatchUpdatesLog } = useContext(AppContext);
   const [showAlert] = useIonAlert();
   const [showLoading, dismissLoading] = useIonLoading();
   const [allValid, setAllValid] = useState(false);
-  const { couchDBSyncDownload } = useDBSync();
 
   let loaded = true;
 
@@ -35,7 +32,7 @@ export const ActionLog = () => {
       
       try {
         
-        const queryData = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
+        const queryData = await dbX.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
         const userActions:any = queryData.docs.filter( 
           (i:any) => 
           i.created_by === session.user && 

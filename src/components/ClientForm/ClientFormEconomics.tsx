@@ -1,4 +1,4 @@
-import { IonItem, IonItemDivider, IonLabel, IonList, IonSelect, IonSelectOption } from "@ionic/react";
+import { IonCheckbox, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonSelect, IonSelectOption } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
@@ -14,7 +14,9 @@ export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
   
     const [economicActivityCatalog, setEconomicActivityCatalog] = useState<SearchData[]>([]);
     const [economicActivity, setEconomicActivity] = useState<SearchData>({id: "",etiqueta: ""});
-  
+    
+    const [econocmicDeps, setEconomicDeps] = useState<string>('');
+    
     const [educationLevel, setEducationLevel] = useState<string>('');
     const [ educationLevelCatalog, setEducationLevelCatalog] = useState<SearchData[]>([]);
     const [maritalStatus, setMaritalStatus] = useState<number>(0);
@@ -149,15 +151,89 @@ useEffect( ()=>{
           ))}
         </IonSelect>
       </IonItem>
+      <IonItem>
+        <IonLabel position="stacked">Numero de Dependientes economicos</IonLabel>
+        <IonInput
+          type="text"
+          value={econocmicDeps}
+          onIonChange={(e) => setEconomicDeps(e.detail.value!)}
+        ></IonInput>
+      </IonItem>
+
+      <IonItem>
+        <IonLabel>Acceso a Internet?</IonLabel>
+        <IonCheckbox
+          // checked={bisOwnOrRent}
+          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+          <IonLabel position="stacked">Red Social preferida</IonLabel>
+          <IonSelect
+            // value={ownwerShipId}
+            okText="Ok"
+            cancelText="Cancelar"
+            // onIonChange={(e) => setOwnerShipId(e.detail.value)}
+            // style={ !ownwerShipId ? {border: "1px dotted red"}: {}}          
+          >
+            <IonSelectOption key={1} value='1'>WHATSAPP</IonSelectOption>
+            <IonSelectOption key={2} value='2'>FACEBOOK</IonSelectOption>
+            <IonSelectOption key={3} value='3'>INSTAGRAM</IonSelectOption>
+          </IonSelect>
+        </IonItem>
+      <IonItem>
+        <IonLabel position="stacked">Indique el usuario de la red social</IonLabel>
+        <IonInput type="text"></IonInput>
+      </IonItem>
+      <IonItemDivider><IonLabel>Condiciones de su vivienda</IonLabel></IonItemDivider>
+      <IonItem>
+        <IonLabel>Piso Firme</IonLabel>
+        <IonCheckbox
+          // checked={bisOwnOrRent}
+          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Techo Losa</IonLabel>
+        <IonCheckbox
+          // checked={bisOwnOrRent}
+          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Baño</IonLabel>
+        <IonCheckbox
+          // checked={bisOwnOrRent}
+          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Letrina</IonLabel>
+        <IonCheckbox
+          // checked={bisOwnOrRent}
+          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Muro de Tabique/Block</IonLabel>
+        <IonCheckbox
+          // checked={bisOwnOrRent}
+          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+
+
+  
       <p>
         {!ocupation.id && <i style={{color: "gray"}}>* Ocupación es un dato obligatorio<br/></i>}
         {!profession.id && <i style={{color: "gray"}}>* Profesión es un dato obligatorio<br/></i>}
         {!economicActivity.id && <i style={{color: "gray"}}>* Actividad Económica es un dato obligatorio<br/></i>}
         {!educationLevel && <i style={{color: "gray"}}>* Escolaridad es un dato obligatorio<br/></i>}
         {!maritalStatus && <i style={{color: "gray"}}>* Estado civil es un dato obligatorio<br/></i>}
+        {!econocmicDeps && <i style={{color: "gray"}}>* Numero de dependientes es un dato obligatorio<br/></i>}
       </p>
           <ButtonSlider
-            disabled={ !ocupation.id || !profession.id || !economicActivity.id || !educationLevel || !maritalStatus} 
+            disabled={ !ocupation.id || !profession.id || !economicActivity.id || !educationLevel || !maritalStatus || !econocmicDeps} 
             onClick={onSubmit} 
             slideDirection={'F'} 
             color='medium' 

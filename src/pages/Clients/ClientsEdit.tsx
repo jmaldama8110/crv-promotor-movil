@@ -58,11 +58,11 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
       return db.put({
         ...clientDbData,
         ...data,
-        comprobante_domicilio_pics: data.comprobante_domicilio_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
-        identity_pics: data.identity_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
+        // comprobante_domicilio_pics: data.comprobante_domicilio_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
+        // identity_pics: data.identity_pics.map( (x:GeneralPhoto) => ({ _id: x._id, title: x.title })),
       }).then( async ()=>{
-        await dbX.bulkDocs(data.identity_pics);
-        await dbX.bulkDocs(data.comprobante_domicilio_pics);
+        // await dbX.bulkDocs(data.identity_pics);
+        // await dbX.bulkDocs(data.comprobante_domicilio_pics);
         await createAction("CREATE_UPDATE_CLIENT", 
         { 
           _id: itemId,

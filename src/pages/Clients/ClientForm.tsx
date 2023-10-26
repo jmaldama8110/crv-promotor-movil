@@ -114,7 +114,6 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       type: "SET_CLIENT",
       ...clientData,
       rfc: data.rfc,
-      not_bis: data.not_bis,
       business_data: {
         ...clientData.business_data,
         business_start_date: data.business_start_date,
@@ -166,12 +165,10 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
         <ClientFormBusinessData onNext={onBisDataNext} />
 
       </SwiperSlide>
-        
       
-      {!clientData.not_bis &&
         <SwiperSlide>
           <ClientFormAddress addressType={"NEGOCIO"} onNext={onBisAddressNext} />
-      </SwiperSlide>}
+      </SwiperSlide>
        
       <SwiperSlide>
         <ClientFormSummary onNext={sendData}/>

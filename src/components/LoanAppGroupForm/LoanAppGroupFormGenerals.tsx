@@ -3,7 +3,7 @@ import { DatetimeChangeEventDetail, IonAvatar, IonDatetime, IonDatetimeButton, I
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
 import { getRound } from "../../utils/math";
-import { formatLocalCurrency } from "../../utils/numberFormatter";
+import { formatLocalCurrencyV2, formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import { Geolocation } from "@capacitor/geolocation";
 
@@ -95,8 +95,8 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
           
           const numerator = importe * period_rate;
           const divisor = 1 - (1 + period_rate) ** npagos;
-          cuota = divisor ? numerator / divisor : 0;
-          setPaymentAmount(formatLocalCurrency(cuota));
+          cuota = getRound(divisor ? numerator / divisor : 0,1);
+          setPaymentAmount(formatLocalCurrencyV2(cuota,"$","",""));
     
           /// inserta en item 0 del plan de cuotas
           sched.push({
@@ -118,12 +118,12 @@ export const LoanAppGroupFormGenerals: React.FC< { onSubmit:any }> = ( {onSubmit
       
             sched.push({
               number: i,
-              amount: getRound(cuota),
-              principal: getRound(capital_periodo),
-              interest: getRound(interes_periodo),
-              tax: getRound(impuesto_periodo),
+              amount: getRound(cuota,100),
+              principal: getRound(capital_periodo,100),
+              interest: getRound(interes_periodo,100),
+              tax: getRound(impuesto_periodo,100),
               insurance: 0,
-              balance: getRound(saldo)
+              balance: getRound(saldo,100)
             });
           }
         }

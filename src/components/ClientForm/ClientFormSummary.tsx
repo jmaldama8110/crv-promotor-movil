@@ -67,18 +67,15 @@ export const ClientFormSummary: React.FC<{disabledAddress?: boolean, onNext:any}
                   <IonCol size="4">Domicilio</IonCol> <IonCol>{ getAddresFromType('DOMICILIO') }</IonCol>
                 </IonRow>
                 <IonRow>
-                  <IonCol size="4">Tengo Negocio?</IonCol> <IonCol>{clientData.not_bis ? 'No' : 'Si, tengo un negocio'}</IonCol>
-                </IonRow>
-                <IonRow>
                   <IonCol size="4">Coord Geo:</IonCol> <IonCol>{ clientData.coordinates? `${clientData.coordinates[0]}, ${clientData.coordinates[1]}` : '' }</IonCol>
                 </IonRow>
-                {!clientData.not_bis &&
+                
                     <IonRow>
                       <IonCol size="4">Nombre del negocio</IonCol><IonCol>{clientData.business_data.business_name} {!disabledAddress ? '(En el domicilio)' : ''}</IonCol>
                     </IonRow>
-                }
+                
                 {
-                  !clientData.not_bis && !disabledAddress &&
+                   !disabledAddress &&
                   <IonRow>
                     <IonCol size="4">Ubicado en:</IonCol><IonCol>{ getAddresFromType('NEGOCIO')}</IonCol>
                   </IonRow>              

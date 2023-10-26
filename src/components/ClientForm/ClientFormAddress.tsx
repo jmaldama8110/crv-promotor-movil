@@ -1,7 +1,8 @@
-import { IonButton, IonCheckbox, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonSelect, IonSelectOption } from "@ionic/react";
+import { IonButton, IonCheckbox, IonDatetime, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonPopover, IonSelect, IonSelectOption, IonText } from "@ionic/react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
+import { formatDate } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 
 
@@ -25,6 +26,10 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   
   const myColonySelectList = useRef<any>(null);
 
+  const [homeResideSinceDate, setHomeResideSinceDate] = useState("");
+  const [homeResideSinceDateFormatted, setHomeResideSinceDateFormatted] = useState("");
+
+  const [ownwerShipId, setOwnerShipId] = useState<string>('');
 
   const [ext_number, setExtNumber] = useState('');
   const [extNumberError, setExtNumberError] = useState<boolean>(false);
@@ -40,6 +45,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   const [colonyName, setColonyName] = useState<string>("");
   const [cityId, setCityId] = useState<string>('');
   const [cityName, setCityName] = useState<string>("");
+
+
+
   const [municipalityId, setMunicipalityId] = useState<string>('');
   const [municipalityName, setMunicipalityName] = useState<string>("");
   const [provinceId, setProvinceId] = useState<string>('');
@@ -313,6 +321,39 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
           ></IonInput>
         </IonItem>
 
+   { addressType ==="DOMICILIO"&& <>
+        <IonItem>
+          <IonLabel position="stacked">Vivienda Propia / Rentada</IonLabel>
+          <IonSelect
+            value={ownwerShipId}
+            okText="Ok"
+            cancelText="Cancelar"
+            onIonChange={(e) => setOwnerShipId(e.detail.value)}
+            style={ !ownwerShipId ? {border: "1px dotted red"}: {}}          
+          >
+            <IonSelectOption key={1} value='1'>Propia</IonSelectOption>
+            <IonSelectOption key={2} value='2'>Rentada</IonSelectOption>
+            <IonSelectOption key={3} value='3'>Familiar</IonSelectOption>
+          </IonSelect>
+        </IonItem>
+
+        <IonItem button={true} id="open-home-address-reside-since-input">
+        <IonLabel>Reside ahi desde:</IonLabel>
+        <IonText slot="end">{homeResideSinceDateFormatted}</IonText>
+        <IonPopover trigger="open-home-address-reside-since-input" showBackdrop={false}>
+          <IonDatetime
+            presentation="month-year"
+            value={homeResideSinceDate}
+            onIonChange={(ev: any) => {
+              setHomeResideSinceDate(ev.detail.value!);
+              setHomeResideSinceDateFormatted(formatDate(ev.detail.value!));
+            }}
+            
+          />
+        </IonPopover>
+      </IonItem> 
+    </>}
+
         <IonItem>
           <IonLabel position="stacked">
             Numero Interior
@@ -367,10 +408,12 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
           { intNumberError && <i style={{color: "gray"}}>* Numero interior obligatorio (si no tiene, debe colocar SN<br/></i>}
           { streetReferenceError && <i style={{color: "gray"}}>* Referencia es obligatoria: (ej.: color de la fachada, porton, etc)<br/></i>}
           { !road && <i style={{color: "gray"}}>* Tipo de vialidad es obligatoria<br/></i>}
+          {! homeResideSinceDate && addressType === 'DOMICILIO' && <i style={{color: "gray"}}>* Elige el mes/año desde que reside ahi la persona<br/></i> }
+          {! ownwerShipId && addressType === 'DOMICILIO' && <i style={{color: "gray"}}>* Vivienda Propia / Rentada es un datos obligatorio<br/></i> }
 
 
         </p>
-          <ButtonSlider  disabled={ myCpError || !colonyId || addressLine1Error || extNumberError || intNumberError || streetReferenceError || !road }
+          <ButtonSlider  disabled={ myCpError || !colonyId || addressLine1Error || extNumberError || intNumberError || streetReferenceError || !road || ( (!homeResideSinceDate || !ownwerShipId)&& addressType === 'DOMICILIO')}
             onClick={onSubmit} 
             slideDirection={'F'} 
             color='medium' 

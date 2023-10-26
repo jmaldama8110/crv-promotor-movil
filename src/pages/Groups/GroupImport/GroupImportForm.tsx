@@ -306,41 +306,45 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       }
     })
     setMembersHf(newData);
-
   }
 
 
   async function onImportAllMembers() {
 
     let apiCall = 0;
+
     present({message: `Importando...` })
-
+    let membersHfCopy = membersHf;
     while ( apiCall < membersHf.length ){
-
       try {
-        
-          const idCliente = membersHf[apiCall].id_cliente;
-          const apiRes = await api.get(`/clients/hf?externalId=${idCliente}`);
-          const newClientId = Date.now().toString()
+        if( ! (membersHf[apiCall].isActive) ){
 
-          if( ! (membersHf[apiCall].isActive) ){  
+            const idCliente = membersHf[apiCall].id_cliente;
+            const newArrayState = membersHfCopy.map( (i:MemberHf)=> (i.id_cliente == idCliente ) ?
+                                  {...i, isActive: true } :
+                                   i )
+            // setMembersHf(newArrayState);
+            membersHfCopy = newArrayState;
+            setMembersHf(membersHfCopy)
+            const apiRes = await api.get(`/clients/hf?externalId=${idCliente}`);            
+            const newClientId = Date.now().toString()          
             await db.put({ ...apiRes.data, 
                             couchdb_type: 'CLIENT',
                             _id: newClientId,
                             status: [2,'Aprovado'] });
-              
-          }
-          onUpdateIsActive(idCliente)
+        }
+          
         
       }
-      catch(e){
+      catch(e){  
         apiCall = membersHf.length
         console.log(e);  
       }
-      console.log(apiCall);
       apiCall++;
     }
+
     dismiss();
+    
 
 
 

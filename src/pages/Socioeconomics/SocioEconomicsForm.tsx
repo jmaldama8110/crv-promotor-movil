@@ -407,7 +407,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
   }
 
   function onAddBisSaleItem(e:any) {
-    const subtotal = getRound(parseFloat(bisSalesPrice) * parseFloat(bisSalesQuantity)).toString();
+    const subtotal = getRound(parseFloat(bisSalesPrice) * parseFloat(bisSalesQuantity),100).toString();
     const newData:SalesInventoryData = { id: bisSales.length, description: bisSalesDescription, unit: bisSalesUnit, quantity: bisSalesQuantity, price: bisSalesPrice, subtotal}
     setBisSalesDescription("");
     setBisSalesPrice("");
@@ -416,7 +416,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
     setBisSales( [...bisSales, newData]);
   }
   function onAddBisPurchaseItem(e:any) {
-    const subtotal = getRound(parseFloat(bisPurchasePrice) * parseFloat(bisPurchaseQuantity)).toString();
+    const subtotal = getRound(parseFloat(bisPurchasePrice) * parseFloat(bisPurchaseQuantity),100).toString();
     const newData:SalesInventoryData = { id: bisPurchase.length, description: bisPurchaseDescription, unit: bisPurchaseUnit, quantity: bisPurchaseQuantity, price: bisPurchasePrice, subtotal}
     setBisPurchaseDescription("");
     setBisPurchasePrice("");
@@ -431,7 +431,7 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
     setBisExpense([...bisExpense, newData]);
   }
   function onAddBisInventoryItem(e:any) {
-    const subtotal = getRound(parseFloat(bisInventoryPrice) * parseFloat(bisInventoryQuantity)).toString();
+    const subtotal = getRound(parseFloat(bisInventoryPrice) * parseFloat(bisInventoryQuantity),100).toString();
     const newData:SalesInventoryData = { id: bisInventory.length, description: bisInventoryDescription, unit: bisInventoryUnit, quantity: bisInventoryQuantity, price: bisInventoryPrice, subtotal}
     setBisInventoryDescription("");
     setBisInventoryPrice("");
@@ -621,6 +621,8 @@ export const SocioEconomicsForm: React.FC<RouteComponentProps> = ({history,match
               >
                 <IonSelectOption value="Conyugue">Conyugue</IonSelectOption>
                 <IonSelectOption value="Pensiones">Pensiones</IonSelectOption>
+                <IonSelectOption value="Empleo">Empleo</IonSelectOption>
+                <IonSelectOption value="Giros(o remesas)">Giros o Remesas</IonSelectOption>
                 <IonSelectOption value="Rentas">Rentas</IonSelectOption>
                 <IonSelectOption value="Hijos">Hijos</IonSelectOption>
                 <IonSelectOption value="Otros">Otros</IonSelectOption>
