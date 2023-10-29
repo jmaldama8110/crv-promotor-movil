@@ -1,4 +1,4 @@
-import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonButton, IonItemDivider, IonLabel, useIonAlert, IonRefresher, IonRefresherContent, RefresherEventDetail, IonCard, IonCardHeader, IonCardSubtitle, IonCardContent } from "@ionic/react";
+import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonButton, IonItemDivider, IonLabel, useIonAlert, IonRefresher, IonRefresherContent, RefresherEventDetail, IonCard, IonCardHeader, IonCardSubtitle, IonCardContent, useIonLoading } from "@ionic/react";
 import { useContext, useState, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
 
@@ -7,13 +7,15 @@ import { ContractsHome } from "../Contracts/ContractsHome";
 import { db } from "../../db";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { LoanAppGroup } from "../../reducer/LoanAppGroupReducer";
+import { Browser } from '@capacitor/browser';
+import api from "../../api/api";
 
 export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
 
     const {  session, dispatchSession }  = useContext( AppContext) ;
     const [showAlert] = useIonAlert();
     const [loans, setLoans] = useState<LoanAppGroup[]>([]);
-    
+    const [present, dismiss] = useIonLoading();
     let render = true;
     
     const onAddNew = async () =>{
@@ -99,6 +101,25 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
       },1000) 
    }
 
+
+   async function onPrintLoanApplications(e:any) {
+    try{
+      
+      const loanAppId = e.target.id.split("-")[2];
+      present({message: "Descargando pdf..."});
+      const apiRes = await api.get(`/docs/pdf/mujeres-de-palabra?loanId=${loanAppId}`);
+      const url = `${process.env.REACT_APP_BASE_URL_API}/${apiRes.data.downloadPath}`;
+      await Browser.open({ url } );
+      dismiss();
+    }
+    catch(error){
+      console.log(error);
+      dismiss();
+      alert('Se presento un problema al intentar crear el archivo')
+    }
+
+  }
+
   
    function getStatus(status: string) {
     switch (status) {
@@ -140,8 +161,6 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
                 <IonCard
                   button={true}
                   color={getStatus(i.sub_estatus)}
-                  
-                  routerLink={`loanapps/edit/${i._id}`}
                   key={n}
                 >
                   <IonCardHeader>
@@ -150,6 +169,16 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
                   </IonCardHeader>
                   <IonCardContent>
                     {formatLocalCurrency(i.apply_amount)} / {i.term} {i.frequency[1]}
+                    <p>
+                      {
+                        i.sub_estatus === 'NUEVO TRAMITE' &&< IonButton color='success' id={`btn-printloanapp-${i._id}`} onClick={onPrintLoanApplications}>Imprimir</IonButton>
+                      }
+                      {
+                        i.sub_estatus === 'NUEVO TRAMITE' &&<IonButton routerLink={`loanapps/edit/${i._id}`}>Editar</IonButton>
+                      }
+                    </p>
+                    
+                    
                   </IonCardContent>
                 </IonCard>
               ))}

@@ -2,7 +2,7 @@ import {
   IonCheckbox,IonCol,IonDatetime,IonGrid,IonInput,IonItem,IonItemDivider,IonLabel,IonList,IonPopover,IonRow,IonSelect,IonSelectOption,IonText } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
-import { formatDate } from "../../utils/numberFormatter";
+import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import { db } from "../../db";
 
@@ -32,19 +32,19 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
   const [loanDests, setLoanDest]  = useState<LoanDestInfo[]>([]);
   const [loanDestItem, setLoanDestItem]  = useState<number>(0);
 
-  const [incomeSalesTotal, setIncomeSalesTotal] = useState<string>("")
-  const [incomePartner, setIncomePartner] = useState<string>("")
-  const [incomeJob, setIncomeJob] = useState<string>("")
-  const [incomeRemittances, setIncomeRemittances] = useState<string>("")
-  const [incomeOther, setIncomeOther] = useState<string>("")
-  const [incomeTotal, setIncomeTotal] = useState<string>("")
+  const [incomeSalesTotal, setIncomeSalesTotal] = useState<string>("0")
+  const [incomePartner, setIncomePartner] = useState<string>("0")
+  const [incomeJob, setIncomeJob] = useState<string>("0")
+  const [incomeRemittances, setIncomeRemittances] = useState<string>("0")
+  const [incomeOther, setIncomeOther] = useState<string>("0")
+  const [incomeTotal, setIncomeTotal] = useState<string>("0")
 
-  const [expenseFamily, setExpenseFamily] = useState<string>("");
-  const [expenseRent, setExpenseRent] = useState<string>("");
-  const [expenseBusiness, setExpenseBuisness] = useState<string>("");
-  const [expenseDebt, setExpenseDebt] = useState<string>("");
-  const [expenseCreditCards, setExpenseCreditCards] = useState<string>("");
-  const [expenseTotal, setExpenseTotal] = useState<string>("");
+  const [expenseFamily, setExpenseFamily] = useState<string>("0");
+  const [expenseRent, setExpenseRent] = useState<string>("0");
+  const [expenseBusiness, setExpenseBuisness] = useState<string>("0");
+  const [expenseDebt, setExpenseDebt] = useState<string>("0");
+  const [expenseCreditCards, setExpenseCreditCards] = useState<string>("0");
+  const [expenseTotal, setExpenseTotal] = useState<string>("0");
 
   const [keepsAccountingRecords, setKeepsAccountinnRecords] = useState<boolean>(false);
   const [hasPreviousExperience, setHasPreviousExperience] = useState<boolean>(false);
@@ -169,13 +169,30 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
     onNext(data);
   }
 
-  useEffect( ()=> {
+  function updateIncomeTotals() {
+      let total = 0;
+      total = parseFloat(incomeJob) + parseFloat(incomeOther) + parseFloat(incomePartner) + parseFloat(incomeRemittances) + parseFloat(incomeSalesTotal);
+      setIncomeTotal(formatLocalCurrency(total) );
 
+  }
+  function updateExpenseTotals () {
+    let total = 0;
+    total = parseFloat(expenseBusiness) + parseFloat(expenseCreditCards) + parseFloat(expenseDebt)+ parseFloat(expenseFamily) + parseFloat(expenseRent);
+    setExpenseTotal(formatLocalCurrency(total));
+  }
+  useEffect( ()=> {
     if( clientData._id && loanDests.length ){
           setLoanDestItem( clientData.business_data.loan_destination[0]);
     }
-   
     },[loanDests])
+
+    useEffect(()=>{
+      updateIncomeTotals();
+    },[incomeJob,incomeOther,incomePartner,incomeRemittances,incomeSalesTotal]);
+
+    useEffect(()=>{
+      updateExpenseTotals();
+    },[expenseBusiness,expenseCreditCards, expenseDebt,expenseFamily,expenseRent])
 
   return (
     <IonList className="ion-padding">
