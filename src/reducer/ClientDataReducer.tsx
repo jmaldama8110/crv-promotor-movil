@@ -39,6 +39,39 @@ export type ActionsClientData = {
     business_name: string;
     business_owned: boolean;
     business_phone: string;
+    number_employees: string;
+    loan_destination: [number,string];
+    income_sales_total: string;
+    income_partner: string;
+    income_job: string;
+    income_remittances: string;
+    income_other: string;
+    income_total: string;
+    expense_family: string;
+    expense_rent: string;
+    expense_business: string;
+    expense_debt: string;
+    expense_credit_cards: string;
+    expense_total: string;
+    keeps_accounting_records: boolean;
+    has_previous_experience: boolean;
+    previous_loan_experience: string;
+    bis_season_type: string;
+    bis_quality_sales_monthly: {
+      month_sale_jan: string;
+      month_sale_feb: string;
+      month_sale_mar: string;
+      month_sale_apr: string;
+      month_sale_may: string;
+      month_sale_jun: string;
+      month_sale_jul: string;
+      month_sale_aug: string;
+      month_sale_sep: string;
+      month_sale_oct: string;
+      month_sale_nov: string;
+      month_sale_dic: string;
+    }
+
   };
   client_type: [number, string];
   country_of_birth: [string, string];
@@ -60,7 +93,16 @@ export type ActionsClientData = {
   ocupation: [string, string];
   rfc: string;
   status: [number, string];
-  
+  household_floor: boolean;
+  household_roof: boolean;
+  household_toilet: boolean;
+  household_latrine: boolean;
+  household_brick: boolean;
+  economic_dependants: string;
+  internet_access: boolean;
+  prefered_social: string;
+  user_social: string;
+
   comment: string;
   identity_pics: any[];
   identity_verification: {
@@ -98,6 +140,39 @@ export interface ClientData {
       business_name: string;
       business_owned: boolean;
       business_phone: string;
+      number_employees: string;
+      loan_destination: [number,string];
+      income_sales_total: string;
+      income_partner: string;
+      income_job: string;
+      income_remittances: string;
+      income_other: string;
+      income_total: string;
+      expense_family: string;
+      expense_rent: string;
+      expense_business: string;
+      expense_debt: string;
+      expense_credit_cards: string;
+      expense_total: string;
+      keeps_accounting_records: boolean;
+      has_previous_experience: boolean;
+      previous_loan_experience: string;
+      bis_season_type: string;
+      bis_quality_sales_monthly: {
+        month_sale_jan: string;
+        month_sale_feb: string;
+        month_sale_mar: string;
+        month_sale_apr: string;
+        month_sale_may: string;
+        month_sale_jun: string;
+        month_sale_jul: string;
+        month_sale_aug: string;
+        month_sale_sep: string;
+        month_sale_oct: string;
+        month_sale_nov: string;
+        month_sale_dic: string;
+      }
+
     };
     client_type: [number, string];
     country_of_birth: [string, string];
@@ -119,7 +194,15 @@ export interface ClientData {
     ocupation: [string, string];
     rfc: string;
     status: [number, string];
-    
+    household_floor: boolean;
+    household_roof: boolean;
+    household_toilet: boolean;
+    household_latrine: boolean;
+    household_brick: boolean;
+    economic_dependants: string;
+    internet_access: boolean;
+    prefered_social: string;
+    user_social: string;
     comment: string;
     identity_pics: any[];
     identity_verification: {
@@ -144,6 +227,39 @@ export const clientDataDef: ClientData = {
     business_name: '',
     business_owned: false,
     business_phone: '',
+    number_employees: '',
+    loan_destination: [0,''],
+    income_sales_total: '',
+    income_partner: '',
+    income_job: '',
+    income_remittances: '',
+    income_other: '',
+    income_total: '',
+    expense_family: '',
+    expense_rent: '',
+    expense_business: '',
+    expense_debt: '',
+    expense_credit_cards: '',
+    expense_total: '',
+    keeps_accounting_records: false,
+    has_previous_experience: false,
+    previous_loan_experience: '',
+    bis_season_type: '',
+    bis_quality_sales_monthly: {
+      month_sale_jan: '',
+      month_sale_feb: '',
+      month_sale_mar: '',
+      month_sale_apr: '',
+      month_sale_may: '',
+      month_sale_jun: '',
+      month_sale_jul: '',
+      month_sale_aug: '',
+      month_sale_sep: '',
+      month_sale_oct: '',
+      month_sale_nov: '',
+      month_sale_dic: '',
+    }
+
   },
   client_type: [0, ''],
   coordinates: [0,0],
@@ -174,6 +290,15 @@ export const clientDataDef: ClientData = {
   second_lastname: "",
   sex: [0, ''],
   status: [0, ''],
+  household_floor: false,
+  household_roof: false,
+  household_toilet: false,
+  household_latrine: false,
+  household_brick: false,
+  economic_dependants: '',
+  internet_access: false,
+  prefered_social: '',
+  user_social: '',
   comment: '',
   identity_pics: [],
   identity_verification: {
@@ -231,6 +356,40 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
           business_name: action.business_data.business_name,
           business_owned: action.business_data.business_owned,
           business_phone: action.business_data.business_phone,
+          number_employees: action.business_data.number_employees,
+          loan_destination: action.business_data.loan_destination,
+          income_sales_total: action.business_data.income_sales_total,
+          income_partner: action.business_data.income_partner,
+          income_job: action.business_data.income_job,
+          income_remittances: action.business_data.income_remittances,
+          income_other: action.business_data.income_other,
+          income_total: action.business_data.income_total,
+          expense_family: action.business_data.expense_family,
+          expense_rent: action.business_data.expense_rent,
+          expense_business: action.business_data.expense_business,
+          expense_debt: action.business_data.expense_debt,
+          expense_credit_cards: action.business_data.expense_credit_cards,
+          expense_total: action.business_data.expense_total,
+          keeps_accounting_records: action.business_data.keeps_accounting_records,
+          has_previous_experience: action.business_data.has_previous_experience,
+          previous_loan_experience: action.business_data.previous_loan_experience,
+          bis_season_type: action.business_data.bis_season_type,
+          bis_quality_sales_monthly: {
+            month_sale_jan: action.business_data.bis_quality_sales_monthly.month_sale_jan,
+            month_sale_feb: action.business_data.bis_quality_sales_monthly.month_sale_feb,
+            month_sale_mar: action.business_data.bis_quality_sales_monthly.month_sale_mar,
+            month_sale_apr: action.business_data.bis_quality_sales_monthly.month_sale_apr,
+            month_sale_may: action.business_data.bis_quality_sales_monthly.month_sale_may,
+            month_sale_jun: action.business_data.bis_quality_sales_monthly.month_sale_jun,
+            month_sale_jul: action.business_data.bis_quality_sales_monthly.month_sale_jul,
+            month_sale_aug: action.business_data.bis_quality_sales_monthly.month_sale_aug,
+            month_sale_sep: action.business_data.bis_quality_sales_monthly.month_sale_sep,
+            month_sale_oct: action.business_data.bis_quality_sales_monthly.month_sale_oct,
+            month_sale_nov: action.business_data.bis_quality_sales_monthly.month_sale_nov,
+            month_sale_dic: action.business_data.bis_quality_sales_monthly.month_sale_dic,
+          }
+
+
         },
         client_type: action.client_type,
         country_of_birth: action.country_of_birth,
@@ -252,6 +411,16 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         ocupation: action.ocupation,
         rfc: action.rfc,
         status: action.status,
+        household_floor: action.household_floor,
+        household_roof: action.household_roof,
+        household_toilet: action.household_toilet,
+        household_latrine: action.household_latrine,
+        household_brick: action.household_brick,
+        economic_dependants: action.economic_dependants,
+        internet_access: action.internet_access,
+        prefered_social: action.prefered_social,
+        user_social: action.user_social,
+      
         comment: action.comment,
         identity_pics: action.identity_pics,
         identity_verification: action.identity_verification,

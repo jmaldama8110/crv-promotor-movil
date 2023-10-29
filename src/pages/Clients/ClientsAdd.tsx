@@ -16,7 +16,6 @@ export const ClientsAdd: React.FC<RouteComponentProps> = ( {history} ) => {
   const { couchDBSyncUpload }  = useDBSync();
 
   async function onClientAdd (data: any){
-    
   
     /// Save new record
     dispatchSession({ type: "SET_LOADING", loading_msg: 'Guardando...', loading: true});

@@ -25,7 +25,7 @@ interface DatetimeCustomEvent extends CustomEvent {
     target: HTMLIonDatetimeElement;
   }
 
-interface LoanDestination {
+export interface LoanDestination {
     _id: number;
     description: string;
     status: boolean;

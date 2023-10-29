@@ -9,8 +9,7 @@ import {
   } from "@ionic/react";
 import { useContext, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
-import { db, dbX } from "../../db";
-import { GeneralPhoto } from "../../hooks/useCameraTaker";
+import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 import { createAction } from "../../model/Actions";
 import { ClientData } from "../../reducer/ClientDataReducer";

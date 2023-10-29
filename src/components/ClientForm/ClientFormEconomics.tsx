@@ -16,6 +16,16 @@ export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
     const [economicActivity, setEconomicActivity] = useState<SearchData>({id: "",etiqueta: ""});
     
     const [econocmicDeps, setEconomicDeps] = useState<string>('');
+    const [internetAccess, setInternetAccess] = useState<boolean>(false);
+    const [socialMediaPrefered, setSocialMediaPrefered] = useState<string>('');
+    const [socialMediaUser, setSocialMediaUser] = useState<string>('');
+    
+    const [householdFloor, setHouseholdFloor] = useState<boolean>(false);
+    const [householdRoof, setHouseholdRoof] = useState<boolean>(false);
+    const [householdToilet, setHouseholdToilet] = useState<boolean>(false);
+    const [householdLatrine, setHouseholdLatrine] = useState<boolean>(false);
+    const [householdBrick, setHouseholdBrick] = useState<boolean>(false);
+
     
     const [educationLevel, setEducationLevel] = useState<string>('');
     const [ educationLevelCatalog, setEducationLevelCatalog] = useState<SearchData[]>([]);
@@ -72,6 +82,15 @@ useEffect( ()=>{
                   setOcupation({ id: clientData.ocupation[0], etiqueta: clientData.ocupation[1]})
                   setProfession( { id: clientData.business_data.profession[0], etiqueta: clientData.business_data.profession[1]});
                   setEconomicActivity( { id: clientData.business_data.economic_activity[0], etiqueta:clientData.business_data.economic_activity[1]})
+                  setHouseholdFloor( clientData.household_floor);
+                  setHouseholdRoof( clientData.household_roof );
+                  setHouseholdToilet( clientData.household_toilet);
+                  setHouseholdLatrine( clientData.household_latrine);
+                  setHouseholdBrick( clientData.household_brick);
+                  setEconomicDeps( clientData.economic_dependants);
+                  setInternetAccess( clientData.internet_access);
+                  setSocialMediaPrefered( clientData.prefered_social);
+                  setSocialMediaUser( clientData.user_social);
                 }
               })
             })
@@ -90,6 +109,15 @@ useEffect( ()=>{
       economic_activity: [economicActivity.id, economicActivity.etiqueta],
       education_level: [educationLevel, educationLevel ? educationLevelCatalog.find( (i)=> i.id == educationLevel)?.etiqueta: ''],
       marital_status: [maritalStatus,maritalStatus ? maritalStatusCatalog.find((i: any) => i.id == maritalStatus)!.etiqueta: "",],
+      household_floor: householdFloor,
+      household_roof: householdRoof,
+      household_toilet: householdToilet,
+      household_latrine: householdLatrine,
+      housegold_brick: householdBrick,
+      economic_dependants: econocmicDeps,
+      internet_access: internetAccess,
+      prefered_social: socialMediaPrefered,
+      user_social: socialMediaUser
     }
     onNext(data);
   }
@@ -97,6 +125,45 @@ useEffect( ()=>{
 
   return (
     <IonList className="ion-padding">
+
+<IonItemDivider><IonLabel>Condiciones de su vivienda</IonLabel></IonItemDivider>
+      <IonItem>
+        <IonLabel>Piso Firme</IonLabel>
+        <IonCheckbox
+          checked={householdFloor}
+          onIonChange={(e) => setHouseholdFloor(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Techo Losa</IonLabel>
+        <IonCheckbox
+          checked={householdRoof}
+          onIonChange={(e) => setHouseholdRoof(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Baño</IonLabel>
+        <IonCheckbox
+          checked={householdToilet}
+          onIonChange={(e) => setHouseholdToilet(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Letrina</IonLabel>
+        <IonCheckbox
+          checked={householdLatrine}
+          onIonChange={(e) => setHouseholdLatrine(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Muro de Tabique/Block</IonLabel>
+        <IonCheckbox
+          checked={householdBrick}
+          onIonChange={(e) => setHouseholdBrick(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+
+
       <IonItemDivider>
         <IonLabel>Ocupacion, profesion y Actividad Economica</IonLabel>
       </IonItemDivider>
@@ -151,6 +218,7 @@ useEffect( ()=>{
           ))}
         </IonSelect>
       </IonItem>
+
       <IonItem>
         <IonLabel position="stacked">Numero de Dependientes economicos</IonLabel>
         <IonInput
@@ -163,66 +231,27 @@ useEffect( ()=>{
       <IonItem>
         <IonLabel>Acceso a Internet?</IonLabel>
         <IonCheckbox
-          // checked={bisOwnOrRent}
-          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
+          checked={internetAccess}
+          onIonChange={(e) => setInternetAccess(e.detail.checked)}
         ></IonCheckbox>
       </IonItem>
       <IonItem>
           <IonLabel position="stacked">Red Social preferida</IonLabel>
           <IonSelect
-            // value={ownwerShipId}
+            value={socialMediaPrefered}
             okText="Ok"
             cancelText="Cancelar"
-            // onIonChange={(e) => setOwnerShipId(e.detail.value)}
-            // style={ !ownwerShipId ? {border: "1px dotted red"}: {}}          
+            onIonChange={(e) => setSocialMediaPrefered(e.detail.value)}
           >
-            <IonSelectOption key={1} value='1'>WHATSAPP</IonSelectOption>
-            <IonSelectOption key={2} value='2'>FACEBOOK</IonSelectOption>
-            <IonSelectOption key={3} value='3'>INSTAGRAM</IonSelectOption>
+            <IonSelectOption key={1} value='WHATSAPP'>WHATSAPP</IonSelectOption>
+            <IonSelectOption key={2} value='FACEBOOK'>FACEBOOK</IonSelectOption>
+            <IonSelectOption key={3} value='INSTAGRAM'>INSTAGRAM</IonSelectOption>
           </IonSelect>
         </IonItem>
       <IonItem>
         <IonLabel position="stacked">Indique el usuario de la red social</IonLabel>
-        <IonInput type="text"></IonInput>
+        <IonInput type="text" value={socialMediaUser} onIonChange={ (e)=> setSocialMediaUser( e.detail.value!)}></IonInput>
       </IonItem>
-      <IonItemDivider><IonLabel>Condiciones de su vivienda</IonLabel></IonItemDivider>
-      <IonItem>
-        <IonLabel>Piso Firme</IonLabel>
-        <IonCheckbox
-          // checked={bisOwnOrRent}
-          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
-        ></IonCheckbox>
-      </IonItem>
-      <IonItem>
-        <IonLabel>Techo Losa</IonLabel>
-        <IonCheckbox
-          // checked={bisOwnOrRent}
-          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
-        ></IonCheckbox>
-      </IonItem>
-      <IonItem>
-        <IonLabel>Baño</IonLabel>
-        <IonCheckbox
-          // checked={bisOwnOrRent}
-          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
-        ></IonCheckbox>
-      </IonItem>
-      <IonItem>
-        <IonLabel>Letrina</IonLabel>
-        <IonCheckbox
-          // checked={bisOwnOrRent}
-          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
-        ></IonCheckbox>
-      </IonItem>
-      <IonItem>
-        <IonLabel>Muro de Tabique/Block</IonLabel>
-        <IonCheckbox
-          // checked={bisOwnOrRent}
-          // onIonChange={(e) => setOwnOrRent(e.detail.checked)}
-        ></IonCheckbox>
-      </IonItem>
-
-
   
       <p>
         {!ocupation.id && <i style={{color: "gray"}}>* Ocupación es un dato obligatorio<br/></i>}

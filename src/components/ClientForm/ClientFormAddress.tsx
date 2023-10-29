@@ -46,8 +46,6 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   const [cityId, setCityId] = useState<string>('');
   const [cityName, setCityName] = useState<string>("");
 
-
-
   const [municipalityId, setMunicipalityId] = useState<string>('');
   const [municipalityName, setMunicipalityName] = useState<string>("");
   const [provinceId, setProvinceId] = useState<string>('');
@@ -75,6 +73,10 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             setExtNumber( homeAddress.ext_number);
             setIntNumber( homeAddress.int_number);
             setStreetReference( homeAddress.street_reference);
+            setOwnerShipId( homeAddress.ownership_type );
+            setHomeResideSinceDate( homeAddress.residence_since);
+            setHomeResideSinceDateFormatted( formatDate( homeAddress.residence_since));
+
 
           }
 
@@ -103,8 +105,8 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
   const onPopulateHomeColonies = async ()=>{
     dispatchSession({ type: "SET_LOADING", loading: true, loading_msg: "Optimizando busqueda codigos postales..."});
     await populateColoniesByPostCode(myCP,setColonyCat);
-    myColonySelectList.current.open();
     dispatchSession({ type: "SET_LOADING", loading: false, loading_msg: "" });
+    myColonySelectList.current.open();
 
   }
 
@@ -133,7 +135,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
     
     /// opens only when we are in Add record mode
     if( !clientData._id && colonyCat.length){
-        myColonySelectList.current.open();
+      myColonySelectList.current.open();
     }
 
     /// if we are editing, then set the current value of the Colony ID
@@ -175,6 +177,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
       city: [cityId, cityName],
       colony: [colonyId, colonyName],
       post_code: myCP,
+      bis_address_same,
+      ownership_type: ownwerShipId,
+      residence_since: homeResideSinceDate
     }
     
     onNext(data);
@@ -240,7 +245,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             />
           </IonItem>
           </div>
-          }
+        }
         
         <IonItemDivider>
           <IonLabel>Direccion del {addressType}</IonLabel>
@@ -256,7 +261,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             style={ myCpError ? {border: "1px dotted red"}: {}}
           ></IonInput>
         </IonItem>
-
+        
         <IonButton onClick={onPopulateHomeColonies}>Buscar</IonButton>
         <IonItem>
           <IonLabel position="stacked">Colonia / Asentamiento</IonLabel>
@@ -331,9 +336,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             onIonChange={(e) => setOwnerShipId(e.detail.value)}
             style={ !ownwerShipId ? {border: "1px dotted red"}: {}}          
           >
-            <IonSelectOption key={1} value='1'>Propia</IonSelectOption>
-            <IonSelectOption key={2} value='2'>Rentada</IonSelectOption>
-            <IonSelectOption key={3} value='3'>Familiar</IonSelectOption>
+            <IonSelectOption key={1} value='Propia'>Propia</IonSelectOption>
+            <IonSelectOption key={2} value='Rentada'>Rentada</IonSelectOption>
+            <IonSelectOption key={3} value='Familiar'>Familiar</IonSelectOption>
           </IonSelect>
         </IonItem>
 

@@ -28,6 +28,7 @@ import { GroupData, groupDataDef } from "../../../reducer/GroupDataReducer";
 import { LoanAppGroup, loanAppGroupDef } from "../../../reducer/LoanAppGroupReducer";
 import { formatDate, formatLocalCurrency, formatLocalCurrencyV2 } from "../../../utils/numberFormatter";
 import { GroupMember } from "../../../reducer/GroupMembersReducer";
+import { clientDataDef } from "../../../reducer/ClientDataReducer";
 
 
 interface GroupLoanApplicationHF {
@@ -327,8 +328,15 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
             membersHfCopy = newArrayState;
             setMembersHf(membersHfCopy)
             const apiRes = await api.get(`/clients/hf?externalId=${idCliente}`);            
+            
             const newClientId = Date.now().toString()          
-            await db.put({ ...apiRes.data, 
+            await db.put({  ...clientDataDef,
+                            ...apiRes.data, 
+                            business_data: {
+                              ...clientDataDef.business_data,
+                              ...apiRes.data.business_data
+                            },
+                            
                             couchdb_type: 'CLIENT',
                             _id: newClientId,
                             status: [2,'Aprovado'] });

@@ -9,8 +9,8 @@ import { ClientFormBusinessData } from "../../components/ClientForm/ClientFormBu
 import { ClientFormSummary } from "../../components/ClientForm/ClientFormSummary";
 import { AppContext } from "../../store/store";
 import { Geolocation } from "@capacitor/geolocation";
-import { ClientFormIdentity } from "../../components/ClientForm/ClientFormIdentity";
-import { ClientFormComprobanteDomicilio } from "../../components/ClientForm/ClientFormComprobanteDomicilio";
+// import { ClientFormIdentity } from "../../components/ClientForm/ClientFormIdentity";
+// import { ClientFormComprobanteDomicilio } from "../../components/ClientForm/ClientFormComprobanteDomicilio";
 
 
 interface ClientFormProps {
@@ -97,14 +97,16 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       ocupation: data.ocupation,
       marital_status: data.marital_status,
       education_level: data.education_level,
-      business_data: {
-        economic_activity: data.economic_activity,
-        profession: data.profession,
-        business_start_date: clientData.business_data.business_start_date,
-        business_name: clientData.business_data.business_name,
-        business_owned: clientData.business_data.business_owned,
-        business_phone: clientData.business_data.business_phone,
-      }
+      household_floor: data.household_floor,
+      household_roof: data.household_roof,
+      household_toilet: data.household_toilet,
+      household_latrine: data.household_latrine,
+      household_brick: data.housegold_brick,
+      economic_dependants: data.economic_dependants,
+      internet_access: data.internet_access,
+      prefered_social: data.prefered_social,
+      user_social: data.user_social,
+
     })
 
   }
@@ -114,12 +116,46 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       type: "SET_CLIENT",
       ...clientData,
       rfc: data.rfc,
+      
       business_data: {
         ...clientData.business_data,
         business_start_date: data.business_start_date,
         business_name: data.business_name,
         business_owned: data.business_owned,
         business_phone: data.business_phone,
+        number_employees: data.number_employees,
+        loan_destination: data.loan_destination,
+        income_sales_total: data.income_sales_total,
+        income_partner: data.income_partner,
+        income_job: data.income_job,
+        income_remittances: data.income_remittances,
+        income_other: data.income_other,
+        income_total: data.income_total,
+        expense_family: data.expense_family,
+        expense_rent: data.expense_rent,
+        expense_business: data.expense_business,
+        expense_debt: data.expense_debt,
+        expense_credit_cards: data.expense_credit_cards,
+        expense_total: data.expense_total,
+        keeps_accounting_records: data.keeps_accounting_records,
+        has_previous_experience: data.has_previous_experience,
+        previous_loan_experience: data.previous_loan_experience,
+        bis_season_type: data.bis_season_type,
+        bis_quality_sales_monthly: {
+          month_sale_jan: data.bis_quality_sales_monthly.month_sale_jan,
+          month_sale_feb: data.bis_quality_sales_monthly.month_sale_feb,
+          month_sale_mar: data.bis_quality_sales_monthly.month_sale_mar,
+          month_sale_apr: data.bis_quality_sales_monthly.month_sale_apr,
+          month_sale_may: data.bis_quality_sales_monthly.month_sale_may,
+          month_sale_jun: data.bis_quality_sales_monthly.month_sale_jun,
+          month_sale_jul: data.bis_quality_sales_monthly.month_sale_jul,
+          month_sale_aug: data.bis_quality_sales_monthly.month_sale_aug,
+          month_sale_sep: data.bis_quality_sales_monthly.month_sale_sep,
+          month_sale_oct: data.bis_quality_sales_monthly.month_sale_oct,
+          month_sale_nov: data.bis_quality_sales_monthly.month_sale_nov,
+          month_sale_dic: data.bis_quality_sales_monthly.month_sale_dic,
+        }
+  
       }
     })
   }
