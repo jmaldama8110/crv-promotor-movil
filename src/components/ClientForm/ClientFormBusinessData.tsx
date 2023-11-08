@@ -2,7 +2,7 @@ import {
   IonCheckbox,IonCol,IonDatetime,IonGrid,IonInput,IonItem,IonItemDivider,IonLabel,IonList,IonPopover,IonRow,IonSelect,IonSelectOption,IonText } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
-import { formatDate, formatLocalCurrency } from "../../utils/numberFormatter";
+import { formatDate, formatLocalCurrency, formatLocalCurrencyV2 } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import { db } from "../../db";
 
@@ -135,17 +135,17 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
       loan_destination: loanDestItem ? 
                         [loanDestItem, loanDests.find( (i:LoanDestInfo) => i.id === loanDestItem)?.description] : 
                         [0,''],
-      income_sales_total: incomeSalesTotal,
-      income_partner: incomePartner,
-      income_job: incomeJob,
-      income_remittances: incomeRemittances,
-      income_other: incomeOther,
+      income_sales_total: formatLocalCurrency(parseFloat(incomeSalesTotal)),
+      income_partner: formatLocalCurrency(parseFloat(incomePartner)),
+      income_job: formatLocalCurrency(parseFloat(incomeJob)),
+      income_remittances: formatLocalCurrency(parseFloat(incomeRemittances)),
+      income_other: formatLocalCurrency(parseFloat(incomeOther)),
       income_total: incomeTotal,
-      expense_family: expenseFamily,
-      expense_rent: expenseRent,
-      expense_business: expenseBusiness,
-      expense_debt: expenseDebt,
-      expense_credit_cards: expenseCreditCards,
+      expense_family: formatLocalCurrency(parseFloat(expenseFamily)),
+      expense_rent: formatLocalCurrency(parseFloat(expenseRent)),
+      expense_business: formatLocalCurrency(parseFloat(expenseBusiness)),
+      expense_debt: formatLocalCurrency(parseFloat(expenseDebt)),
+      expense_credit_cards: formatLocalCurrency(parseFloat(expenseCreditCards)),
       expense_total: expenseTotal,
       keeps_accounting_records: keepsAccountingRecords,
       has_previous_experience: hasPreviousExperience,
@@ -173,7 +173,6 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
       let total = 0;
       total = parseFloat(incomeJob) + parseFloat(incomeOther) + parseFloat(incomePartner) + parseFloat(incomeRemittances) + parseFloat(incomeSalesTotal);
       setIncomeTotal(formatLocalCurrency(total) );
-
   }
   function updateExpenseTotals () {
     let total = 0;

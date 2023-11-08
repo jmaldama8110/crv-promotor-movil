@@ -197,19 +197,17 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       </SwiperSlide>
  
       <SwiperSlide>
-
         <ClientFormBusinessData onNext={onBisDataNext} />
-
       </SwiperSlide>
       
-        <SwiperSlide>
+      <SwiperSlide>
           <ClientFormAddress addressType={"NEGOCIO"} onNext={onBisAddressNext} />
       </SwiperSlide>
        
       <SwiperSlide>
         <ClientFormSummary onNext={sendData}/>
-
       </SwiperSlide> 
+
     </Swiper>
   );
 };

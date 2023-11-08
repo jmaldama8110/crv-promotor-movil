@@ -157,7 +157,6 @@ const ClientsHome: React.FC = () => {
   }
 
 
-
   return (
     <IonPage>
       <IonHeader>

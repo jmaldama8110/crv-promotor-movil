@@ -107,6 +107,7 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
       
       const loanAppId = e.target.id.split("-")[2];
       present({message: "Descargando pdf..."});
+      api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
       const apiRes = await api.get(`/docs/pdf/mujeres-de-palabra?loanId=${loanAppId}`);
       const url = `${process.env.REACT_APP_BASE_URL_API}/${apiRes.data.downloadPath}`;
       await Browser.open({ url } );

@@ -336,9 +336,9 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
             onIonChange={(e) => setOwnerShipId(e.detail.value)}
             style={ !ownwerShipId ? {border: "1px dotted red"}: {}}          
           >
-            <IonSelectOption key={1} value='Propia'>Propia</IonSelectOption>
-            <IonSelectOption key={2} value='Rentada'>Rentada</IonSelectOption>
-            <IonSelectOption key={3} value='Familiar'>Familiar</IonSelectOption>
+            <IonSelectOption key={'household-conditions-select-id-01'} value='Propia'>Propia</IonSelectOption>
+            <IonSelectOption key={'household-conditions-select-id-02'} value='Rentada'>Rentada</IonSelectOption>
+            <IonSelectOption key={'household-conditions-select-id-03'} value='Familiar'>Familiar</IonSelectOption>
           </IonSelect>
         </IonItem>
 

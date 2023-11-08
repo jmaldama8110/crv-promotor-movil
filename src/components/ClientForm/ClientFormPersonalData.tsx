@@ -1,4 +1,4 @@
-import { IonBadge, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonSelect, IonSelectOption } from "@ionic/react";
+import { IonBadge, IonButton, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonSelect, IonSelectOption, useIonLoading } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 
 import { db } from "../../db";
@@ -6,7 +6,12 @@ import { AppContext } from "../../store/store";
 import { getCurpInfo } from "../../utils/getCurpInfo";
 import { SearchData } from "../SelectDropSearch";
 import { ButtonSlider } from "../SliderButtons";
+import api from "../../api/api";
 
+interface iSelectOptionItem {
+    id: number;
+    etiqueta: string;
+}
 
 export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => {
 
@@ -37,7 +42,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     const [ countries, setCountries] = useState<any[]>([]);
 
     const [nationality, setNationality] = useState<number>(0);
-    const [nationCatalog, setNationCatalog] = useState<any[]>([]);
+    const [nationCatalog, setNationCatalog] = useState<iSelectOptionItem[]>([]);
 
     const [dob,setDob ] = useState<string>('');
 
@@ -45,7 +50,12 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     const [phoneStatus, setPhoneStatus] = useState<boolean>(false);
     const [curp, setCurp] = useState<string>("");
     const [curpStatus, setCurpStatus] = useState<boolean>(false);
-    const { clientData } = useContext(AppContext);
+    const [curpIsNew, setCurpIsNew] = useState(false);
+
+    const { clientData, session } = useContext(AppContext);
+
+    const [showLoading, dismissLoading] = useIonLoading();
+
 
     let render = true;
 
@@ -75,8 +85,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                   name: "CATA_nacionalidad"
                 }
               }).then( dataNationCatalog =>{
-                setNationCatalog( dataNationCatalog.docs );
-                
+                setNationCatalog( dataNationCatalog.docs.map( (i:any) => ({ id: i.id, etiqueta: i.etiqueta })) );
                 db.find({
                   selector: {
                     couchdb_type: "COUNTRY"
@@ -125,6 +134,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     
       useEffect(() => {
         const curpInput = curp;
+        setCurpIsNew(false);
         if (curp) {
           const curpRE = new RegExp(process.env.REACT_APP_CURP_REGEX!);
           const curpMatch = curpInput.match(curpRE);
@@ -144,6 +154,28 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           }
         }
       }, [curp]);
+    
+      async function onVerifyCurp (){
+        showLoading({ message: 'Validando...' });
+        try {
+          api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+          const apiRes = await api.get(`/clients/exits?identityNumber=${curp}`);
+          const idCliente = apiRes.data.id_cliente;
+          if( idCliente ){
+            
+            alert(`OJO: El CURP ${curp} arrojo el Id de Cliente:${idCliente}`);
+
+          }
+          else
+            setCurpIsNew(true);
+
+          dismissLoading();
+        }
+        catch(e){
+          dismissLoading();
+          alert("Ocurrio un error, puede que no tengas conexion con datos")
+        }
+      }
 
     function onSubmit () {
       const newData = {
@@ -169,7 +201,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
         }],
         province_of_birth: provinceOfBirth ,
         country_of_birth: countryOfBirth ? [countryOfBirth, countries.find( (i:SearchData)=> ({id: i.id, etiqueta: i.etiqueta}) ).etiqueta] : ['',''],
-        nationality: nationality ? [ nationality, nationCatalog.find( (i:any) =>(i.id == nationality)).etiqueta] : [0,'']
+        nationality: nationality ? [ nationality, nationCatalog.find( (i:iSelectOptionItem) =>(i.id == nationality))!.etiqueta] : [0,'']
       }
       
       onNext(newData);
@@ -226,7 +258,9 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                 <IonBadge color={curpStatus ? "success" : "warning"}>
                 {curpStatus ? "Ok" : "No valida"}
                 </IonBadge>
+                { !clientData._id && curpStatus && !curpIsNew &&<IonButton color='primary' onClick={onVerifyCurp}>Verificar</IonButton>}
             </IonItem>
+
             { curpStatus && 
             <div>
                 <IonItem><IonLabel>Fecha Nacimiento: {dob}</IonLabel></IonItem>
@@ -234,7 +268,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
                 <IonItem><IonLabel>Nacio en: { provinceOfBirth[1] }</IonLabel></IonItem>
                 </div>
             }
-                  <IonItem>
+      <IonItem>
         <IonLabel position="stacked">País de Nacimiento</IonLabel>
         <IonSelect
           value={countryOfBirth}
@@ -293,6 +327,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
 
           {!countryOfBirth && <i style={{color: "gray"}}>* País de Nacimiento es obligatorio<br/></i>}
           {!nationality && <i style={{color: "gray"}}>* Nacionalidad es obligatorio<br/></i>}
+          {!clientData._id && !curpIsNew && <i style={{color: "gray"}}>La CURP se debe verificar dando click el boton<br/></i> }
 
         </p>
         <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' disabled={ nameError || lastnameError || !curpStatus ||!phoneStatus || !countryOfBirth || !nationality}  />

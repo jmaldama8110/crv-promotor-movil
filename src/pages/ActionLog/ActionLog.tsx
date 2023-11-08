@@ -1,16 +1,18 @@
-import { IonHeader, IonToolbar, IonContent, IonList, IonTitle, IonItem, IonIcon, IonLabel, IonPage, IonButtons, IonBackButton, useIonLoading, IonButton, useIonAlert } from "@ionic/react"
+import { IonHeader, IonToolbar, IonContent, IonList, IonTitle, IonItem, IonIcon, IonLabel, IonPage, IonButtons, IonBackButton, useIonLoading, IonButton, useIonAlert, IonRefresher, IonRefresherContent, RefresherEventDetail } from "@ionic/react"
 import { useContext, useEffect, useState } from "react";
 import { ellipse  } from 'ionicons/icons';
-import { dbX } from "../../db";
+import { db } from "../../db";
 import { AppContext } from "../../store/store";
 import api from "../../api/api";
 import { UpdateLog } from "../../reducer/UpdateLogsReducer";
+import { useDBSync } from "../../hooks/useDBSync";
 
 export const ActionLog = () => {  
   const { session, updatesLog, dispatchUpdatesLog } = useContext(AppContext);
   const [showAlert] = useIonAlert();
   const [showLoading, dismissLoading] = useIonLoading();
   const [allValid, setAllValid] = useState(false);
+  const { couchDBSyncUpload } = useDBSync();
 
   let loaded = true;
 
@@ -25,14 +27,11 @@ export const ActionLog = () => {
         }
 
     }
-
-    
-  useEffect(() => {
     async function onPopulate() {
       
       try {
         
-        const queryData = await dbX.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
+        const queryData = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
         const userActions:any = queryData.docs.filter( 
           (i:any) => 
           i.created_by === session.user && 
@@ -59,6 +58,9 @@ export const ActionLog = () => {
         alert('No fue posible recuperar datos')
       }
     }
+    
+  useEffect(() => {
+
   
     if (loaded) {
       loaded = false;
@@ -173,7 +175,14 @@ export const ActionLog = () => {
     }
 
   }
-
+  async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    
+    setTimeout(async () => {      
+      await onPopulate();
+      event.detail.complete();
+    },1000);
+    
+  }
   function onIgnoreAction (e:any) {
     
     const idx = e.target.id
@@ -196,6 +205,9 @@ export const ActionLog = () => {
       </IonHeader>
 
       <IonContent className="ion-padding">
+      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         
           {!allValid &&<IonButton color='warning' onClick={onApplyAll} disabled={!updatesLog.length}>Validar Todo</IonButton>}
           {allValid && <IonButton color='success' onClick={onExecAll} disabled={!updatesLog.length}>Aplicar Todo</IonButton>}
