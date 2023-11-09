@@ -28,8 +28,11 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
     },[])
     
     const onSave = async (data:any) => {
+
       const itemId = props.match.url.split("/")[5];
+      
       dispatchSession( { type: "SET_LOADING", loading_msg: 'Guardando...',loading: true});
+      
       db.get(itemId).then( async (loanInfo:any) => {
         return db.put({
           ...loanInfo,

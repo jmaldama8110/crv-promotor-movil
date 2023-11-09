@@ -12,9 +12,7 @@ export const ActionLog = () => {
   const [showAlert] = useIonAlert();
   const [showLoading, dismissLoading] = useIonLoading();
   const [allValid, setAllValid] = useState(false);
-  const { couchDBSyncUpload } = useDBSync();
-
-  let loaded = true;
+  const { couchDBSyncDownload } = useDBSync();
 
   function mapActionsTypes ( actionName: string ) {
         switch( actionName) {
@@ -29,16 +27,16 @@ export const ActionLog = () => {
     }
     async function onPopulate() {
       
+      
       try {
+        await couchDBSyncDownload();
         
-        const queryData = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 1000 });
+        const queryData = await db.find({ selector: { couchdb_type: "ACTION" }, limit: 100000 });
         const userActions:any = queryData.docs.filter( 
           (i:any) => 
           i.created_by === session.user && 
           i.status ==='Pending'
           );
-
-          
         const data: UpdateLog[] = userActions.map( (i:any) => ( {
                                                                         _id: i._id,
                                                                         name: `${mapActionsTypes(i.name)}`,
@@ -51,21 +49,17 @@ export const ActionLog = () => {
                                                                         isOk: i.isOk,
                                                                         errors: !i.errors ? [] : i.errors }))
       
-        dispatchUpdatesLog( { type: 'POPULATE_UPDATE_LOGS', data})
+        dispatchUpdatesLog( { type: 'POPULATE_UPDATE_LOGS', data});
+        
       }
       catch(e){
-        console.log(e);
+        
         alert('No fue posible recuperar datos')
       }
     }
     
-  useEffect(() => {
+  useEffect(() => {  
 
-  
-    if (loaded) {
-      loaded = false;
-      onPopulate();
-    }
     return ()=> {
       dispatchUpdatesLog({ type: "POPULATE_UPDATE_LOGS", data: []})
     }
@@ -151,37 +145,59 @@ export const ActionLog = () => {
       try {
         const apiRes = await api.get(`/actions/exec?id=${idTrx}`);
         
-        dispatchUpdatesLog( {
-          type: "REMOVE_UPDATE_LOG",
-          idx: idTrx          
-        });
+        if( apiRes.data.status === 'ERROR'){
+
+          dispatchUpdatesLog( {
+            type: "UPDATE_UPDATE_LOG",
+            idx: idTrx,
+            status: 'Pending',
+            hf_info: {
+              client_name: updatesLog[apiCalls].hf_info?.client_name,
+              hf_client_id: updatesLog[apiCalls].hf_info?.hf_client_id,
+              hf_application_id: updatesLog[apiCalls].hf_info?.hf_application_id
+            },
+            isOk: apiRes.data.action.errors.length == 0,
+            errors: apiRes.data.action.errors.map( (e:any )=>(JSON.stringify(e)))
+          });
+
+          try {
+            // sends email with
+          api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+          const emailTo = process.env.NODE_ENV === 'development' ? 'josman.gomez.aldama@gmail.com' : session.user
+          
+          await api.post(`/sendemail?toEmail=${emailTo}&templateId=d-644621db309643f0aba469b4e229f776&fromEmail=soporte.hf@grupoconserva.mx`,
+          { /// Data for email Template
+            actionType: mapActionsTypes(updatesLog[apiCalls].name),
+            clientName: updatesLog[apiCalls].hf_info?.client_name,
+            errors:  apiRes.data.action.errors.map( (e:any) => (JSON.stringify(e)))
+          })
+
+          } catch (err) {
+            alert('Error al intentar enviar el correo...')
+          }
+        }
+        else {
+          dispatchUpdatesLog( {
+            type: "REMOVE_UPDATE_LOG",
+            idx: idTrx
+          });
+        }
+
 
       }
-      catch(e){
-        
-        dismissLoading();
-        dispatchUpdatesLog( {
-          type: "UPDATE_UPDATE_LOG",
-          idx: idTrx,
-          status: 'Pending',
-          isOk: false,
-          errors: ['Error al hacer update en el HF']
-        });
-
+      catch(e){    
         
       }
-      dismissLoading();
+      
       apiCalls ++;
     }
+    
+    dismissLoading();
 
   }
   async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
-    
-    setTimeout(async () => {      
       await onPopulate();
       event.detail.complete();
-    },1000);
-    
   }
   function onIgnoreAction (e:any) {
     

@@ -172,8 +172,8 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           dismissLoading();
         }
         catch(e){
-          dismissLoading();
           alert("Ocurrio un error, puede que no tengas conexion con datos")
+          dismissLoading();
         }
       }
 

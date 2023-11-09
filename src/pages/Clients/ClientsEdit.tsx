@@ -75,7 +75,7 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
         history.goBack();
       })
     })
-    
+
   };
 
   return (
