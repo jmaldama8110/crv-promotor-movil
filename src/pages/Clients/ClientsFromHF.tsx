@@ -5,7 +5,7 @@ import api from "../../api/api";
 import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 import { createAction } from "../../model/Actions";
-import { ClientData } from "../../reducer/ClientDataReducer";
+import { ClientData, clientDataDef } from "../../reducer/ClientDataReducer";
 import { AppContext } from "../../store/store";
 import { ClientForm } from "./ClientForm";
 
@@ -86,9 +86,18 @@ export const ClientsFromHF: React.FC<RouteComponentProps> = ({ history, match })
             }
             setClientName(`${newData.name} ${newData.lastname} ${newData.second_lastname}`);
 
-            dispatchClientData({ type: 'SET_CLIENT',
-                    ...newData,
-                    _id:'0' });
+            const clientDataReducer = {  ...clientDataDef,
+              ...apiRes2.data, 
+              business_data: {
+                ...clientDataDef.business_data,
+                ...apiRes2.data.business_data
+              }
+          }
+
+          dispatchClientData({ type: 'SET_CLIENT',
+                  ...clientDataReducer,
+                  _id:'0' });
+                    
             
             dismiss();
 
