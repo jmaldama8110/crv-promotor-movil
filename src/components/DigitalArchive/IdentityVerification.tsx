@@ -5,15 +5,17 @@ import api from "../../api/api";
 import { db } from "../../db";
 import { useDBSync } from "../../hooks/useDBSync";
 import { DocumentIdProperties } from "../../reducer/ClientDataReducer";
+import { useCameraTaker } from "../../hooks/useCameraTaker";
 
 
 export const IdentityVerification = () =>{
 
     const { clientData, session } = useContext(AppContext);
+    const { takePhoto, pics, setPics } = useCameraTaker();
     const { couchDBSyncUpload } = useDBSync();
     const [showToast] = useIonToast();
     const [uuid, setUuid ] = useState("");
-    const [documentData, setDocumentData] =
+    const [documentData, setDocumentData] =    
     useState<DocumentIdProperties>({
             age: '0',
             voter_key: '',
@@ -86,11 +88,15 @@ export const IdentityVerification = () =>{
         }
     },[clientData])
 
-    async function onEnviar () {
+    async function onSend () {
         showLoading({message:'Enviando imagenes...'});
         try {
             api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
-            const apiRes = await api.post(`/verify?clientId=${clientData._id}`);
+            const apiRes = await api.post(`/verify?clientId=${clientData._id}`,{
+                frontImage: pics[0].base64str,
+                backImage: pics[1].base64str,
+                faceImage: pics[2].base64str
+            });
             if( apiRes.data ){
                 setUuid(apiRes.data);
                 setStatus('sent');
@@ -188,36 +194,41 @@ export const IdentityVerification = () =>{
     
     return (
         <IonList className="ion-padding">
-            <IonItemGroup>
-                <IonItemDivider>
-                    <IonLabel>Identificacion y selfi</IonLabel>
-                </IonItemDivider>
-            </IonItemGroup>
+            <IonItemDivider><IonLabel>Prueba de Vida</IonLabel></IonItemDivider>
 
-            {clientData.identity_pics.length !== 3 &&
-                <IonItem>
-                <IonLabel color='danger'>... no se encontraron fotos</IonLabel>
-            </IonItem>}
+                <IonGrid>
+                    <IonRow>
+                        
+                        <IonCol size="5" >
+                            { pics.length > 0 
+                                ? !! pics[0].base64str &&  <IonImg src={`data:image/jpeg;base64,${pics[0].base64str}`}></IonImg>
+                                : <IonButton color='medium' onClick={()=> takePhoto(20)}>INE Frontal</IonButton>
+                            }
+                        </IonCol> 
+                        
+                        <IonCol size="5" >
+                            { pics.length > 1
+                                ? !! pics[1].base64str &&  <IonImg src={`data:image/jpeg;base64,${pics[1].base64str}`}></IonImg>
+                                : <IonButton color='medium' onClick={()=> takePhoto(20)} disabled={pics.length != 1}>INE Posterior</IonButton>
+                            }
+                        </IonCol> 
 
-            
-            <IonGrid>
-                <IonRow>
-                    {
-                    clientData.identity_pics.map((photo, index) => (
-                    <IonCol size="6" key={index} >
-                        {! photo.base64str &&<IonImg src={`${process.env.REACT_APP_BASE_URL_API}/docs/img?id=${photo._id}`}></IonImg>}
-                        {!! photo.base64str && <IonImg src={`data:image/jpeg;base64,${photo.base64str}`}></IonImg>}
-                    </IonCol>
-                    
-                    ))
-                    }
-                </IonRow>
-            </IonGrid>
+                    </IonRow>
+                    <IonRow>
+                        <IonCol size="5" >
+                            { pics.length > 2
+                                ? !! pics[2].base64str &&  <IonImg src={`data:image/jpeg;base64,${pics[2].base64str}`}></IonImg>
+                                : <IonButton color='medium' onClick={()=> takePhoto(20)} disabled={ pics.length != 2}>Selfi</IonButton>
+                            }
+                        </IonCol> 
+                    </IonRow>
+                </IonGrid>
+
 
             { result !== 'ok' &&
             <>
                 { status ==='pending' &&
-                    <IonButton onClick={onEnviar} disabled={clientData.identity_pics.length !== 3}>Enviar</IonButton>}
+                    <IonButton onClick={onSend} disabled={pics.length !== 3}>Enviar</IonButton>}
                 {status === 'sent' && 
                 <>
                 <IonItem>

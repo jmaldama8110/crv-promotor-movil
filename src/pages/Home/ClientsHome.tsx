@@ -34,8 +34,9 @@ const ClientsHome: React.FC = () => {
   const [ clientDetail, setClientDetail] = useState<{
     id_cliente: number;
     location: string;
-    coords: [number, number]
-  }>({id_cliente: 0, location: '', coords:[0,0]})
+    coords: [number, number],
+    identity_result: string;
+  }>({id_cliente: 0, location: '', coords:[0,0], identity_result: ''})
 
 
   async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
@@ -134,7 +135,8 @@ const ClientsHome: React.FC = () => {
         setClientDetail( {
           id_cliente: foundClient.id_cliente,
           location: !!addrs ? `${addrs.colony[1]}, ${addrs.city[1]}`: '',
-          coords: foundClient.coordinates
+          coords: foundClient.coordinates,
+          identity_result: foundClient.identity_verification.result,
         } );
       }
     }
@@ -195,6 +197,9 @@ const ClientsHome: React.FC = () => {
           <IonItem button onClick={onShowGeoActions}>
             <IonIcon icon={locationOutline}></IonIcon> 
             <IonLabel>{clientDetail.location} </IonLabel>
+          </IonItem>
+          <IonItem>
+            <IonLabel style={ clientDetail.identity_result === 'ok'? {}:{backgroundColor: 'yellow'}}>INE verificación: { clientDetail.identity_result === 'ok'? 'OK':'No verificada'} </IonLabel>
           </IonItem>
         </div>
         }
