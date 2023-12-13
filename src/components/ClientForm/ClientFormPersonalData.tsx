@@ -159,7 +159,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
         showLoading({ message: 'Validando...' });
         try {
           api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
-          const apiRes = await api.get(`/clients/exits?identityNumber=${curp}`);
+          const apiRes = await api.get(`/clients/exists?identityNumber=${curp}`);
           const idCliente = apiRes.data.id_cliente;
           if( idCliente ){
             

@@ -38,7 +38,15 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
               couchdb_type: "PRODUCT",
             },
           }).then((data: any) => {
-            const productForGroups = data.docs.filter((i: any) => (i.external_id === 1 || i.external_id === 3))
+            const productForGroups = data.docs.filter(
+              (i: any) => 
+              ( i.external_id === 1 || 
+                i.external_id === 2 ||
+                i.external_id === 3 ||
+                i.external_id === 6 ||
+                i.external_id === 8 ||
+                i.external_id === 9 ||
+                i.external_id === 19 ))
             setProductList(productForGroups);
           });
         });

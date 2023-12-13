@@ -68,8 +68,6 @@ import { PersonalReferenceEdit } from "./pages/RelatedPeople/References/Personal
 import { BeneficiariesAdd } from "./pages/RelatedPeople/Beneficiaries/BeneficiariesAdd";
 import { BeneficiariesEdit } from "./pages/RelatedPeople/Beneficiaries/BeneficiariesEdit";
 
-import { ClientsFromHF } from "./pages/Clients/ClientsFromHF";
-
 import { GroupAdd } from "./pages/Groups/GroupAdd";
 import { LoanAppGroupHome } from "./pages/LoanAppGroup/LoanAppGroupHome";
 import { GroupEdit } from "./pages/Groups/GroupEdit";
@@ -77,7 +75,6 @@ import { LoanAppGroupEdit } from "./pages/LoanAppGroup/LoanAppGroupEdit";
 
 import { LoanAppMemberAdd } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberAdd";
 import { LoanAppMemberEdit } from "./components/LoanAppGroupForm/LoanAppGroupFormMember/LoanAppMemberEdit";
-import { GroupFromHF } from "./pages/Groups/GroupFromHF";
 import { GroupImport } from "./pages/Groups/GroupImport/GroupImport";
 import { useDBSync } from "./hooks/useDBSync";
 import { ContractDetail } from "./pages/Contracts/ContractDetail";
@@ -91,6 +88,7 @@ import { WhereToPayHome } from "./pages/WhereToPay/WhereoToPayHome";
 import { ActionLog } from "./pages/ActionLog/ActionLog";
 import { DigitalArchive } from "./pages/Clients/DigitalArchive";
 import { LoanAppGroupAdd } from "./pages/LoanAppGroup/LoanAppGroupAdd";
+import { ClientsImport } from "./pages/Clients/ClientsImport";
 
 setupIonicReact();
 
@@ -101,7 +99,6 @@ const App: React.FC = () => {
   const { couchDBSyncDownload, evaluateTokenExpiration} = useDBSync();
 
   useEffect(() => {
-    
     if (session.loading) {
       present({ message: session.loading_msg });
     } else {
@@ -112,15 +109,12 @@ const App: React.FC = () => {
   useEffect(() => {
     const loadRender = async () => {
       if (render) {
-        ///// what needs to be rendered once goes here!
+        /// what needs to be rendered once goes here!
         await couchDBSyncDownload();
-        
         render = false;      
       }
     };
     loadRender();
-
-    
   }, []);
 
   async function onTabChange  (){
@@ -145,7 +139,7 @@ const App: React.FC = () => {
             <Route exact path="/clients/edit/:id" component={ClientsEdit}></Route>
             <Route exact path="/clients/socioeconomics/edit/:id" component={SocioEconomicsForm}></Route>
             <Route exact path="/clients/add" component={ClientsAdd}></Route>
-            <Route exact path="/clients/add-from-hf/:external_id" component={ClientsFromHF}></Route> 
+            <Route exact path="/clients/add-from-hf" component={ClientsImport}></Route> 
             
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
             <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>
@@ -180,7 +174,6 @@ const App: React.FC = () => {
             />
 
             <Route exact path="/groups/add" component={GroupAdd}></Route>
-            <Route exact path="/groups/add-from-hf" component={GroupFromHF}></Route>
             <Route exact path="/groups/edit/:id" component={GroupEdit}></Route>
 
             <Route exact path="/groups/:id/loanapps" component={LoanAppGroupHome}></Route>

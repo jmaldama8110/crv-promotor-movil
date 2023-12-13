@@ -48,10 +48,9 @@ const ClientsHome: React.FC = () => {
       const newData: SearchData[] = query.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
       setClientSearchData(newData);
       event.detail.complete();
-    },2000);
+    },600);
     
   }
-
 
   function onShowActions(){
     const buttons = clientSelected.id ? 
@@ -67,7 +66,7 @@ const ClientsHome: React.FC = () => {
     ] :
       [
         { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
-        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/clients/add-from-hf/0' } },
+        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/clients/add-from-hf' } },
         { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },  
       ]
       present(
@@ -132,11 +131,12 @@ const ClientsHome: React.FC = () => {
       const foundClient:any = data.docs.find( (i:any) => i._id === clientSelected.id )
       if( foundClient) {
         const addrs = foundClient.address.find((i:any) => i.type ==="DOMICILIO")
+        let identity_verification = !!foundClient.identity_verification ? foundClient.identity_verification.result : ''
         setClientDetail( {
           id_cliente: foundClient.id_cliente,
           location: !!addrs ? `${addrs.colony[1]}, ${addrs.city[1]}`: '',
           coords: foundClient.coordinates,
-          identity_result: foundClient.identity_verification.result,
+          identity_result: identity_verification
         } );
       }
     }

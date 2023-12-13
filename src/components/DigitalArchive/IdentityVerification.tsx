@@ -34,8 +34,6 @@ export const IdentityVerification = () =>{
             street_address: '',
             suburb_address: ''})
     
-    // const [selfi, setSelfi ] = useState("");
-    // const [docPortrait, setDocuPortrait ] = useState("");
 
     const [status, setStatus] = useState<"sent" | "pending">("pending"); /// sent | pending
     const [result, setResult] = useState<"ok" | "waiting" | "fail">("waiting"); /// ok | fail | waiting

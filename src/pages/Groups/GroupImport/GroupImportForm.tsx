@@ -177,6 +177,9 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
         }
         
         try {
+          if( groupSearch ){
+            throw new Error('El grupo ya se ha importado');
+          }
           api.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${session.current_token}`;
@@ -199,14 +202,14 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
             setLoansList(reversedData);
           }
           
-        } catch (err) {
-          console.log(err);
+        } catch (err:any) {
+          
           dismiss();
           presentAlert({
             header: "No fue posible procesar la solicitud de informacion",
             subHeader:
-              "Error al generar la solicitud, puede que no tengas datos",
-            message: "Error al enviar tu solicitud de busqueda!",
+              "Verifica el nombre del grupo",
+            message: err.message,
             buttons: ["OK"],
           });
         }
@@ -390,12 +393,21 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       <SwiperSlide>
         <IonList className="ion-padding">
           <IonItem>
-            <IonLabel position="floating">Ingresa Nombre del Grupo</IonLabel>
+            <IonLabel position="floating">Ingresa Nombre del Grupo </IonLabel>
             <IonInput
               type="text"
               value={groupName}
               onIonChange={(e) => setGroupName(e.detail.value!)}
               onIonBlur={(e: any) => setGroupName(e.target.value.toUpperCase())}
+              onFocus={ ()=> setSelectLoad({
+                idCliente: 0,
+                nombreCliente: "",
+                idSolicitud: 0,
+                estatus: "",
+                sub_estatus: "",
+                idTipoCliente: 0,
+                TipoCliente: "",
+              })}
             ></IonInput>
           </IonItem>
           <IonButton onClick={onSearch} disabled={!groupName}>
@@ -438,7 +450,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
           </IonItem>
 
           <p></p>
-          <ButtonSlider label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={onGroupSearchNext}/>
+          <ButtonSlider  disabled={!selectLoan.idCliente} label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={onGroupSearchNext}/>
         </IonList>
       </SwiperSlide>
 

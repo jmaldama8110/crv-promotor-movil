@@ -1,4 +1,4 @@
-import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonButton, IonItemDivider, IonLabel, useIonAlert, IonRefresher, IonRefresherContent, RefresherEventDetail, IonCard, IonCardHeader, IonCardSubtitle, IonCardContent, useIonLoading } from "@ionic/react";
+import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonList, IonButton, IonItemDivider, IonLabel, useIonAlert, IonRefresher, IonRefresherContent, RefresherEventDetail, IonCard, IonCardHeader, IonCardSubtitle, IonCardContent, useIonLoading, IonItem } from "@ionic/react";
 import { useContext, useState, useEffect } from "react";
 import { RouteComponentProps } from "react-router";
 
@@ -155,6 +155,7 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
         </IonRefresher>
 
           <IonList className="ion-padding">
+
             <IonItemDivider><IonLabel>Solicitudes</IonLabel></IonItemDivider>
                   {/* Lista de solicitudes */}
               {!loans.length ? <p>No hay solicitudes...</p> : <p></p>}
@@ -178,13 +179,12 @@ export const LoanAppGroupHome: React.FC<RouteComponentProps> = (props) => {
                         i.sub_estatus === 'NUEVO TRAMITE' &&<IonButton routerLink={`loanapps/edit/${i._id}`}>Editar</IonButton>
                       }
                     </p>
-                    
-                    
                   </IonCardContent>
                 </IonCard>
               ))}
 
                 <IonButton onClick={onAddNew} >Nuevo</IonButton>
+
             <IonItemDivider><IonLabel>Contratos Activos</IonLabel></IonItemDivider>
                   <ContractsHome {...props} />
           </IonList>

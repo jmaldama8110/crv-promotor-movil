@@ -75,7 +75,20 @@ export const LoanApplicationForm: React.FC<LoanApplicationFormProps> = (props) =
                   couchdb_type: "PRODUCT"
                 }
               }).then( (data:any) =>{
-                const newData = data.docs.filter( (i:any) => ( (i.external_id == 5 || i.external_id == 12 || i.external_id == 4 ) ))
+                const newData = data.docs.filter( 
+                    (i:any) => ( 
+                        (    i.external_id == 4 ||
+                             i.external_id == 5 ||
+                            i.external_id == 7 ||
+                            i.external_id == 10 ||
+                            i.external_id == 11 ||
+                            i.external_id == 12 ||
+                            i.external_id == 13 ||
+                            i.external_id == 14 ||
+                            i.external_id == 15 ||
+                            i.external_id == 16 ||
+                            i.external_id == 20
+                     ) ))
                 setProductList( newData);
             })
            })
