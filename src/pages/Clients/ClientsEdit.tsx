@@ -27,7 +27,7 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
     if( render ){
       render = false;
       const itemId = match.url.replace("/clients/edit/", "");
-      dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
+    //   dispatchSession({ type: "SET_LOADING", loading_msg: 'Cargando...', loading: true});
         db.get(itemId)
           .then( async (data) => {
             
@@ -36,7 +36,7 @@ export const ClientsEdit: React.FC<RouteComponentProps> = ({ match,history }) =>
               type: "SET_CLIENT",
               ...newData
             });
-            dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
+            // dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false});
           })
           .catch((err) => {
             alert("No fue posible recuperar el cliente: " + itemId);

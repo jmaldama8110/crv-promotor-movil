@@ -146,12 +146,15 @@ useEffect( ()=>{
 
 
  async function onOpenLinkPdf() {
-  
+  const clientId = match.url.split("/")[2];
+  const clientData:any = await db.get(clientId);
+
+  console.log(`/docs/pdf/tarjeton-digital?typeReference=${selectedType}&contractId=${selectedContract}&clientId=${clientData.id_cliente}`)
   try{
     present({message: "Descargando pdf..."});
      
-    const clientId = match.url.split("/")[2];
-    const clientData:any = await db.get(clientId);
+    // const clientId = match.url.split("/")[2];
+    // const clientData:any = await db.get(clientId);
     
     api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
     const apiRes = await api.get(`/docs/pdf/tarjeton-digital?typeReference=${selectedType}&contractId=${selectedContract}&clientId=${clientData.id_cliente}`);

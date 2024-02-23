@@ -2,7 +2,7 @@ import {
   IonCheckbox,IonCol,IonDatetime,IonGrid,IonInput,IonItem,IonItemDivider,IonLabel,IonList,IonPopover,IonRow,IonSelect,IonSelectOption,IonText } from "@ionic/react";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../store/store";
-import { formatDate, formatLocalCurrency, formatLocalCurrencyV2 } from "../../utils/numberFormatter";
+import { formatDate } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
 import { db } from "../../db";
 
@@ -32,19 +32,19 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
   const [loanDests, setLoanDest]  = useState<LoanDestInfo[]>([]);
   const [loanDestItem, setLoanDestItem]  = useState<number>(0);
 
-  const [incomeSalesTotal, setIncomeSalesTotal] = useState<string>("0")
-  const [incomePartner, setIncomePartner] = useState<string>("0")
-  const [incomeJob, setIncomeJob] = useState<string>("0")
-  const [incomeRemittances, setIncomeRemittances] = useState<string>("0")
-  const [incomeOther, setIncomeOther] = useState<string>("0")
-  const [incomeTotal, setIncomeTotal] = useState<string>("0")
+  const [incomeSalesTotal, setIncomeSalesTotal] = useState<number>(0)
+  const [incomePartner, setIncomePartner] = useState<number>(0)
+  const [incomeJob, setIncomeJob] = useState<number>(0)
+  const [incomeRemittances, setIncomeRemittances] = useState<number>(0)
+  const [incomeOther, setIncomeOther] = useState<number>(0)
+  const [incomeTotal, setIncomeTotal] = useState<number>(0)
 
-  const [expenseFamily, setExpenseFamily] = useState<string>("0");
-  const [expenseRent, setExpenseRent] = useState<string>("0");
-  const [expenseBusiness, setExpenseBuisness] = useState<string>("0");
-  const [expenseDebt, setExpenseDebt] = useState<string>("0");
-  const [expenseCreditCards, setExpenseCreditCards] = useState<string>("0");
-  const [expenseTotal, setExpenseTotal] = useState<string>("0");
+  const [expenseFamily, setExpenseFamily] = useState<number>(0);
+  const [expenseRent, setExpenseRent] = useState<number>(0);
+  const [expenseBusiness, setExpenseBuisness] = useState<number>(0);
+  const [expenseDebt, setExpenseDebt] = useState<number>(0);
+  const [expenseCreditCards, setExpenseCreditCards] = useState<number>(0);
+  const [expenseTotal, setExpenseTotal] = useState<number>(0);
 
   const [keepsAccountingRecords, setKeepsAccountinnRecords] = useState<boolean>(false);
   const [hasPreviousExperience, setHasPreviousExperience] = useState<boolean>(false);
@@ -135,17 +135,17 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
       loan_destination: loanDestItem ? 
                         [loanDestItem, loanDests.find( (i:LoanDestInfo) => i.id === loanDestItem)?.description] : 
                         [0,''],
-      income_sales_total: formatLocalCurrency(parseFloat(incomeSalesTotal)),
-      income_partner: formatLocalCurrency(parseFloat(incomePartner)),
-      income_job: formatLocalCurrency(parseFloat(incomeJob)),
-      income_remittances: formatLocalCurrency(parseFloat(incomeRemittances)),
-      income_other: formatLocalCurrency(parseFloat(incomeOther)),
+      income_sales_total: ((incomeSalesTotal)),
+      income_partner: ((incomePartner)),
+      income_job: ((incomeJob)),
+      income_remittances: ((incomeRemittances)),
+      income_other: ((incomeOther)),
       income_total: incomeTotal,
-      expense_family: formatLocalCurrency(parseFloat(expenseFamily)),
-      expense_rent: formatLocalCurrency(parseFloat(expenseRent)),
-      expense_business: formatLocalCurrency(parseFloat(expenseBusiness)),
-      expense_debt: formatLocalCurrency(parseFloat(expenseDebt)),
-      expense_credit_cards: formatLocalCurrency(parseFloat(expenseCreditCards)),
+      expense_family: ((expenseFamily)),
+      expense_rent: ((expenseRent)),
+      expense_business: ((expenseBusiness)),
+      expense_debt: ((expenseDebt)),
+      expense_credit_cards: ((expenseCreditCards)),
       expense_total: expenseTotal,
       keeps_accounting_records: keepsAccountingRecords,
       has_previous_experience: hasPreviousExperience,
@@ -171,13 +171,13 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
 
   function updateIncomeTotals() {
       let total = 0;
-      total = parseFloat(incomeJob) + parseFloat(incomeOther) + parseFloat(incomePartner) + parseFloat(incomeRemittances) + parseFloat(incomeSalesTotal);
-      setIncomeTotal(formatLocalCurrency(total) );
+      total = (incomeJob) + (incomeOther) + (incomePartner) + (incomeRemittances) + (incomeSalesTotal);
+      setIncomeTotal((total) );
   }
   function updateExpenseTotals () {
     let total = 0;
-    total = parseFloat(expenseBusiness) + parseFloat(expenseCreditCards) + parseFloat(expenseDebt)+ parseFloat(expenseFamily) + parseFloat(expenseRent);
-    setExpenseTotal(formatLocalCurrency(total));
+    total = (expenseBusiness) + (expenseCreditCards) + (expenseDebt)+ (expenseFamily) + (expenseRent);
+    setExpenseTotal((total));
   }
   useEffect( ()=> {
     if( clientData._id && loanDests.length ){
@@ -276,42 +276,42 @@ export const ClientFormBusinessData: React.FC<{ onNext:any }> = ({ onNext}) => {
       </IonItem>
       <IonItemDivider><IonLabel>INGRESOS MENSUALES</IonLabel></IonItemDivider>
       <IonItem>
-        <IonLabel position="stacked">Ventas totales</IonLabel><IonInput type="text" value={incomeSalesTotal} onIonChange={(e)=>setIncomeSalesTotal(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Ventas totales</IonLabel><IonInput type="number" value={incomeSalesTotal} onIonChange={(e)=>setIncomeSalesTotal(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Aportaciones de su esposo, pareja, etc</IonLabel><IonInput type="text" value={incomePartner} onIonChange={(e)=>setIncomePartner(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Aportaciones de su esposo, pareja, etc</IonLabel><IonInput type="number" value={incomePartner} onIonChange={(e)=>setIncomePartner(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Cuenta con otro trabajo</IonLabel><IonInput type="text" value={incomeJob} onIonChange={(e)=>setIncomeJob(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Cuenta con otro trabajo</IonLabel><IonInput type="number" value={incomeJob} onIonChange={(e)=>setIncomeJob(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Envios de dinero (remesas)</IonLabel><IonInput type="text" value={incomeRemittances} onIonChange={(e)=>setIncomeRemittances(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Envios de dinero (remesas)</IonLabel><IonInput type="number" value={incomeRemittances} onIonChange={(e)=>setIncomeRemittances(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Otros ingresos</IonLabel><IonInput type="text" value={incomeOther} onIonChange={(e)=>setIncomeOther(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Otros ingresos</IonLabel><IonInput type="number" value={incomeOther} onIonChange={(e)=>setIncomeOther(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Total ingresos</IonLabel><IonInput type="text" value={incomeTotal} onIonChange={(e)=>setIncomeTotal(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Total ingresos</IonLabel><IonInput type="number" value={incomeTotal} onIonChange={(e)=>setIncomeTotal(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
 
       <IonItemDivider><IonLabel>GASTOS MENSUALES</IonLabel></IonItemDivider>
       <IonItem>
-        <IonLabel position="stacked">Gastos Familiares (alimentos, ropa)</IonLabel><IonInput type="text" value={expenseFamily} onIonChange={(e)=>setExpenseFamily(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Gastos Familiares (alimentos, ropa)</IonLabel><IonInput type="number" value={expenseFamily} onIonChange={(e)=>setExpenseFamily(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Renta</IonLabel><IonInput type="text" value={expenseRent} onIonChange={(e)=>setExpenseRent(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Renta</IonLabel><IonInput type="number" value={expenseRent} onIonChange={(e)=>setExpenseRent(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Gastos del negocio (mercansias, gas, transporte)</IonLabel><IonInput type="text" value={expenseBusiness} onIonChange={(e)=>setExpenseBuisness(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Gastos del negocio (mercansias, gas, transporte)</IonLabel><IonInput type="number" value={expenseBusiness} onIonChange={(e)=>setExpenseBuisness(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Cuentas por pagar (otros creditos)</IonLabel><IonInput type="text" value={expenseDebt} onIonChange={(e)=>setExpenseDebt(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Cuentas por pagar (otros creditos)</IonLabel><IonInput type="number" value={expenseDebt} onIonChange={(e)=>setExpenseDebt(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Tarjetas de credito (tiendas comerciales)</IonLabel><IonInput type="text" value={expenseCreditCards} onIonChange={(e)=>setExpenseCreditCards(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Tarjetas de credito (tiendas comerciales)</IonLabel><IonInput type="number" value={expenseCreditCards} onIonChange={(e)=>setExpenseCreditCards(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
       <IonItem>
-        <IonLabel position="stacked">Total Gastos</IonLabel><IonInput type="text" value={expenseTotal} onIonChange={(e)=>setExpenseTotal(e.detail.value!)}></IonInput>
+        <IonLabel position="stacked">Total Gastos</IonLabel><IonInput type="number" value={expenseTotal} onIonChange={(e)=>setExpenseTotal(parseFloat(e.detail.value!))}></IonInput>
       </IonItem>
 
       <IonItem>

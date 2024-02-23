@@ -12,7 +12,7 @@ import {
 import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
 import { useDBSync } from '../../hooks/useDBSync';
-import {locationOutline, personAddOutline} from 'ionicons/icons';
+import { analyticsOutline, bookmarkOutline, buildOutline, businessOutline, cashOutline, homeOutline, informationCircleOutline, locationOutline, personAddOutline } from 'ionicons/icons';
 
 const ClientsHome: React.FC = () => {
 
@@ -23,139 +23,149 @@ const ClientsHome: React.FC = () => {
   const { couchDBSyncUpload } = useDBSync();
 
   let history = useHistory();
-  
-  const [clientSearchData,setClientSearchData ] = useState<SearchData[]>([]);
+
+  const [clientSearchData, setClientSearchData] = useState<SearchData[]>([]);
   const [clientSelected, setClientSelected] = useState<SearchData>({
     id: '',
     rev: "",
     etiqueta: "",
   });
 
-  const [ clientDetail, setClientDetail] = useState<{
+  const [clientDetail, setClientDetail] = useState<{
     id_cliente: number;
     location: string;
     coords: [number, number],
     identity_result: string;
-  }>({id_cliente: 0, location: '', coords:[0,0], identity_result: ''})
+  }>({ id_cliente: 0, location: '', coords: [0, 0], identity_result: '' })
 
 
   async function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(async () => {
       await couchDBSyncUpload();
-      const data:any = await db.find({ selector: { couchdb_type:"CLIENT" }});
-      const query = data.docs.filter( (i:any) => i.branch[0] === session.branch[0] );
-      
-      const newData: SearchData[] = query.map( (i:any) =>( { id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
+      const data: any = await db.find({ selector: { couchdb_type: "CLIENT" } });
+      const query = data.docs.filter((i: any) => i.branch[0] === session.branch[0]);
+
+      const newData: SearchData[] = query.map((i: any) => ({ id: i._id, rev: i._rev, etiqueta: `${i.name} ${i.lastname} ${i.second_lastname}` }))
       setClientSearchData(newData);
       event.detail.complete();
-    },600);
-    
+    }, 600);
+
   }
 
-  function onShowActions(){
-    const buttons = clientSelected.id ? 
-    [
-      { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
-      { text: 'Editar', data: { action:"edit", routerLink: `/clients/edit/${clientSelected.id}` } },
-      { text: 'Solicitudes & Creditos', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps`} },
-      { text: 'Datos Socioseconomicos', data: { action: 'edit-socioeconomics', routerLink:`/clients/socioeconomics/edit/${clientSelected.id}` } },
-      { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink:  `/clients/${clientSelected.id}/guarantees` } },
-      { text: 'Referencias & Personas', data: { action: 'related-people', routerLink:  `/clients/${clientSelected.id}/related-people` } },
-      { text: 'Tarjeton de Pago', data: { action: 'tarjeton', routerLink:  `/wheretopay/${clientSelected.id}` } },
-      { text: 'Expediente Digital', data: { action: 'digital-archive', routerLink:  `/digitalachive/${clientSelected.id}` } },
-    ] :
+  function onShowActions() {
+    const buttons = clientSelected.id ?
       [
-        { text: 'Nuevo', role:"destructive",data: { action: 'add', routerLink:'/clients/add' } },
-        { text: 'Traer Desde...',data: { action: 'add-hf', routerLink:'/clients/add-from-hf' } },
-        { text: 'Cancelar', role: 'cancel', data: { action: 'cancel'} },  
+        { text: 'Nuevo', role: "destructive", data: { action: 'add', routerLink: '/clients/add' } },
+        { text: 'Editar', data: { action: "edit", routerLink: `/personaldata/edit/${clientSelected.id}` } },
+        { text: 'Solicitudes & Creditos', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps` } },
+        { text: 'Estudio Socioeconomico', data: { action: 'edit-socioeconomics', routerLink: `/clients/socioeconomics/edit/${clientSelected.id}` } },
+        { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink: `/clients/${clientSelected.id}/guarantees` } },
+        { text: 'Referencias & Personas', data: { action: 'related-people', routerLink: `/clients/${clientSelected.id}/related-people` } },
+        { text: 'Tarjeton de Pago', data: { action: 'tarjeton', routerLink: `/wheretopay/${clientSelected.id}` } },
+        { text: 'Expediente Digital', data: { action: 'digital-archive', routerLink: `/digitalachive/${clientSelected.id}` } },
+      ] :
+      [
+        { text: 'Nuevo', role: "destructive", data: { action: 'add', routerLink: '/clients/add' } },
+        { text: 'Traer Desde...', data: { action: 'add-hf', routerLink: '/clients/add-from-hf' } },
+        { text: 'Cancelar', role: 'cancel', data: { action: 'cancel' } },
       ]
-      present(
-        { header: 'Mis Clientes',
-          subHeader: 'Acciones / tareas:',
-          buttons,
-            onDidDismiss: ({ detail }) => setActions(detail),
-          })
+    present(
+      {
+        header: 'Mis Clientes',
+        subHeader: 'Acciones / tareas:',
+        buttons,
+        onDidDismiss: ({ detail }) => setActions(detail),
+      })
   }
-  
-  useEffect( ()=>{
-    if( actions ){
-      if( actions.data){
-        if(actions.data.action === 'add'){
-          dispatchClientData({type:'RESET_CLIENT'});
+
+  useEffect(() => {
+    if (actions) {
+      if (actions.data) {
+        if (actions.data.action === 'add') {
+          dispatchClientData({ type: 'RESET_CLIENT' });
           history.push(actions.data.routerLink);
         }
-        if(actions.data.action === 'add-hf')
+        if (actions.data.action === 'add-hf')
           history.push(actions.data.routerLink);
-        if(actions.data.action === 'edit')
+        if (actions.data.action === 'edit')
           history.push(actions.data.routerLink);
-        if( actions.data.action === 'edit-socioeconomics')
+        if (actions.data.action === 'edit-socioeconomics')
           history.push(actions.data.routerLink);
-        if( actions.data.action === 'loanapps')
-            history.push(actions.data.routerLink);
-        if( actions.data.action === 'guarantees')
-            history.push(actions.data.routerLink);
-        if( actions.data.action === 'related-people')
-            history.push(actions.data.routerLink);
-        if( actions.data.action === 'tarjeton')
-            history.push(actions.data.routerLink);
-        if( actions.data.action === 'digital-archive')
-            history.push(actions.data.routerLink);
+        if (actions.data.action === 'loanapps')
+          history.push(actions.data.routerLink);
+        if (actions.data.action === 'guarantees')
+          history.push(actions.data.routerLink);
+        if (actions.data.action === 'related-people')
+          history.push(actions.data.routerLink);
+        if (actions.data.action === 'tarjeton')
+          history.push(actions.data.routerLink);
+        if (actions.data.action === 'digital-archive')
+          history.push(actions.data.routerLink);
 
 
       }
     }
-  },[actions])
+  }, [actions])
 
 
-  useEffect( ()=>{
+  useEffect(() => {
 
-    async function loadOptions (){
-      if( geoActions) {
-        if( geoActions.data ){
-            if( geoActions.data.action === 'directions'){
-              await Browser.open({ url: `https://www.google.com/maps/dir/?api=1&destination=${clientDetail.coords[0]}%2C${clientDetail.coords[1]}` });
-            }
-            if( geoActions.data.action === 'map-view'){
-              await Browser.open({ url: `https://www.google.com/maps/@?api=1&map_action=map&zoom=18&center=${clientDetail.coords[0]}%2C${clientDetail.coords[1]}` });            
-            }
+    async function loadOptions() {
+      if (geoActions) {
+        if (geoActions.data) {
+          if (geoActions.data.action === 'directions') {
+            await Browser.open({ url: `https://www.google.com/maps/dir/?api=1&destination=${clientDetail.coords[0]}%2C${clientDetail.coords[1]}` });
+          }
+          if (geoActions.data.action === 'map-view') {
+            await Browser.open({ url: `https://www.google.com/maps/@?api=1&map_action=map&zoom=18&center=${clientDetail.coords[0]}%2C${clientDetail.coords[1]}` });
+          }
         }
       }
-        
+
     }
     loadOptions();
-  },[geoActions])
+  }, [geoActions])
 
-  useEffect( ()=>{
-    async function loadClientData(){
-      const data = await db.find( { selector: { couchdb_type: "CLIENT"}});
-      const foundClient:any = data.docs.find( (i:any) => i._id === clientSelected.id )
-      if( foundClient) {
-        const addrs = foundClient.address.find((i:any) => i.type ==="DOMICILIO")
+  useEffect(() => {
+    async function loadClientData() {
+      const data = await db.find({ selector: { couchdb_type: "CLIENT" } });
+      const foundClient: any = data.docs.find((i: any) => i._id === clientSelected.id)
+      if (foundClient) {
+        const addrs = foundClient.address.find((i: any) => i.type === "DOMICILIO")
         let identity_verification = !!foundClient.identity_verification ? foundClient.identity_verification.result : ''
-        setClientDetail( {
+        
+        setClientDetail({
           id_cliente: foundClient.id_cliente,
-          location: !!addrs ? `${addrs.colony[1]}, ${addrs.city[1]}`: '',
+          location: !!addrs ? `${addrs.colony[1]}, ${addrs.city[1]}` : '',
           coords: foundClient.coordinates,
           identity_result: identity_verification
-        } );
+        });
+
+        dispatchClientData({
+          type: "SET_CLIENT",
+          ...foundClient
+        });
+
+
       }
     }
 
     loadClientData();
 
-  },[clientSelected])
+  }, [clientSelected])
 
-  function onShowGeoActions () {
-    const buttons = [ 
-                      { text: 'Indicaciones', role:"destructive",data: { action: 'directions'}},
-                      { text: 'Ver Mapa', data: { action: "map-view" } }
-                    ]
-                    present(
-                      { header: 'Ubicacion',
-                        subHeader: 'Indique modo del mapa:',
-                        buttons,
-                          onDidDismiss: ({ detail }) => setGeoActions(detail),
-                        })
+  function onShowGeoActions() {
+    const buttons = [
+      { text: 'Indicaciones', role: "destructive", data: { action: 'directions' } },
+      { text: 'Ver Mapa', data: { action: "map-view" } }
+    ]
+    present(
+      {
+        header: 'Ubicacion',
+        subHeader: 'Indique modo del mapa:',
+        buttons,
+        onDidDismiss: ({ detail }) => setGeoActions(detail),
+      })
   }
 
 
@@ -163,11 +173,11 @@ const ClientsHome: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle><IonIcon icon={personAddOutline}  /> Clientes</IonTitle>
+          <IonTitle><IonIcon icon={personAddOutline} /> Clientes</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-      <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
@@ -179,32 +189,62 @@ const ClientsHome: React.FC = () => {
 
         <IonList className='ion-padding height-full'>
           <IonItemGroup>
-                <IonItemDivider><IonLabel>Clientes</IonLabel></IonItemDivider>
-                              
-                <SelectDropSearch
-                  dataList={clientSearchData}
-                  setSelectedItemFx={setClientSelected}
-                  currentItem={clientSelected}
-                  description={'Buscar...'}                  
-                />
-        </IonItemGroup>
+            <IonItemDivider><IonLabel>Clientes</IonLabel></IonItemDivider>
 
-        {!!clientSelected.id &&
-        <div>
-          <IonItem>
-            <IonLabel style={ clientDetail.id_cliente ? {}: { backgroundColor: "yellow"} }>Id Cliente: {clientDetail.id_cliente ? clientDetail.id_cliente : 'Sin Registro HF'} </IonLabel>
-          </IonItem>
-          <IonItem button onClick={onShowGeoActions}>
-            <IonIcon icon={locationOutline}></IonIcon> 
-            <IonLabel>{clientDetail.location} </IonLabel>
-          </IonItem>
-          <IonItem>
-            <IonLabel style={ clientDetail.identity_result === 'ok'? {}:{backgroundColor: 'yellow'}}>INE verificación: { clientDetail.identity_result === 'ok'? 'OK':'No verificada'} </IonLabel>
-          </IonItem>
-        </div>
-        }
-        
-        <IonButton onClick={onShowActions} color='success'>Acciones</IonButton>
+            <SelectDropSearch
+              dataList={clientSearchData}
+              setSelectedItemFx={setClientSelected}
+              currentItem={clientSelected}
+              description={'Buscar...'}
+            />
+          </IonItemGroup>
+
+          {!!clientSelected.id &&
+            <div>
+
+              <IonItem>
+                <IonLabel style={clientDetail.id_cliente ? {} : { backgroundColor: "yellow" }}>Id Cliente: {clientDetail.id_cliente ? clientDetail.id_cliente : 'Sin Registro HF'} </IonLabel>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Información personal</IonLabel>
+                <IonButton color="medium" routerLink={`/personaldata/edit/${clientSelected.id}`}><IonIcon icon={buildOutline}></IonIcon></IonButton>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Domicilio: {clientDetail.location} </IonLabel>
+                <IonButton color="medium" routerLink={`/address/edit-domicilio`}><IonIcon icon={homeOutline}></IonIcon></IonButton>
+                <IonButton color="medium" onClick={onShowGeoActions}><IonIcon icon={locationOutline}></IonIcon></IonButton>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Negocio: {clientDetail.location} </IonLabel>
+                <IonButton color="medium" routerLink={`/address/edit-negocio`}><IonIcon icon={businessOutline}></IonIcon></IonButton>
+                <IonButton color="medium" onClick={onShowGeoActions}><IonIcon icon={locationOutline}></IonIcon></IonButton>
+              </IonItem>
+
+              {/* <IonItem>
+                <IonLabel>Ingresos & Egresos</IonLabel>
+                <IonButton color="medium"><IonIcon icon={analyticsOutline}></IonIcon></IonButton>
+              </IonItem>
+
+              <IonItem>
+                <IonLabel>Créditos personales</IonLabel>
+                <IonButton color="medium"><IonIcon icon={cashOutline}></IonIcon></IonButton>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Reportes crediticios</IonLabel>
+                <IonButton color="medium"><IonIcon icon={informationCircleOutline}></IonIcon></IonButton>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Prendas & Garantías</IonLabel>
+                <IonButton color="medium"><IonIcon icon={bookmarkOutline}></IonIcon></IonButton>
+              </IonItem> */}
+              <IonItem>
+                <IonLabel style={clientDetail.identity_result === 'ok' ? {} : { backgroundColor: 'yellow' }}>INE verificación: {clientDetail.identity_result === 'ok' ? 'OK' : 'No verificada'} </IonLabel>
+              </IonItem>
+
+            </div>
+          }
+
+          <IonButton onClick={onShowActions} color='success'>Más Acciones</IonButton>
         </IonList>
 
       </IonContent>

@@ -78,7 +78,9 @@ export const MyProfile: React.FC<RouteComponentProps> = (props) => {
       setInfo(data); 
       
     }
-    setEnvs([`Host: ${process.env.REACT_APP_COUCHDB_HOST}`, `DB: ${process.env.REACT_APP_COUCHDB_NAME}`])
+    setEnvs([`CouchDB Host: ${process.env.REACT_APP_COUCHDB_HOST}`, 
+            `DB: ${process.env.REACT_APP_COUCHDB_NAME}`
+          ]);
     
     LoadAppInfo();
    },[])

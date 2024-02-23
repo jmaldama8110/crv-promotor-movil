@@ -47,6 +47,7 @@ import './pages/WhereToPay/WhereToPay.css';
 import { MyProfile } from "./pages/Home/MyProfile";
 import { useContext, useEffect } from "react";
 import { AppContext } from "./store/store";
+
 import { ClientsEdit } from "./pages/Clients/ClientsEdit";
 import { ClientsAdd } from "./pages/Clients/ClientsAdd";
 import { SocioEconomicsForm } from "./pages/Socioeconomics/SocioEconomicsForm";
@@ -89,6 +90,10 @@ import { ActionLog } from "./pages/ActionLog/ActionLog";
 import { DigitalArchive } from "./pages/Clients/DigitalArchive";
 import { LoanAppGroupAdd } from "./pages/LoanAppGroup/LoanAppGroupAdd";
 import { ClientsImport } from "./pages/Clients/ClientsImport";
+import { PersonalDataAdd } from "./pages/PersonalData/PersonalDataAdd";
+import { PersonalDataEdit } from "./pages/PersonalData/PersonalDataEdit";
+import {  AddressEditNegocio } from "./pages/Address/AddressEditNegocio";
+import {  AddressEditDomicilio } from "./pages/Address/AddressEditDomicilio";
 
 setupIonicReact();
 
@@ -140,6 +145,13 @@ const App: React.FC = () => {
             <Route exact path="/clients/socioeconomics/edit/:id" component={SocioEconomicsForm}></Route>
             <Route exact path="/clients/add" component={ClientsAdd}></Route>
             <Route exact path="/clients/add-from-hf" component={ClientsImport}></Route> 
+
+            <Route exact path="/personaldata/add" component={PersonalDataAdd}></Route>
+            <Route exact path="/personaldata/edit/:id" component={PersonalDataEdit}></Route>
+
+            <Route exact path="/address/edit-domicilio" component={AddressEditDomicilio}></Route>
+            <Route exact path="/address/edit-negocio" component={AddressEditNegocio}></Route>
+            
             
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>
             <Route exact path="/clients/:id/loanapps/add" component={LoanApplicationAdd}></Route>

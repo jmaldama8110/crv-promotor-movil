@@ -41,18 +41,18 @@ export type ActionsClientData = {
     business_phone: string;
     number_employees: string;
     loan_destination: [number,string];
-    income_sales_total: string;
-    income_partner: string;
-    income_job: string;
-    income_remittances: string;
-    income_other: string;
-    income_total: string;
-    expense_family: string;
-    expense_rent: string;
-    expense_business: string;
-    expense_debt: string;
-    expense_credit_cards: string;
-    expense_total: string;
+    income_sales_total: number;
+    income_partner: number;
+    income_job: number;
+    income_remittances: number;
+    income_other: number;
+    income_total: number;
+    expense_family: number;
+    expense_rent: number;
+    expense_business: number;
+    expense_debt: number;
+    expense_credit_cards: number;
+    expense_total: number;
     keeps_accounting_records: boolean;
     has_previous_experience: boolean;
     previous_loan_experience: string;
@@ -142,18 +142,18 @@ export interface ClientData {
       business_phone: string;
       number_employees: string;
       loan_destination: [number,string];
-      income_sales_total: string;
-      income_partner: string;
-      income_job: string;
-      income_remittances: string;
-      income_other: string;
-      income_total: string;
-      expense_family: string;
-      expense_rent: string;
-      expense_business: string;
-      expense_debt: string;
-      expense_credit_cards: string;
-      expense_total: string;
+      income_sales_total: number;
+      income_partner: number;
+      income_job: number;
+      income_remittances: number;
+      income_other: number;
+      income_total: number;
+      expense_family: number;
+      expense_rent: number;
+      expense_business: number;
+      expense_debt: number;
+      expense_credit_cards: number;
+      expense_total: number;
       keeps_accounting_records: boolean;
       has_previous_experience: boolean;
       previous_loan_experience: string;
@@ -229,18 +229,18 @@ export const clientDataDef: ClientData = {
     business_phone: '',
     number_employees: '',
     loan_destination: [0,''],
-    income_sales_total: '',
-    income_partner: '',
-    income_job: '',
-    income_remittances: '',
-    income_other: '',
-    income_total: '',
-    expense_family: '',
-    expense_rent: '',
-    expense_business: '',
-    expense_debt: '',
-    expense_credit_cards: '',
-    expense_total: '',
+    income_sales_total: 0,
+    income_partner: 0,
+    income_job: 0,
+    income_remittances: 0,
+    income_other: 0,
+    income_total: 0,
+    expense_family: 0,
+    expense_rent: 0,
+    expense_business: 0,
+    expense_debt: 0,
+    expense_credit_cards: 0,
+    expense_total: 0,
     keeps_accounting_records: false,
     has_previous_experience: false,
     previous_loan_experience: '',

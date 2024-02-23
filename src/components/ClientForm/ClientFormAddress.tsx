@@ -65,6 +65,7 @@ export const ClientFormAddress: React.FC<{addressType: "DOMICILIO"|"NEGOCIO", on
     if( clientData._id){ // loads up onyl when edit client mode (_id not empty)
       if( clientData.address.length ){ // populates Colonies component
           const homeAddress = clientData.address.find( (i:any) => ( i.type === addressType))
+         
           if( homeAddress ){
             setMyCp(homeAddress.post_code);
             populateColoniesByPostCode( homeAddress.post_code, setColonyCat);
