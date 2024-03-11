@@ -94,6 +94,8 @@ import { PersonalDataAdd } from "./pages/PersonalData/PersonalDataAdd";
 import { PersonalDataEdit } from "./pages/PersonalData/PersonalDataEdit";
 import {  AddressEditNegocio } from "./pages/Address/AddressEditNegocio";
 import {  AddressEditDomicilio } from "./pages/Address/AddressEditDomicilio";
+import { PersonConditionsEdit } from "./pages/PersonConditions/PersonConditionsEdit";
+import { IncomeExpensesEdit } from "./pages/IncomeExpenses/IncomeExpensesEdit";
 
 setupIonicReact();
 
@@ -106,6 +108,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (session.loading) {
       present({ message: session.loading_msg });
+
     } else {
       dismiss();
     }
@@ -116,6 +119,7 @@ const App: React.FC = () => {
       if (render) {
         /// what needs to be rendered once goes here!
         await couchDBSyncDownload();
+        
         render = false;      
       }
     };
@@ -151,6 +155,8 @@ const App: React.FC = () => {
 
             <Route exact path="/address/edit-domicilio" component={AddressEditDomicilio}></Route>
             <Route exact path="/address/edit-negocio" component={AddressEditNegocio}></Route>
+            <Route exact path="/person-conditions" component={PersonConditionsEdit}></Route>
+            <Route exact path="/income-expenses" component={IncomeExpensesEdit}></Route>
             
             
             <Route exact path="/clients/:id/loanapps" component={LoanApplicationHome}></Route>

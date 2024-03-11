@@ -17,8 +17,6 @@ export interface DocumentIdProperties {
   suburb_address: string;
 }
 
-
-
 export type ActionsClientData = {
   type: "SET_CLIENT";
   name: string;
@@ -33,13 +31,15 @@ export type ActionsClientData = {
   branch: [number, string];
   address: any[];
   business_data: {
+    bis_location: [number, string];  // new
     economic_activity: [string, string];
     profession: [string, string];
+    ocupation: [string, string];
     business_start_date: string;
     business_name: string;
     business_owned: boolean;
     business_phone: string;
-    number_employees: string;
+    number_employees: number;
     loan_destination: [number,string];
     income_sales_total: number;
     income_partner: number;
@@ -90,7 +90,6 @@ export type ActionsClientData = {
   loan_cycle: number;
   marital_status: [number, string];
   nationality: [number, string];
-  ocupation: [string, string];
   rfc: string;
   status: [number, string];
   household_floor: boolean;
@@ -98,10 +97,27 @@ export type ActionsClientData = {
   household_toilet: boolean;
   household_latrine: boolean;
   household_brick: boolean;
-  economic_dependants: string;
+  economic_dependants: number;
   internet_access: boolean;
-  prefered_social: string;
+
+  prefered_social: [number,string]; // new
   user_social: string;
+  rol_hogar: [number, string];  // new
+  has_disable: boolean;
+  speaks_dialect: boolean;
+  has_improved_income: boolean;
+
+  spld: {  // new
+    desempenia_funcion_publica_cargo: string,
+    desempenia_funcion_publica_dependencia: string,
+    familiar_desempenia_funcion_publica_cargo: string,
+    familiar_desempenia_funcion_publica_dependencia: string,
+    familiar_desempenia_funcion_publica_nombre: string,
+    familiar_desempenia_funcion_publica_paterno: string,
+    familiar_desempenia_funcion_publica_materno: string,
+    familiar_desempenia_funcion_publica_parentesco: string,
+    instrumento_monetario: [number, string],
+  }
 
   comment: string;
   identity_pics: any[];
@@ -134,13 +150,15 @@ export interface ClientData {
     branch: [number, string];
     address: any[];
     business_data: {
+      bis_location: [number, string];  // new
       economic_activity: [string, string];
       profession: [string, string];
+      ocupation: [string, string];
       business_start_date: string;
       business_name: string;
       business_owned: boolean;
       business_phone: string;
-      number_employees: string;
+      number_employees: number;
       loan_destination: [number,string];
       income_sales_total: number;
       income_partner: number;
@@ -191,7 +209,6 @@ export interface ClientData {
     loan_cycle: number;
     marital_status: [number, string];
     nationality: [number, string];
-    ocupation: [string, string];
     rfc: string;
     status: [number, string];
     household_floor: boolean;
@@ -199,12 +216,31 @@ export interface ClientData {
     household_toilet: boolean;
     household_latrine: boolean;
     household_brick: boolean;
-    economic_dependants: string;
+    economic_dependants: number;
     internet_access: boolean;
-    prefered_social: string;
+
+    prefered_social: [number,string]; // new
     user_social: string;
+    rol_hogar: [number, string];  // new
+    has_disable: boolean;
+    speaks_dialect: boolean;
+    has_improved_income: boolean;
+  
+    spld: {  // new
+      desempenia_funcion_publica_cargo: string,
+      desempenia_funcion_publica_dependencia: string,
+      familiar_desempenia_funcion_publica_cargo: string,
+      familiar_desempenia_funcion_publica_dependencia: string,
+      familiar_desempenia_funcion_publica_nombre: string,
+      familiar_desempenia_funcion_publica_paterno: string,
+      familiar_desempenia_funcion_publica_materno: string,
+      familiar_desempenia_funcion_publica_parentesco: string,
+      instrumento_monetario: [number, string],
+    }
+  
     comment: string;
     identity_pics: any[];
+    
     identity_verification: {
       uuid: string;
       status: "sent" | "pending";
@@ -220,14 +256,16 @@ export interface ClientData {
 export const clientDataDef: ClientData = {
   address:  [],
   branch: [0, ''],
-  business_data: { 
+  business_data: {
+    bis_location: [0,""],
     economic_activity: ['',''], 
     profession: ['',''],
+    ocupation: ["", ""],
     business_start_date: '',
     business_name: '',
     business_owned: false,
     business_phone: '',
-    number_employees: '',
+    number_employees: 0,
     loan_destination: [0,''],
     income_sales_total: 0,
     income_partner: 0,
@@ -282,7 +320,6 @@ export const clientDataDef: ClientData = {
   marital_status: [1, ''],
   name: "",
   nationality: [0, ''],
-  ocupation: ['', '0'],
   phones: [],
   identities: [],
   province_of_birth: ['',''],
@@ -290,15 +327,33 @@ export const clientDataDef: ClientData = {
   second_lastname: "",
   sex: [0, ''],
   status: [0, ''],
+  
   household_floor: false,
   household_roof: false,
   household_toilet: false,
   household_latrine: false,
   household_brick: false,
-  economic_dependants: '',
+  economic_dependants: 0,
   internet_access: false,
-  prefered_social: '',
+  prefered_social: [0,""],
+  rol_hogar: [0,""],
   user_social: '',
+  has_disable: false,
+  speaks_dialect: false,
+  has_improved_income: false,
+
+  spld: {
+    desempenia_funcion_publica_cargo: "",
+    desempenia_funcion_publica_dependencia: "",
+    familiar_desempenia_funcion_publica_cargo: "",
+    familiar_desempenia_funcion_publica_dependencia: "",
+    familiar_desempenia_funcion_publica_nombre: "",
+    familiar_desempenia_funcion_publica_paterno: "",
+    familiar_desempenia_funcion_publica_materno: "",
+    familiar_desempenia_funcion_publica_parentesco: "",
+    instrumento_monetario: [0, ""],
+    
+  },
   comment: '',
   identity_pics: [],
   identity_verification: {
@@ -350,8 +405,10 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         branch: action.branch,
         address: action.address,
         business_data: {
+          bis_location: action.business_data.bis_location,
           economic_activity: action.business_data.economic_activity,
           profession: action.business_data.profession,
+          ocupation: action.business_data.ocupation,
           business_start_date: action.business_data.business_start_date,
           business_name: action.business_data.business_name,
           business_owned: action.business_data.business_owned,
@@ -408,7 +465,6 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         loan_cycle: action.loan_cycle,
         marital_status: action.marital_status,
         nationality: action.nationality,
-        ocupation: action.ocupation,
         rfc: action.rfc,
         status: action.status,
         household_floor: action.household_floor,
@@ -420,7 +476,21 @@ export const ClientDataReducer = (state: State, action: ActionsClientData) => {
         internet_access: action.internet_access,
         prefered_social: action.prefered_social,
         user_social: action.user_social,
-      
+        rol_hogar: action.rol_hogar,
+        has_disable: action.has_disable,
+        speaks_dialect: action.speaks_dialect,
+        has_improved_income: action.has_improved_income,
+        spld: {
+          desempenia_funcion_publica_cargo: action.spld.desempenia_funcion_publica_cargo,
+          desempenia_funcion_publica_dependencia: action.spld.desempenia_funcion_publica_dependencia,
+          familiar_desempenia_funcion_publica_cargo: action.spld.familiar_desempenia_funcion_publica_cargo,
+          familiar_desempenia_funcion_publica_dependencia: action.spld.familiar_desempenia_funcion_publica_dependencia,
+          familiar_desempenia_funcion_publica_nombre: action.spld.familiar_desempenia_funcion_publica_nombre,
+          familiar_desempenia_funcion_publica_paterno: action.spld.familiar_desempenia_funcion_publica_paterno,
+          familiar_desempenia_funcion_publica_materno: action.spld.familiar_desempenia_funcion_publica_materno,
+          familiar_desempenia_funcion_publica_parentesco: action.spld.familiar_desempenia_funcion_publica_parentesco,
+          instrumento_monetario: action.spld.instrumento_monetario,
+         },
         comment: action.comment,
         identity_pics: action.identity_pics,
         identity_verification: action.identity_verification,

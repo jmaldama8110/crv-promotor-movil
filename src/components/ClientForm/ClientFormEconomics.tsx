@@ -2,23 +2,23 @@ import { IonCheckbox, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonS
 import { useContext, useEffect, useState } from "react";
 import { db } from "../../db";
 import { AppContext } from "../../store/store";
-import { SearchData, SelectDropSearch } from "../SelectDropSearch";
+import { SearchData } from "../SelectDropSearch";
 import { ButtonSlider } from "../SliderButtons";
 
 export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
-
-    const [ocupationCatalog, setOcupationCatalog ] = useState<SearchData[]>([]);
-    const [ocupation, setOcupation] = useState<SearchData>({ id: "", etiqueta: ""});
-    const [professionCatalog, setProfessionCatalog] = useState<SearchData[]>([]);
-    const [profession, setProfession] = useState<SearchData>({id: "",etiqueta: ""});
-  
-    const [economicActivityCatalog, setEconomicActivityCatalog] = useState<SearchData[]>([]);
-    const [economicActivity, setEconomicActivity] = useState<SearchData>({id: "",etiqueta: ""});
     
-    const [econocmicDeps, setEconomicDeps] = useState<string>('');
+    const [econocmicDeps, setEconomicDeps] = useState<number>(0);
     const [internetAccess, setInternetAccess] = useState<boolean>(false);
-    const [socialMediaPrefered, setSocialMediaPrefered] = useState<string>('');
+    const [hasDisable, setHasDisable] = useState<boolean>(false);
+    const [speaksDialect, setSpeaksDialect] = useState<boolean>(false);
+    const [hasImprovedIncome, setHasImprovedIncome] = useState<boolean>(false);
+    
+    const [socialMediaCat, setSocialMediaCat] = useState<any[]>([]);
+    const [socialMediaPrefered, setSocialMediaPrefered] = useState<number>(0);
     const [socialMediaUser, setSocialMediaUser] = useState<string>('');
+
+    const [rolHogar,setRolHogar] = useState<number>(0);
+    const [rolHogarCatalog, setRolHogarCatalog] = useState<any[]>([]);
     
     const [householdFloor, setHouseholdFloor] = useState<boolean>(false);
     const [householdRoof, setHouseholdRoof] = useState<boolean>(false);
@@ -35,32 +35,8 @@ export const ClientFormEconomics: React.FC< {onNext:any}> = ({onNext}) => {
 
 useEffect( ()=>{
   
-  
   db.createIndex( { index: { fields: ["couchdb_type", "name"]}} )
   .then( function (){
-    db.find({
-      selector: {
-        couchdb_type: 'CATALOG',
-        name: 'CATA_ocupacionPLD'
-      }
-    }).then( (data:any) =>{
-      
-      setOcupationCatalog(data.docs.map( (i:SearchData)=>({id: i.id, etiqueta: i.etiqueta}) ));
-      db.find({ 
-        selector: {
-          couchdb_type: 'CATALOG',
-          name: 'CATA_profesion'
-        }
-      }).then( (data:any)=>{
-        setProfessionCatalog( data.docs.map( (i:SearchData)=>({ id: i.id, etiqueta: i.etiqueta})));
-        db.find({
-          selector:{
-            couchdb_type: "CATALOG",
-            name: "CATA_ActividadEconomica"
-          }
-        }).then( (data:any) =>{
-          
-            setEconomicActivityCatalog( data.docs.map( (i:SearchData)=>({id: i.id, etiqueta: i.etiqueta})));
             db.find( {
               selector: {
                 couchdb_type: "CATALOG",
@@ -75,40 +51,57 @@ useEffect( ()=>{
                 }
               }).then( (data:any)=>{
                 
-                setMaritalStatusCatalog( data.docs.map( (i:SearchData)=>({ id: i.id, etiqueta: i.etiqueta})))
-                if( clientData._id){
-                  setMaritalStatus(clientData.marital_status[0]);
-                  setEducationLevel(clientData.education_level[0]);
-                  setOcupation({ id: clientData.ocupation[0], etiqueta: clientData.ocupation[1]})
-                  setProfession( { id: clientData.business_data.profession[0], etiqueta: clientData.business_data.profession[1]});
-                  setEconomicActivity( { id: clientData.business_data.economic_activity[0], etiqueta:clientData.business_data.economic_activity[1]})
-                  setHouseholdFloor( clientData.household_floor);
-                  setHouseholdRoof( clientData.household_roof );
-                  setHouseholdToilet( clientData.household_toilet);
-                  setHouseholdLatrine( clientData.household_latrine);
-                  setHouseholdBrick( clientData.household_brick);
-                  setEconomicDeps( clientData.economic_dependants);
-                  setInternetAccess( clientData.internet_access);
-                  setSocialMediaPrefered( clientData.prefered_social);
-                  setSocialMediaUser( clientData.user_social);
-                }
+                const newData = data.docs.map( (i:any)=>({ id: i.id, etiqueta: i.etiqueta, eliminar: i.eliminar })).filter( (x:any) => !x.eliminar )
+                setMaritalStatusCatalog(newData )
+                db.find( {
+                  selector: {
+                    couchdb_type: "CATALOG",
+                    name:"CATA_RedesSociales"
+                  }
+                }).then( (data:any) =>{
+                  setSocialMediaCat( data.docs.map( (i:any)=> ({id: i.id, etiqueta: i.nombre})));
+
+                  db.find({
+                    selector: {
+                      couchdb_type: "CATALOG",
+                      name: "CATA_rolHogar"
+                    }
+                  }).then( (data:any) => {
+                    setRolHogarCatalog( data.docs.map( (i:any) => ({ id:i.id, etiqueta: i.alias_1 })))
+                      if( clientData._id){
+                        setMaritalStatus(clientData.marital_status[0]);
+                        setEducationLevel(clientData.education_level[0]);
+                        setRolHogar( clientData.rol_hogar[0]);
+                        setHasDisable( clientData.has_disable);
+                        setHasImprovedIncome( clientData.has_improved_income);
+                        setSpeaksDialect( clientData.speaks_dialect);
+                        setHouseholdFloor( clientData.household_floor);
+                        setHouseholdRoof( clientData.household_roof );
+                        setHouseholdToilet( clientData.household_toilet);
+                        setHouseholdLatrine( clientData.household_latrine);
+                        setHouseholdBrick( clientData.household_brick);
+                        setEconomicDeps( clientData.economic_dependants);
+                        setInternetAccess( clientData.internet_access);
+                        setSocialMediaPrefered( clientData.prefered_social[0]);
+                        setSocialMediaUser( clientData.user_social);
+                      }
+                  })
+
+
+                })
+
               })
             })
         })
-      })
-    })
-  })
 
 },[clientData])
 
 
   function onSubmit(){
     const data = {
-      ocupation: [ocupation.id, ocupation.etiqueta],
-      profession: [profession.id,profession.etiqueta],
-      economic_activity: [economicActivity.id, economicActivity.etiqueta],
       education_level: [educationLevel, educationLevel ? educationLevelCatalog.find( (i)=> i.id == educationLevel)?.etiqueta: ''],
       marital_status: [maritalStatus,maritalStatus ? maritalStatusCatalog.find((i: any) => i.id == maritalStatus)!.etiqueta: "",],
+      rol_hogar: rolHogar ? [ rolHogar, rolHogarCatalog.find( (i:any) => ( i.id == rolHogar )).etiqueta] :[0,""],
       household_floor: householdFloor,
       household_roof: householdRoof,
       household_toilet: householdToilet,
@@ -116,8 +109,11 @@ useEffect( ()=>{
       housegold_brick: householdBrick,
       economic_dependants: econocmicDeps,
       internet_access: internetAccess,
-      prefered_social: socialMediaPrefered,
-      user_social: socialMediaUser
+      prefered_social: [socialMediaPrefered, socialMediaPrefered ? socialMediaCat.find( (i)=> i.id == socialMediaPrefered).etiqueta : ''],
+      user_social: socialMediaUser,
+      has_disable: hasDisable,
+      speaks_dialect: speaksDialect,
+      has_improved_income: hasImprovedIncome
     }
     onNext(data);
   }
@@ -163,30 +159,6 @@ useEffect( ()=>{
         ></IonCheckbox>
       </IonItem>
 
-
-      <IonItemDivider>
-        <IonLabel>Ocupacion, profesion y Actividad Economica</IonLabel>
-      </IonItemDivider>
-
-      <SelectDropSearch
-        dataList={ocupationCatalog}
-        setSelectedItemFx={setOcupation}
-        currentItem={ocupation}
-        description={"Ocupacion..."}
-      />
-      <SelectDropSearch
-        dataList={professionCatalog}
-        setSelectedItemFx={setProfession}
-        currentItem={profession}
-        description={"Profesion..."}
-      />
-      <SelectDropSearch
-        dataList={economicActivityCatalog}
-        setSelectedItemFx={setEconomicActivity}
-        currentItem={economicActivity}
-        description={"Actividad economica..."}
-      />
-
       <IonItem>
         <IonLabel position="stacked">Escolaridad</IonLabel>
         <IonSelect
@@ -222,11 +194,52 @@ useEffect( ()=>{
       <IonItem>
         <IonLabel position="stacked">Numero de Dependientes economicos</IonLabel>
         <IonInput
-          type="text"
+          type="number"
           value={econocmicDeps}
-          onIonChange={(e) => setEconomicDeps(e.detail.value!)}
+          onIonChange={(e) => setEconomicDeps(parseFloat(e.detail.value!))}
+          onIonBlur={(e) => !e.target.value ? setEconomicDeps(0) : ''}
         ></IonInput>
       </IonItem>
+      <IonItem>
+          <IonLabel position="stacked">Rol en el Hogar</IonLabel>
+          <IonSelect
+            value={rolHogar}
+            okText="Ok"
+            cancelText="Cancelar"
+            onIonChange={(e) => setRolHogar(e.detail.value)}
+          >
+            {
+              rolHogarCatalog.map( (i:any) => (
+              <IonSelectOption key={i.id} value={i.id}>
+                {i.etiqueta}
+              </IonSelectOption>))
+            }
+          </IonSelect>
+        </IonItem>
+
+        <IonItem>
+        <IonLabel>Ha mejorado sus ingresos?</IonLabel>
+        <IonCheckbox
+          checked={hasImprovedIncome}
+          onIonChange={(e) => setHasImprovedIncome(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+
+      <IonItem>
+        <IonLabel>Habla alguna lengua indigena?</IonLabel>
+        <IonCheckbox
+          checked={speaksDialect}
+          onIonChange={(e) => setSpeaksDialect(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Tiene habilidades diferentes?</IonLabel>
+        <IonCheckbox
+          checked={hasDisable}
+          onIonChange={(e) => setHasDisable(e.detail.checked)}
+        ></IonCheckbox>
+      </IonItem>
+
 
       <IonItem>
         <IonLabel>Acceso a Internet?</IonLabel>
@@ -235,6 +248,7 @@ useEffect( ()=>{
           onIonChange={(e) => setInternetAccess(e.detail.checked)}
         ></IonCheckbox>
       </IonItem>
+
       <IonItem>
           <IonLabel position="stacked">Red Social preferida</IonLabel>
           <IonSelect
@@ -243,9 +257,12 @@ useEffect( ()=>{
             cancelText="Cancelar"
             onIonChange={(e) => setSocialMediaPrefered(e.detail.value)}
           >
-            <IonSelectOption key={1} value='WHATSAPP'>WHATSAPP</IonSelectOption>
-            <IonSelectOption key={2} value='FACEBOOK'>FACEBOOK</IonSelectOption>
-            <IonSelectOption key={3} value='INSTAGRAM'>INSTAGRAM</IonSelectOption>
+            {
+              socialMediaCat.map( (i:any) => (
+              <IonSelectOption key={i.id} value={i.id}>
+                {i.etiqueta}
+              </IonSelectOption>))
+            }
           </IonSelect>
         </IonItem>
       <IonItem>
@@ -254,15 +271,12 @@ useEffect( ()=>{
       </IonItem>
   
       <p>
-        {!ocupation.id && <i style={{color: "gray"}}>* Ocupación es un dato obligatorio<br/></i>}
-        {!profession.id && <i style={{color: "gray"}}>* Profesión es un dato obligatorio<br/></i>}
-        {!economicActivity.id && <i style={{color: "gray"}}>* Actividad Económica es un dato obligatorio<br/></i>}
         {!educationLevel && <i style={{color: "gray"}}>* Escolaridad es un dato obligatorio<br/></i>}
         {!maritalStatus && <i style={{color: "gray"}}>* Estado civil es un dato obligatorio<br/></i>}
-        {!econocmicDeps && <i style={{color: "gray"}}>* Numero de dependientes es un dato obligatorio<br/></i>}
+        { (econocmicDeps < 0 || econocmicDeps > 99) && <i style={{color: "gray"}}>* Numero de dependientes es un dato obligatorio y un valor entre 0 y 99<br/></i>}
       </p>
           <ButtonSlider
-            disabled={ !ocupation.id || !profession.id || !economicActivity.id || !educationLevel || !maritalStatus || !econocmicDeps} 
+            disabled={ !educationLevel || !maritalStatus || (econocmicDeps < 0 || econocmicDeps > 99)} 
             onClick={onSubmit} 
             slideDirection={'F'} 
             color='medium' 

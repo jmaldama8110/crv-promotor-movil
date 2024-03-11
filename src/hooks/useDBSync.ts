@@ -30,7 +30,7 @@ export function useDBSync () {
           showToast("Ok, se guardo el registro!, pero sin conexion!",1500);
         });
         
-      }
+      } 
     
       catch(error){
         console.log(error);

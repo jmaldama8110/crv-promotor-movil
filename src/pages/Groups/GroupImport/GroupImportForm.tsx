@@ -41,6 +41,7 @@ interface GroupLoanApplicationHF {
   TipoCliente: string;
 }
 
+
 interface MemberHf extends GroupMember{
   isActive: boolean;
 }
@@ -66,14 +67,19 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
     TipoCliente: "",
   });
   const [group_data, setGroupData] = useState<GroupData>(groupDataDef);
+  
   const [loan_app, setLoanApp] = useState<LoanAppGroup>(loanAppGroupDef);
   const [contract, setContract] = useState<any>({});
   const [createNewLoanApp, setCreateNewLoanApp] = useState<boolean>(false);
 
+  const [products, setProducts] = useState<any[]>([]);
+  const [productId, setProductId] = useState<number>(0);
+
+  let render = true;
+
   async function onGroupSearchNext  (){
     setProgress(0.66);
     await onUpdateMembersList();
-
 
   }
 
@@ -96,12 +102,14 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
       const apiRes = await api.get(`/groups/hf/loanapps?branchId=${session.branch[0]}&applicationId=${selectLoan.idSolicitud}`);
       const apiRes2 = await api.get(`/clients/hf/getBalance?idCliente=${selectLoan.idCliente}`);
+
       if( apiRes2.data[0]){
         setContract( apiRes2.data[0])
       }
 
       setGroupData( apiRes.data.group_data);
-      setLoanApp( apiRes.data.loan_app);
+      setLoanApp( apiRes.data.loan_app );
+      
       const newMemberData: MemberHf[] = apiRes
                                         .data.
                                         loan_app.members.map( (mem:MemberHf, count:number)=>(
@@ -232,6 +240,44 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
     });
 }
 
+  useEffect( ()=>{
+      async function loadProducts (){
+
+        present({ message:"Cargando..."})
+        try{
+          api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
+          const apiRes = await api.get(`/products/hf?branchId=${session.branch[0]}&clientType=1`);
+          setProducts( apiRes.data.map( (i:any) => ({
+            GL_financeable: i.GL_financeable,
+            liquid_guarantee: i.liquid_guarantee,    
+            external_id: i.external_id,
+            min_amount: i.min_amount,
+            max_amount: i.max_amount,
+            step_amount: i.step_amount,
+            min_term: i.min_term,
+            max_term: i.max_term,
+            product_name: i.product_name,
+            term_types: i.allowed_term_type,
+            rate: i.rate,
+            tax: i.tax
+          })))
+          dismiss();
+        
+        }
+        catch(e){
+          alert('No fue posible cargar productos para esta sucursal, solicite ayuda')          
+          dismiss();
+        }
+      }
+      if( render ){
+        render = false;
+      loadProducts();
+      
+      
+      }
+
+  },[])
+
   useEffect(() => {
     if (loansList.length) {
       const defualtSelection = loansList.find(
@@ -254,6 +300,7 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
       }
     }
   }, [loansList]);
+
 
   const onVerifyMembersExist = async (data:MemberHf[])=>{      
     //// verifies and updates the list of members, whether ther are Register locally or not
@@ -372,13 +419,37 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
           buttons: ["OK"],
         });
       } else {
+        /// this part only in case you
+        
+        const productInfo: any = products.find( (i:any) => i.external_id == productId) ;
+        const loanAppNew = 
+                createNewLoanApp ? 
+                {
+                  ...loan_app,
+                  product: {
+                    GL_financeable: false,
+                    liquid_guarantee: 10,
+                    external_id: productInfo?.external_id,
+                    min_amount: productInfo?.min_amount,
+                    max_amount: productInfo?.max_amount,
+                    step_amount: productInfo?.step_amount,
+                    min_term: productInfo?.min_term,
+                    max_term: productInfo?.max_term,
+                    product_name: productInfo?.product_name,
+                    term_types: productInfo?.term_types,
+                    rate: productInfo?.rate,
+                    tax: productInfo?.tax,
+                  } 
+              } : loan_app
 
         const data ={
             selectLoan,
             groupName,
             groupExistId,
             group_data,
-            loan_app,
+            /// only when create a new Loan Application, has to convert and use the new Product ID
+            loan_app: loanAppNew,
+            ////
             membersHf,
             contract,
             createNewLoanApp
@@ -484,8 +555,15 @@ export const GroupImportImportForm: React.FC<{setProgress: React.Dispatch<React.
                 checked={createNewLoanApp}
                 onIonChange={async (e) =>setCreateNewLoanApp(e.detail.checked)} />
               </IonItem>
+              {createNewLoanApp &&
+              <IonItem>
+                <IonSelect value={productId} onIonChange={(e) => setProductId(e.target.value)}>
+                  { products.map( (i:any) => (
+                  <IonSelectOption key={i.external_id} value={i.external_id}>{i.product_name}</IonSelectOption>))}
+                </IonSelect>
+              </IonItem>}
               <p></p>
-            <ButtonSlider label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={()=>{}} />
+            <ButtonSlider label="Siguiente" color="medium" slideDirection="F" expand="block" onClick={()=>{}} disabled={(!productId && createNewLoanApp)} />
             <ButtonSlider label="Anterior" color="light" slideDirection="B" expand="block" onClick={() => {}} />
           </IonList>
 

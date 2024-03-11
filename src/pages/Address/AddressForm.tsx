@@ -4,14 +4,13 @@ import { db } from "../../db";
 import { AppContext } from "../../store/store";
 import { formatDate } from "../../utils/numberFormatter";
 
-
 interface ColonyType {
     _id: string;
     etiqueta: string;
     ciudad_localidad: string;
 }
 
-export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = ({ addressType }) => {
+export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO", onNext?: any }> = ({ addressType, onNext }) => {
 
     const { clientData, dispatchSession } = useContext(AppContext);
 
@@ -32,29 +31,33 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
     const [countryId, setCountryId] = useState<string>('');
     const [countryName, setCountryName] = useState<string>("");
 
-
     const [disabledSearch, setDisableSearch] = useState(true);
     const myColonySelectList = useRef<any>(null);
 
     const [address_line1, setAddressL1] = useState<string>("");
     const [addressLine1Error, setAddressL1Error] = useState<boolean>(false);
 
-    const [ext_number, setExtNumber] = useState('');
+    const [ext_number, setExtNumber] = useState<number>(0);
     const [extNumberError, setExtNumberError] = useState<boolean>(false);
 
     const [homeResideSinceDate, setHomeResideSinceDate] = useState("");
     const [homeResideSinceDateFormatted, setHomeResideSinceDateFormatted] = useState("");
 
 
-    const [int_number, setIntNumber] = useState('');
+    const [int_number, setIntNumber] = useState<number>(0);
     const [intNumberError, setIntNumberError] = useState<boolean>(false);
     const [street_reference, setStreetReference] = useState('');
     const [streetReferenceError, setStreetReferenceError] = useState<boolean>(false);
 
+    const [exterior_number, setExteriorNumber] = useState<string>('');
+    const [interior_number, setInteriorNumber] = useState<string>('');
+
     const [road, setRoad] = useState<number>(0);
     const [roadCatalog, setRoadCatalog] = useState<any[]>([]);
 
-    const [ownwerShipId, setOwnerShipId] = useState<string>('');
+    const [ownwerShipId, setOwnerShipId] = useState<number>(0);
+    const [ownwershipCatalog, setOwnershipCatalog] = useState<any[]>([]);
+
 
     let render = true;
 
@@ -93,9 +96,11 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
             setProvinceName('');
             setAddressL1('');
             setCountryName('');
-            setExtNumber('');
-            setOwnerShipId('');
-            setIntNumber('');
+            setExtNumber(0);
+            setExteriorNumber('')
+            setOwnerShipId(0);
+            setIntNumber(0);
+            setInteriorNumber('');
             setStreetReference('');
         }
 
@@ -148,6 +153,17 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
                     }
                 })
                 setRoadCatalog(dbData.docs.filter((i: any) => i.activo));
+
+                const cataSitacionCatalog = await db.find({
+                    selector: {
+                        couchdb_type: "CATALOG",
+                        name: "CATA_TipoDomicilio"
+                    }
+                });
+
+                const newData = cataSitacionCatalog.docs.map((i: any) => ({ id: i.id, etiqueta: i.etiqueta }))
+                setOwnershipCatalog(newData);
+
             }
             catch (e) {
 
@@ -162,8 +178,8 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
 
         if (clientData._id) { // loads up onyl when edit client mode (_id not empty)
             if (clientData.address.length) { // populates Colonies component
-                const addressItem = clientData.address.find( (i:any) => ( i.type === addressType))
-                
+                const addressItem = clientData.address.find((i: any) => (i.type === addressType))
+
                 if (addressItem) {
 
                     setPostCode(addressItem.post_code);
@@ -176,12 +192,14 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
                     setAddressL1(addressItem.address_line1);
                     setExtNumber(addressItem.ext_number);
                     setIntNumber(addressItem.int_number);
+                    setInteriorNumber(addressItem.interior_number);
+                    setExteriorNumber(addressItem.exterior_number);
                     setStreetReference(addressItem.street_reference);
-                    setOwnerShipId(addressItem.ownership_type);
+
                     setHomeResideSinceDate(addressItem.residence_since);
                     setHomeResideSinceDateFormatted(formatDate(addressItem.residence_since));
-                    
-                    if( addressType === 'NEGOCIO'){
+
+                    if (addressType === 'NEGOCIO') {
                         setBisAddressSame(addressItem.bis_address_same)
                     }
                 }
@@ -190,47 +208,93 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
         }
     }, [clientData])
 
-    useEffect( ()=> {
+    useEffect(() => {
         /// if we are editing, then set the current value of the roadType ID
-        if( clientData._id && roadCatalog.length ){
-          const homeAddress = clientData.address.find( (i:any) => ( i.type === addressType))
-          if( homeAddress && !!homeAddress.road )
-            if( homeAddress.road.length > 0 ){
-              setRoad( homeAddress.road[0]);
-            }
+        if (clientData._id && roadCatalog.length) {
+            const homeAddress = clientData.address.find((i: any) => (i.type === addressType))
+            if (homeAddress && !!homeAddress.road)
+                if (homeAddress.road.length > 0) {
+                    setRoad(homeAddress.road[0]);
+                }
         }
-        },[roadCatalog])
+    }, [roadCatalog])
+
+    useEffect(() => {
+
+        /// if we are editing, then set the current value of the roadType ID
+        if (clientData._id && ownwershipCatalog.length) {
+            const homeAddress = clientData.address.find((i: any) => (i.type === addressType))
+            if (homeAddress && !!homeAddress.ownership_type)
+                if (homeAddress.ownership_type.length > 0) {
+                    setOwnerShipId(homeAddress.ownership_type[0]);
+                }
+
+        }
+    }, [ownwershipCatalog])
+
+    function onSubmit() {
+
+        const roadItem = roadCatalog.find((x: any) => x.id == road)
+        const ownership_type = !ownwerShipId ? [0, ''] : [ownwerShipId, ownwershipCatalog.find((i: any) => i.id == ownwerShipId).etiqueta]
+        const colonyName = colonyId ? colonyCat.find((i: any) => i._id == colonyId) : ""
+        const data = {
+            type: addressType,
+            address_line1,
+            ext_number,
+            int_number,
+            exterior_number,
+            interior_number,
+            street_reference,
+            road: road ? [road, roadItem.descripcion] : [0, ''],
+            country: [countryId, countryName],
+            province: [provinceId, provinceName],
+            municipality: [municipalityId, municipalityName],
+            city: [cityId, cityName],
+            colony: [colonyId, colonyName],
+            post_code: postCode,
+            bis_address_same,
+            ownership_type,
+            residence_since: homeResideSinceDate
+        }
+
+        onNext(data);
+    }
+
 
     return (
         <IonList className='ion-padding'>
-        { addressType==='NEGOCIO' &&
-        <div> 
-          <IonItemDivider><IonLabel>¿Donde se ubica el negocio?</IonLabel></IonItemDivider>
-          <IonItem>
-            <IonLabel>Misma direccion anterior</IonLabel>
-            <IonCheckbox
-            checked={bis_address_same}
-            onIonChange={async (e) => {
-                setBisAddressSame(e.detail.checked);
+            {addressType === 'NEGOCIO' &&
+                <div>
+                    <IonItemDivider><IonLabel>¿Donde se ubica el negocio?</IonLabel></IonItemDivider>
+                    <IonItem>
+                        <IonLabel>Misma direccion anterior</IonLabel>
+                        <IonCheckbox
+                            checked={bis_address_same}
+                            onIonChange={async (e) => {
+                                setBisAddressSame(e.detail.checked);
 
-                if( e.detail.checked ){
-                  const addressPrev = clientData.address.find( (i:any)=> i.type === 'DOMICILIO');
-                  if( addressPrev ){
-                    setPostCode(addressPrev.post_code);
-                    // setColonyId( addressPrev.colony[0]);
-                    setAddressL1( addressPrev.address_line1);
+                                if (e.detail.checked) {
+                                    const addressPrev = clientData.address.find((i: any) => i.type === 'DOMICILIO');
+                                    if (addressPrev) {
+                                        setPostCode(addressPrev.post_code);
+                                        setAddressL1(addressPrev.address_line1);
 
-                    setExtNumber( addressPrev.ext_number);
-                    setIntNumber( addressPrev.int_number);
-                    setStreetReference( addressPrev.street_reference);
-                    setRoad( addressPrev.road[0]);
-                  }
-                }
-            }}
-            />
-          </IonItem>
-          </div>
-        }
+                                        setExtNumber(addressPrev.ext_number);
+                                        setExteriorNumber(addressPrev.exterior_number);
+                                        
+                                        setIntNumber(addressPrev.int_number);
+                                        setInteriorNumber(addressPrev.interior_number);
+                                        setStreetReference(addressPrev.street_reference);
+                                        setRoad(addressPrev.road[0]);
+                                        setOwnerShipId( addressPrev.ownership_type[0]);
+                                        
+                                    }
+                                }
+                            }}
+                        />
+                    </IonItem>
+                </div>
+            }
 
 
             <IonItemDivider><IonLabel>Buscar colonia / asentamiento</IonLabel></IonItemDivider>
@@ -279,12 +343,46 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
                     Numero Exterior
                 </IonLabel>
                 <IonInput
-                    type="text"
+                    type="number"
                     value={ext_number}
-                    onIonChange={(e) => setExtNumber(e.detail.value!)}
-                    onIonBlur={(e: any) => e.target.value ? setExtNumber(e.target.value.toUpperCase()) : setExtNumberError(true)}
+                    onIonChange={(e) => setExtNumber(parseFloat(e.detail.value!))}
+                    onIonBlur={(e: any) => e.target.value ? setExtNumber(parseFloat(e.target.value)) : setExtNumberError(true)}
                     onIonFocus={() => setExtNumberError(false)}
                     style={extNumberError ? { border: "1px dotted red" } : {}}
+                ></IonInput>
+            </IonItem>
+            <IonItem>
+                <IonInput
+                    type="text"
+                    value={exterior_number}
+                    onIonChange={(e) => setExteriorNumber(e.detail.value!)}
+                    onIonBlur={(e: any) => e.target.value ? setExteriorNumber(e.target.value) : setExtNumberError(true)}
+                    onIonFocus={() => setExtNumberError(false)}
+                    style={extNumberError ? { border: "1px dotted red" } : {}}
+                ></IonInput>
+
+            </IonItem>
+            <IonItem>
+                <IonLabel position="stacked">
+                    Numero Interior
+                </IonLabel>
+                <IonInput
+                    type="number"
+                    value={int_number}
+                    onIonChange={(e) => setIntNumber(parseFloat(e.detail.value!))}
+                    onIonBlur={(e: any) => e.target.value ? setIntNumber(parseFloat(e.target.value)) : setIntNumberError(true)}
+                    onIonFocus={() => setIntNumberError(false)}
+                    style={intNumberError ? { border: "1px dotted red" } : {}}
+                ></IonInput>
+            </IonItem>
+            <IonItem>
+                <IonInput
+                    type="text"
+                    value={interior_number}
+                    onIonChange={(e) => setInteriorNumber(e.detail.value!)}
+                    onIonBlur={(e: any) => e.target.value ? setInteriorNumber(e.target.value) : setIntNumberError(true)}
+                    onIonFocus={() => setIntNumberError(false)}
+                    style={intNumberError ? { border: "1px dotted red" } : {}}
                 ></IonInput>
             </IonItem>
 
@@ -298,9 +396,11 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
                         onIonChange={(e) => setOwnerShipId(e.detail.value)}
                         style={!ownwerShipId ? { border: "1px dotted red" } : {}}
                     >
-                        <IonSelectOption key={'household-conditions-select-id-01'} value='PROPIO'>Propia</IonSelectOption>
-                        <IonSelectOption key={'household-conditions-select-id-02'} value='RENTADO'>Rentada</IonSelectOption>
-                        <IonSelectOption key={'household-conditions-select-id-03'} value='FAMILIAR'>Familiar</IonSelectOption>
+                        {
+                            ownwershipCatalog.map((i: any) => (
+                                <IonSelectOption key={i.id} value={i.id}>{i.etiqueta}</IonSelectOption>
+                            ))
+                        }
                     </IonSelect>
                 </IonItem>
 
@@ -320,20 +420,6 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
                     </IonPopover>
                 </IonItem>
             </>}
-
-            <IonItem>
-                <IonLabel position="stacked">
-                    Numero Interior
-                </IonLabel>
-                <IonInput
-                    type="text"
-                    value={int_number}
-                    onIonChange={(e) => setIntNumber(e.detail.value!)}
-                    onIonBlur={(e: any) => e.target.value ? setIntNumber(e.target.value.toUpperCase()) : setIntNumberError(true)}
-                    onIonFocus={() => setIntNumberError(false)}
-                    style={intNumberError ? { border: "1px dotted red" } : {}}
-                ></IonInput>
-            </IonItem>
 
             <IonItem>
                 <IonLabel position="stacked">
@@ -368,33 +454,20 @@ export const AddressForm: React.FC<{ addressType: "DOMICILIO" | "NEGOCIO" }> = (
             </IonItem>
 
             <p>
-          { !postCode && <i style={{color: "gray"}}>* Usa el codigo postal para buscar la lista de asentamientos o colonias disponible<br/></i>}
-          { addressLine1Error && <i style={{color: "gray"}}>* Ingresa el nombre de la calle o vialidad<br/></i>}
-          { extNumberError && <i style={{color: "gray"}}>* Numero exterior obligatorio (si no tiene, debe colocar SN<br/></i>}
-          { intNumberError && <i style={{color: "gray"}}>* Numero interior obligatorio (si no tiene, debe colocar SN<br/></i>}
-          { streetReferenceError && <i style={{color: "gray"}}>* Referencia es obligatoria: (ej.: color de la fachada, porton, etc)<br/></i>}
-          { !road && <i style={{color: "gray"}}>* Tipo de vialidad es obligatoria<br/></i>}
-          {! homeResideSinceDate && addressType === 'DOMICILIO' && <i style={{color: "gray"}}>* Elige el mes/año desde que reside ahi la persona<br/></i> }
-          {! ownwerShipId && addressType === 'DOMICILIO' && <i style={{color: "gray"}}>* Vivienda Propia / Rentada es un datos obligatorio<br/></i> }
+                {!postCode && <i style={{ color: "gray" }}>* Usa el codigo postal para buscar la lista de asentamientos o colonias disponible<br /></i>}
+                {addressLine1Error && <i style={{ color: "gray" }}>* Ingresa el nombre de la calle o vialidad<br /></i>}
+                {extNumberError && <i style={{ color: "gray" }}>* Numero exterior obligatorio (si no tiene, debe colocar SN<br /></i>}
+                {intNumberError && <i style={{ color: "gray" }}>* Numero interior obligatorio (si no tiene, debe colocar SN<br /></i>}
+                {streetReferenceError && <i style={{ color: "gray" }}>* Referencia es obligatoria: (ej.: color de la fachada, porton, etc)<br /></i>}
+                {!road && <i style={{ color: "gray" }}>* Tipo de vialidad es obligatoria<br /></i>}
+                {!homeResideSinceDate && addressType === 'DOMICILIO' && <i style={{ color: "gray" }}>* Elige el mes/año desde que reside ahi la persona<br /></i>}
+                {!ownwerShipId && addressType === 'DOMICILIO' && <i style={{ color: "gray" }}>* Vivienda Propia / Rentada es un datos obligatorio<br /></i>}
 
 
-        </p>
-                <IonButton expand="block" disabled={ !postCode || addressLine1Error || extNumberError || intNumberError || streetReferenceError || !road || ( (!homeResideSinceDate || !ownwerShipId)&& addressType === 'DOMICILIO')}>Guardar</IonButton>
+            </p>
+            <IonButton expand="block" disabled={!postCode || addressLine1Error || extNumberError || intNumberError || streetReferenceError || !road || ((!homeResideSinceDate || !ownwerShipId) && addressType === 'DOMICILIO')}>Guardar</IonButton>
         </IonList>
     );
 
 }
-/*
-EN ESTA FUNCIONALIDAD NOS QUEDAMOS
 
-Nueva Dirección
-todos el formulario en blanco
-el input codigo postal, genera la lista
-de colonias
-
-Si el codigo postal cambia, la lista de colonias 
-se pone en blanco
-
-
-
-*/

@@ -24,6 +24,7 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
     const [second_lastname, setSecondLastName] = useState<string>("");
     const [clave_ine, setClaveIne] = useState<string>("");
     const [claveIneError, setClaveIneError] = useState<boolean>(false);
+    const [claveIneIsNew, setClaveIneIsNew] = useState<boolean>(false);
 
     const [numero_emisiones, setNumeroEmisiones] = useState<string>("");
     const [numeroEmisionesError, setNumeroEmisionesError] = useState<boolean>(false);
@@ -154,6 +155,14 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           }
         }
       }, [curp]);
+
+      useEffect(()=>{
+          const cveIne = new RegExp("^([A-Z]{6}[0-9]{8}[H,M][0-9]{3})$");
+          setClaveIneIsNew(false);
+          if( clave_ine.match( cveIne )){
+              setClaveIneError(false);
+          } else setClaveIneError(true);
+      },[clave_ine])
     
       async function onVerifyCurp (){
         showLoading({ message: 'Validando...' });
@@ -176,6 +185,36 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           dismissLoading();
         }
       }
+    
+      async function onVerifyClaveElector (){
+
+        showLoading({ message: 'Validando INE...' });
+        try {
+          api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;
+          const apiRes = await api.get(`/clients/exists?claveIne=${clave_ine}`);
+          const data = apiRes.data.ids;
+          if( data ){
+            alert(`OJO: La CLAVE Ine ${clave_ine} arrojo existente los siguientes: ${data.toString()}`);
+          }
+          else
+            setClaveIneIsNew(true);
+
+          dismissLoading();
+        }
+        catch(e){
+          alert("Ocurrio un error, puede que no tengas conexion con datos")
+          dismissLoading();
+        }
+      }
+
+      function onNumeroVerticalBlur (e:any){
+        if( e.target.value && 
+          e.target.value.length >=12 && e.target.value.length <=13 ){
+            setNumeroVerticalError(false)
+        } else 
+          setNumeroVerticalError(true);
+      }
+
 
     function onSubmit () {
       const newData = {
@@ -304,16 +343,20 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
 
         <IonItemDivider><IonLabel>Datos del INE</IonLabel></IonItemDivider>
         <IonItem>
-                  <IonLabel position="stacked">Clave INE</IonLabel>
-                  <IonInput type="text" value={clave_ine} onIonChange={(e=>setClaveIne(e.detail.value!))} onIonBlur={(e:any)=> e.target.value ? setClaveIne(e.target.value.toUpperCase()): setClaveIneError(true)} onIonFocus={ ()=> setClaveIneError(false)} style={ claveIneError ? {border: "1px dotted red"}: {} }></IonInput>
+                  <IonInput type="text" value={clave_ine} placeholder="CLAVE Elector" onIonChange={(e=>setClaveIne(e.detail.value!))} onIonBlur={(e:any)=> e.target.value ? setClaveIne(e.target.value.toUpperCase()): setClaveIneError(true)} onIonFocus={ ()=> setClaveIneError(false)} style={ claveIneError ? {border: "1px dotted red"}: {} }></IonInput>
+                  {clave_ine && <IonBadge color={ !claveIneError ? "success" : "warning"}>{!claveIneError ? "Ok" : "No valida"}</IonBadge>}
+                  { !clientData._id && !claveIneError && !claveIneIsNew &&<IonButton color='primary' onClick={onVerifyClaveElector}>Verificar</IonButton>}
         </IonItem>
         <IonItem>
                   <IonLabel position="stacked">Numero Emisiones</IonLabel>
-                  <IonInput type="text" value={numero_emisiones} onIonChange={(e=>setNumeroEmisiones(e.detail.value!))} onIonBlur={(e:any)=> e.target.value ? setNumeroEmisiones(e.target.value.toUpperCase()): setNumeroEmisionesError(true)} onIonFocus={ ()=> setNumeroEmisionesError(false)} style={ numeroEmisionesError ? { border: "1px dotted red"}: {} }></IonInput>
+                  <IonInput type="text" value={numero_emisiones} onIonChange={(e=>setNumeroEmisiones(e.detail.value!))} onIonBlur={(e:any)=> e.target.value && e.target.value.length == 2 ? setNumeroEmisiones(e.target.value.toUpperCase()): setNumeroEmisionesError(true)} onIonFocus={ ()=> setNumeroEmisionesError(false)} style={ numeroEmisionesError ? { border: "1px dotted red"}: {} }></IonInput>
         </IonItem>
         <IonItem>
                   <IonLabel position="stacked">Numero Vertical</IonLabel>
-                  <IonInput type="text" value={numero_vertical} onIonChange={(e=>setNumeroVertical(e.detail.value!))} onIonBlur={ (e:any)=>e.target.value ? setNumeroVertical(e.target.value.toUpperCase()): setNumeroVerticalError(true)} onIonFocus={ ()=> setNumeroVerticalError(false)} style={ numeroVerticalError? {border: "1px dotted red"}: {}}></IonInput>
+                  <IonInput type="text" value={numero_vertical} onIonChange={(e=>setNumeroVertical(e.detail.value!))} 
+                    onIonBlur={onNumeroVerticalBlur} 
+                    onIonFocus={ ()=> setNumeroVerticalError(false)} style={ numeroVerticalError? {border: "1px dotted red"}: {}}
+                  ></IonInput>
         </IonItem>
         <p>
           {nameError && <i style={{color: "gray"}}>* El nombre proporcionado es invalido <br/></i>}
@@ -322,15 +365,16 @@ export const ClientFormPersonalData: React.FC< {onNext?:any}> = ( {onNext} ) => 
           {!phoneStatus && <i style={{color: "gray"}}>* Numero de celular no valido, verifique que 10 digitos (999)9999999<br/></i>}
           
           {claveIneError && <i style={{color: "gray"}}>* Clave del IFE/INE invalida<br/></i>}
-          {numeroEmisionesError && <i style={{color: "gray"}}>* Numero de emisiones invalido<br/></i>}
-          {numeroVerticalError && <i style={{color: "gray"}}>* Numero vertical es invalido<br/></i>}
+          {numeroEmisionesError && <i style={{color: "gray"}}>* Numero de emisiones invalido (2 digitos, ej 00)<br/></i>}
+          {numeroVerticalError && <i style={{color: "gray"}}>* Numero vertical es invalido (12 o 13 posiciones)<br/></i>}
 
           {!countryOfBirth && <i style={{color: "gray"}}>* País de Nacimiento es obligatorio<br/></i>}
           {!nationality && <i style={{color: "gray"}}>* Nacionalidad es obligatorio<br/></i>}
           {!clientData._id && !curpIsNew && <i style={{color: "gray"}}>La CURP se debe verificar dando click el boton<br/></i> }
+          {!clientData._id && !claveIneIsNew && <i style={{color: "gray"}}>La CLAVE Elector se debe verificar dando click el boton<br/></i> }
 
         </p>
-        <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' disabled={ nameError || lastnameError || !curpStatus ||!phoneStatus || !countryOfBirth || !nationality}  />
+        <ButtonSlider color='medium' expand="block" onClick={onSubmit} label={'Siguiente'} slideDirection='F' disabled={ nameError || lastnameError || !curpStatus ||!phoneStatus || !countryOfBirth || !nationality || claveIneError || numeroVerticalError || numeroEmisionesError}  />
 
       </IonList>
     

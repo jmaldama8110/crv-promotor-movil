@@ -12,7 +12,7 @@ import {
 import { useHistory } from 'react-router';
 import { AppContext } from '../../store/store';
 import { useDBSync } from '../../hooks/useDBSync';
-import { analyticsOutline, bookmarkOutline, buildOutline, businessOutline, cashOutline, homeOutline, informationCircleOutline, locationOutline, personAddOutline } from 'ionicons/icons';
+import {  businessOutline, documentTextOutline, fitnessOutline, homeOutline, locationOutline, personAddOutline, statsChartOutline } from 'ionicons/icons';
 
 const ClientsHome: React.FC = () => {
 
@@ -56,7 +56,7 @@ const ClientsHome: React.FC = () => {
     const buttons = clientSelected.id ?
       [
         { text: 'Nuevo', role: "destructive", data: { action: 'add', routerLink: '/clients/add' } },
-        { text: 'Editar', data: { action: "edit", routerLink: `/personaldata/edit/${clientSelected.id}` } },
+        { text: 'Editar', data: { action: "edit", routerLink: `/clients/edit/${clientSelected.id}` } },
         { text: 'Solicitudes & Creditos', data: { action: 'loanapps', routerLink: `/clients/${clientSelected.id}/loanapps` } },
         { text: 'Estudio Socioeconomico', data: { action: 'edit-socioeconomics', routerLink: `/clients/socioeconomics/edit/${clientSelected.id}` } },
         { text: 'Prendas en Garantia', data: { action: 'guarantees', routerLink: `/clients/${clientSelected.id}/guarantees` } },
@@ -138,7 +138,7 @@ const ClientsHome: React.FC = () => {
           id_cliente: foundClient.id_cliente,
           location: !!addrs ? `${addrs.colony[1]}, ${addrs.city[1]}` : '',
           coords: foundClient.coordinates,
-          identity_result: identity_verification
+          identity_result: identity_verification  
         });
 
         dispatchClientData({
@@ -207,17 +207,25 @@ const ClientsHome: React.FC = () => {
               </IonItem>
               <IonItem>
                 <IonLabel>Información personal</IonLabel>
-                <IonButton color="medium" routerLink={`/personaldata/edit/${clientSelected.id}`}><IonIcon icon={buildOutline}></IonIcon></IonButton>
+                <IonButton color="medium" routerLink={`/personaldata/edit/${clientSelected.id}`}><IonIcon icon={documentTextOutline}></IonIcon></IonButton>
               </IonItem>
               <IonItem>
                 <IonLabel>Domicilio: {clientDetail.location} </IonLabel>
-                <IonButton color="medium" routerLink={`/address/edit-domicilio`}><IonIcon icon={homeOutline}></IonIcon></IonButton>
                 <IonButton color="medium" onClick={onShowGeoActions}><IonIcon icon={locationOutline}></IonIcon></IonButton>
+                <IonButton color="medium" routerLink={`/address/edit-domicilio`}><IonIcon icon={homeOutline}></IonIcon></IonButton>
               </IonItem>
               <IonItem>
                 <IonLabel>Negocio: {clientDetail.location} </IonLabel>
-                <IonButton color="medium" routerLink={`/address/edit-negocio`}><IonIcon icon={businessOutline}></IonIcon></IonButton>
                 <IonButton color="medium" onClick={onShowGeoActions}><IonIcon icon={locationOutline}></IonIcon></IonButton>
+                <IonButton color="medium" routerLink={`/address/edit-negocio`}><IonIcon icon={businessOutline}></IonIcon></IonButton>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Condiciones Socioeconómicas </IonLabel>
+                <IonButton color="medium" routerLink={`/person-conditions`}><IonIcon icon={fitnessOutline}></IonIcon></IonButton>
+              </IonItem>
+              <IonItem>
+                <IonLabel>Ingresos y Egresos</IonLabel>
+                <IonButton color="medium" routerLink={`/income-expenses`}><IonIcon icon={statsChartOutline}></IonIcon></IonButton>
               </IonItem>
 
               {/* <IonItem>

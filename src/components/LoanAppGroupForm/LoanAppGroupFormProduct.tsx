@@ -5,6 +5,7 @@ import { TermType } from "../../reducer/LoanAppGroupReducer";
 import { AppContext } from "../../store/store";
 import { formatLocalCurrency } from "../../utils/numberFormatter";
 import { ButtonSlider } from "../SliderButtons";
+import api from "../../api/api";
 
 export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) => {
 
@@ -23,34 +24,31 @@ export const LoanAppGroupFormProduct: React.FC< {onSubmit: any}> = ({onSubmit}) 
   const [productTermTypes, setProductTermTypes] = useState<TermType[]>([]);
   const [productRate, setProductRate] = useState('');
 
-  const { loanAppGroup } = useContext( AppContext );
+  const { loanAppGroup, session } = useContext( AppContext );
 
   let render = true;
   
   useEffect(() => {
-    if( render ){
-      render = false;
-        db.createIndex({
-          index: { fields: ["couchdb_type"] },
-        }).then(function () {
-          db.find({
-            selector: {
-              couchdb_type: "PRODUCT",
-            },
-          }).then((data: any) => {
-            const productForGroups = data.docs.filter(
-              (i: any) => 
-              ( i.external_id === 1 || 
-                i.external_id === 2 ||
-                i.external_id === 3 ||
-                i.external_id === 6 ||
-                i.external_id === 8 ||
-                i.external_id === 9 ||
-                i.external_id === 19 ))
-            setProductList(productForGroups);
-          });
-        });
+
+    async function LoadProducts(){
+
+      try {
+        api.defaults.headers.common["Authorization"] = `Bearer ${session.current_token}`;  
+        const apiRes = await api.get(`/products/hf?branchId=${session.branch[0]}&clientType=1`);
+        // const productsQuery = await db.find( { selector: {couchdb_type: "PRODUCT"}})
+        setProductList(apiRes.data)       
+      }
+      catch(e){
+        alert("No fue posible recuperar datos de productos, solicite ayuda");
+      }
+
     }
+
+    if( render) {
+      render = false;
+      LoadProducts();
+    }
+
   }, []);
 
   useEffect( ()=>{

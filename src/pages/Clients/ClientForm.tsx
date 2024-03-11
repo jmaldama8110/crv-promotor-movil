@@ -9,6 +9,7 @@ import { ClientFormBusinessData } from "../../components/ClientForm/ClientFormBu
 import { ClientFormSummary } from "../../components/ClientForm/ClientFormSummary";
 import { AppContext } from "../../store/store";
 import { Geolocation } from "@capacitor/geolocation";
+import { ClientFormSPLD } from "../../components/ClientForm/ClientFormSPLD";
 // import { ClientFormIdentity } from "../../components/ClientForm/ClientFormIdentity";
 // import { ClientFormComprobanteDomicilio } from "../../components/ClientForm/ClientFormComprobanteDomicilio";
 
@@ -44,26 +45,13 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
     })
   };
 
-  function onIdentityDocsNext( data:any) {
-    dispatchClientData({
-      type: 'SET_CLIENT',
-      ...clientData,
-      ...data
-    })
-  }
-
-  function onComprobanteDomicilioNext( data:any) {
-    dispatchClientData({
-      type: 'SET_CLIENT',
-      ...clientData,
-      ...data
-    })
-  }
 
 
   function updateAddressBasedOnType ( typeAdd: string, newAddressData:any){
     /// 1. determines whether a HOME address exists
+
     let newAddressList = clientData.address
+    
     const homeAddress = newAddressList.find( (i:any) => i.type=== typeAdd );
     ///2. if exists, update it
     if( homeAddress)
@@ -80,7 +68,7 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
   }
 
   function onHomeAddressNext( data:any){
-  
+    
     dispatchClientData({ 
       type:"SET_CLIENT",
       ...clientData,
@@ -90,13 +78,13 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
     
   }
   function onEconomicsData(data:any){
-
+    
     dispatchClientData({
       type: "SET_CLIENT",
       ...clientData,
-      ocupation: data.ocupation,
       marital_status: data.marital_status,
       education_level: data.education_level,
+      rol_hogar: data.rol_hogar,
       household_floor: data.household_floor,
       household_roof: data.household_roof,
       household_toilet: data.household_toilet,
@@ -106,19 +94,25 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       internet_access: data.internet_access,
       prefered_social: data.prefered_social,
       user_social: data.user_social,
-
+      has_disable: data.has_disable,
+      speaks_dialect: data.speaks_dialect,
+      has_improved_income: data.has_improved_income,
     })
 
   }
 
   function onBisDataNext( data:any){
+    
     dispatchClientData({
       type: "SET_CLIENT",
       ...clientData,
       rfc: data.rfc,
-      
       business_data: {
         ...clientData.business_data,
+        bis_location: data.bis_location,
+        profession: data.profession,
+        ocupation: data.ocupation,
+        economic_activity: data.economic_activity,
         business_start_date: data.business_start_date,
         business_name: data.business_name,
         business_owned: data.business_owned,
@@ -161,10 +155,18 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
   }
 
   function onBisAddressNext( data:any){
+    console.log(data)
     dispatchClientData({ 
       type:"SET_CLIENT",
       ...clientData,
       address: updateAddressBasedOnType('NEGOCIO',data)
+    })
+  }
+  function onSpldNext( data:any) {
+    dispatchClientData( {
+      type: "SET_CLIENT",
+      ...clientData,
+      spld: {...data.spld }     
     })
   }
 
@@ -179,18 +181,10 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       <SwiperSlide>
         <ClientFormPersonalData onNext={onPersonalDataNext} />
       </SwiperSlide>
-      
-      {/* <SwiperSlide>
-        <ClientFormIdentity onNext={onIdentityDocsNext} />
-      </SwiperSlide> */}
 
        <SwiperSlide>
         <ClientFormAddress addressType={"DOMICILIO"} onNext={onHomeAddressNext} />
       </SwiperSlide>
-
-      {/* <SwiperSlide>
-        <ClientFormComprobanteDomicilio onNext={onComprobanteDomicilioNext} />
-      </SwiperSlide> */}
      
       <SwiperSlide>
         <ClientFormEconomics onNext={onEconomicsData}  />
@@ -202,6 +196,9 @@ export const ClientForm: React.FC<ClientFormProps> = ({ onSubmit }) => {
       
       <SwiperSlide>
           <ClientFormAddress addressType={"NEGOCIO"} onNext={onBisAddressNext} />
+      </SwiperSlide>
+      <SwiperSlide>
+        <ClientFormSPLD onNext={onSpldNext}/>
       </SwiperSlide>
        
       <SwiperSlide>

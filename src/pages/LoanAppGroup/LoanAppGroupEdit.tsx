@@ -19,6 +19,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
       const itemId = props.match.url.split("/")[5];
       db.get(itemId)
         .then( (loan:any) => {
+
           dispatchLoanAppGroup( {type: 'SET_LOAN_APP_GROUP', ...loan})
           dispatchSession({ type: "SET_LOADING", loading_msg: '', loading: false });
         })
@@ -30,15 +31,12 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
     const onSave = async (data:any) => {
 
       const itemId = props.match.url.split("/")[5];
-      
-      dispatchSession( { type: "SET_LOADING", loading_msg: 'Guardando...',loading: true});
-      
+    
       db.get(itemId).then( async (loanInfo:any) => {
         return db.put({
           ...loanInfo,
           ...data,
           members: groupMemberList,
-          renovation: false,
           updated_at: Date.now()
         }).then( async function(){
 
@@ -59,6 +57,7 @@ export const LoanAppGroupEdit: React.FC<RouteComponentProps> = (props) => {
            dispatchSession( { type: "SET_LOADING", loading_msg: '',loading: false});
           props.history.goBack();
         })
+
       })
       
     }

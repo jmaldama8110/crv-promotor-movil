@@ -1,5 +1,7 @@
 import { GroupMember } from "./GroupMembersReducer";
 
+
+
 export type ActionsLoanAppGroup =
   | {
     type: "SET_LOAN_APP_GROUP";
@@ -7,7 +9,6 @@ export type ActionsLoanAppGroup =
     couchdb_type: 'LOANAPP_GROUP',
     apply_by: string;
     apply_at: string;
-    renovation: boolean;
     GL_financeable: boolean;
     id_cliente: number;
     id_solicitud: number;
@@ -31,9 +32,9 @@ export type ActionsLoanAppGroup =
     dropout: any[],
     status: [number, string],
     members: GroupMember [];
-    product: {
-      GL_financeable: boolean;
+    product :  {
       external_id: number;
+      GL_financeable: boolean;
       liquid_guarantee: number;
       min_amount: number;
       max_amount: number;
@@ -44,7 +45,7 @@ export type ActionsLoanAppGroup =
       term_types: any[];
       rate: number;
       tax: number;
-    }
+    },
     coordinates: [number, number];     
     } |
     {
@@ -63,7 +64,6 @@ export interface LoanAppGroup{
     couchdb_type: 'LOANAPP_GROUP',
     apply_by: string;
     apply_at: string;
-    renovation: boolean;
     GL_financeable: boolean;
     id_cliente: number;
     id_solicitud: number;
@@ -87,9 +87,9 @@ export interface LoanAppGroup{
     status: [number, string],
     dropout: any[],
     members: GroupMember [];
-    product: {
-      GL_financeable: boolean;
+    product:  {
       external_id: number;
+      GL_financeable: boolean;
       liquid_guarantee: number;
       min_amount: number;
       max_amount: number;
@@ -107,7 +107,6 @@ export interface LoanAppGroup{
 export const loanAppGroupDef: LoanAppGroup = {
   _id: "",
   couchdb_type: 'LOANAPP_GROUP',
-  renovation: true,
   GL_financeable: false,
   apply_by: "",
   apply_at: "",

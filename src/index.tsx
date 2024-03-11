@@ -12,7 +12,12 @@ const root = createRoot(container!);
 
 // Call the element loader after the platform has been bootstrapped
 defineCustomElements(window);
-
+/**
+ * 1. AGREGAR COMPONENTE DE DATOS SOCIOECONOMICOS
+ * 2. PERMITIR GUARDAR DE FORMA SEPARADA
+ * 3. 
+ * 
+ */
 
 root.render(
   <React.StrictMode>

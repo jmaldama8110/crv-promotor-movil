@@ -41,6 +41,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
           couchdb_type: 'LOANAPP_GROUP'
         }})
          const loan = data.docs.find((i:any) => i.id_solicitud == IdLoanApp  )
+         
         return !!loan;
      }
      catch(e){
@@ -55,6 +56,7 @@ export const GroupImport: React.FC<RouteComponentProps> = ({ history }) => {
          couchdb_type: 'CONTRACT'
        }})
         const contract = data.docs.find((i:any) => i.idContrato == IdContract  )
+
        return !!contract;
     }
     catch(e){
